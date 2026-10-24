@@ -27,8 +27,7 @@ private struct MenuBarLabel: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        Text(model.menuBarTitle)
-            .monospacedDigit()
+        Image(nsImage: MenuBarTitleImage.make(model.menuBarTitle))
             .accessibilityLabel(model.statusLine)
             #if DEBUG
             // `--show-settings` opens the Settings window at launch, for
