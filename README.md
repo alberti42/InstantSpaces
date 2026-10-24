@@ -51,6 +51,8 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
+- **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
+  Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
 - **Open at login**, through a login helper registered with macOS.
 - **Updates** through [Sparkle](https://sparkle-project.org): InstantSpaces
@@ -119,7 +121,7 @@ is not detected.
   automatically" in Settings → General to check only when you choose Check for
   Updates.
 - InstantSpaces collects no data.
-- Its settings (modifier keys, shortcut groups, swipes) are stored in
+- Its settings (modifier keys, shortcut groups, swipes, wrapping) are stored in
   `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
 
 ## How it works

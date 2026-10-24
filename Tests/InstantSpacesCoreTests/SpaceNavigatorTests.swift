@@ -19,6 +19,25 @@ private let spaces = [
     #expect(SpaceNavigator.neighbour(of: 610, in: spaces, direction: .right) == nil)
 }
 
+@Test func neighbourWrapsAroundWhenAsked() {
+    #expect(SpaceNavigator.neighbour(of: 610, in: spaces, direction: .right, wraps: true) == 1)
+    #expect(SpaceNavigator.neighbour(of: 1, in: spaces, direction: .left, wraps: true) == 610)
+    // Inside the list wrapping changes nothing.
+    #expect(SpaceNavigator.neighbour(of: 475, in: spaces, direction: .right, wraps: true) == 600)
+}
+
+/// Full-screen Spaces are part of the cycle, as for the arrows.
+@Test func wrapLandsOnAFullScreenSpaceAtTheEnd() {
+    let endingFullScreen = [Space(id: 1, type: 0), Space(id: 2, type: 0), Space(id: 9, type: 4)]
+    #expect(SpaceNavigator.neighbour(of: 1, in: endingFullScreen, direction: .left, wraps: true) == 9)
+}
+
+@Test func oneSpaceHasNoNeighbourEvenWhenWrapping() {
+    let single = [Space(id: 1, type: 0)]
+    #expect(SpaceNavigator.neighbour(of: 1, in: single, direction: .right, wraps: true) == nil)
+    #expect(SpaceNavigator.neighbour(of: 1, in: single, direction: .left, wraps: true) == nil)
+}
+
 @Test func neighbourOfUnknownSpaceIsNil() {
     #expect(SpaceNavigator.neighbour(of: 999, in: spaces, direction: .right) == nil)
 }

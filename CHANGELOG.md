@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Switch Spaces without the slide animation: ⌃← and ⌃→ move one Space, ⌃1 … ⌃9 go to a desktop. All shortcuts share the same modifier keys, which can be ⌃ (the default, as in macOS's Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘.
 - A Settings window (⌘,) for the modifier keys, the two shortcut groups (each can be switched off), Open at Login and updates. It lists the macOS shortcuts and other apps' shortcuts that use the same keys.
 - Trackpad swipes between Spaces switch instantly as well ("Switch instantly on trackpad swipes" in Settings, on by default). This needs Accessibility access, which InstantSpaces asks for on first launch; with the setting off, swipes keep macOS's animation and no access is needed.
+- "Wrap around from the last Space to the first" in Settings (off by default): moving past the last Space with the arrow keys or a swipe goes to the first, and back.
 - The menu bar shows the number of the current desktop.
 - The menu points to Settings when a shortcut conflicts with one of macOS or another app.
 - Open at Login, through a login helper registered with macOS.

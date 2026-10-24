@@ -11,6 +11,7 @@ final class AppModel: ObservableObject {
         static let arrowKeys = "arrowKeysEnabled"
         static let desktopKeys = "desktopKeysEnabled"
         static let swipes = "swipesEnabled"
+        static let wrapsAround = "wrapsAround"
         /// Set once InstantSpaces has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -40,6 +41,11 @@ final class AppModel: ObservableObject {
     @Published var swipesEnabled: Bool {
         didSet { UserDefaults.standard.set(swipesEnabled, forKey: Key.swipes); updateGestureTap() }
     }
+    /// Moving past the last Space goes to the first, and back; for the arrow
+    /// keys and swipes.
+    @Published var wrapsAround: Bool {
+        didSet { UserDefaults.standard.set(wrapsAround, forKey: Key.wrapsAround); switcher?.wrapsAround = wrapsAround }
+    }
 
     private let switcher: SpaceSwitcher?
     private let hotKeys = HotKeyCenter()
@@ -51,14 +57,17 @@ final class AppModel: ObservableObject {
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
-                                     Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true])
+                                     Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
+                                     Key.wrapsAround: false])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
         swipesEnabled = defaults.bool(forKey: Key.swipes)
+        wrapsAround = defaults.bool(forKey: Key.wrapsAround)
 
         do {
             switcher = try SpaceSwitcher()
+            switcher?.wrapsAround = wrapsAround
         } catch {
             switcher = nil
             loadError = "\(error)"

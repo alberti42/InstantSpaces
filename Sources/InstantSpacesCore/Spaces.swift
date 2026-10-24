@@ -57,11 +57,14 @@ public enum Direction: String, Sendable {
 /// Which Space a shortcut leads to. Pure functions, so they can be tested.
 public enum SpaceNavigator {
     /// The neighbour of `current` in `spaces`, counting full-screen Spaces as
-    /// macOS does. Nil at either end: macOS does not wrap around.
-    public static func neighbour(of current: UInt64, in spaces: [Space], direction: Direction) -> UInt64? {
-        guard let index = spaces.firstIndex(where: { $0.id == current }) else { return nil }
+    /// macOS does. At either end it is nil, as in macOS, or, with `wraps`, the
+    /// Space at the other end. A display with one Space has no neighbour.
+    public static func neighbour(of current: UInt64, in spaces: [Space], direction: Direction,
+                                 wraps: Bool = false) -> UInt64? {
+        guard let index = spaces.firstIndex(where: { $0.id == current }), spaces.count > 1 else { return nil }
         let target = direction == .left ? index - 1 : index + 1
-        return spaces.indices.contains(target) ? spaces[target].id : nil
+        if spaces.indices.contains(target) { return spaces[target].id }
+        return wraps ? spaces[(target + spaces.count) % spaces.count].id : nil
     }
 
     /// User desktop `number` (1-based). Full-screen Spaces are not numbered, as

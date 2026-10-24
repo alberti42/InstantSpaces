@@ -84,6 +84,26 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
         #expect(endServer.calls.isEmpty)
     }
 
+    @Test func moveWrapsAroundWhenSwitchedOn() {
+        let (atEnd, server, _) = makeSwitcher(current: 610)
+        atEnd.wrapsAround = true
+        #expect(atEnd.move(.right) == 1)
+        #expect(server.calls == [.show([1]), .setCurrent(1, display: "A"), .hide([475, 600, 610])])
+
+        let (atStart, _, _) = makeSwitcher(current: 1)
+        atStart.wrapsAround = true
+        #expect(atStart.move(.left) == 610)
+    }
+
+    /// Two quick presses past the end: the second counts from the wrapped Space.
+    @Test func quickPressesKeepWrapping() {
+        let (switcher, _, clock) = makeSwitcher(current: 610)
+        switcher.wrapsAround = true
+        #expect(switcher.move(.right) == 1)
+        clock.advance(0.1)
+        #expect(switcher.move(.right) == 475)
+    }
+
     @Test func moveIncludesFullScreenSpaces() {
         let (switcher, _, _) = makeSwitcher(current: 475)
         #expect(switcher.move(.right) == 600)

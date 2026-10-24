@@ -62,6 +62,13 @@ private struct ShortcutsPane: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                Toggle("Wrap around from the last Space to the first", isOn: $model.wrapsAround)
+            } footer: {
+                Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
+                    .foregroundStyle(.secondary)
+            }
+
             if !model.clashes.isEmpty || !model.hotKeyFailures.isEmpty {
                 Section {
                     ForEach(model.clashes, id: \.description) { clash in

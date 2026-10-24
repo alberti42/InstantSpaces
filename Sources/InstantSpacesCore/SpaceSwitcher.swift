@@ -12,6 +12,10 @@ public final class SpaceSwitcher {
     /// presses move one Space each.
     public static let pendingInterval: TimeInterval = 0.5
 
+    /// Whether `move` goes from the last Space to the first and back, instead
+    /// of stopping at the ends as macOS does.
+    public var wrapsAround = false
+
     private let server: SpaceServer
     private let now: () -> Date
     private var pending: (display: String, space: UInt64, time: Date)?
@@ -49,11 +53,12 @@ public final class SpaceSwitcher {
     }
 
     /// Moves one Space left or right on the active display. Returns the Space
-    /// switched to, or nil at either end.
+    /// switched to, or nil at either end unless `wrapsAround`.
     @discardableResult
     public func move(_ direction: Direction) -> UInt64? {
         guard let display = activeDisplay(),
-              let target = SpaceNavigator.neighbour(of: currentSpace(of: display), in: display.spaces, direction: direction)
+              let target = SpaceNavigator.neighbour(of: currentSpace(of: display), in: display.spaces,
+                                                    direction: direction, wraps: wrapsAround)
         else { return nil }
         switchTo(target, on: display)
         return target
