@@ -1,0 +1,30 @@
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+/// Loads SkyLight and WindowManagement and resolves the private symbols the
+/// other functions need. Call once before any of them. Returns NO and sets
+/// `error` to a description of the missing piece if one cannot be found.
+BOOL SLBLoad(NSString *_Nullable *_Nullable error);
+
+/// `SLSCopyManagedDisplaySpaces` for the main connection: one dictionary per
+/// display, with "Display Identifier", "Current Space" and "Spaces".
+NSArray<NSDictionary *> *_Nullable SLBCopyManagedDisplaySpaces(void);
+
+/// The identifier of the display that shows the active menu bar.
+NSString *_Nullable SLBActiveMenuBarDisplay(void);
+
+/// The current Space of the active display, as WindowServer reports it.
+uint64_t SLBActiveSpace(void);
+
+/// Bridged window-management operations. They are asynchronous; the return
+/// value only says whether the operation could be built and handed over.
+BOOL SLBShowSpaces(NSArray<NSNumber *> *spaces);
+BOOL SLBHideSpaces(NSArray<NSNumber *> *spaces);
+BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
+
+/// Whether a system symbolic hotkey (79 = Move left a space, 81 = Move right a
+/// space, 118… = Switch to Desktop 1…) is enabled.
+BOOL SLBSymbolicHotKeyEnabled(int hotKey);
+
+NS_ASSUME_NONNULL_END
