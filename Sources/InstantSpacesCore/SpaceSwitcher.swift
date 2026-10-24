@@ -1,5 +1,8 @@
 import Foundation
+import os
 import SkyLightBridge
+
+public let log = Logger(subsystem: "io.alberti42.InstantSpaces", category: "switch")
 
 public struct SkyLightUnavailable: Error, CustomStringConvertible {
     public let description: String
@@ -70,7 +73,9 @@ public final class SpaceSwitcher {
     /// hidden, not only the current one, so a wrong idea of the current Space
     /// cannot leave two Spaces on screen.
     public func switchTo(_ space: UInt64, on display: DisplaySpaces) {
-        guard space != currentSpace(of: display) else { return }
+        let current = currentSpace(of: display)
+        guard space != current else { return }
+        log.info("switch \(current, privacy: .public) -> \(space, privacy: .public) on \(display.identifier, privacy: .public)")
         let others = display.spaces.map(\.id).filter { $0 != space }
         SLBShowSpaces([NSNumber(value: space)])
         SLBSetCurrentSpace(display.identifier, space)
