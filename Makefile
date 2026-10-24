@@ -1,7 +1,7 @@
 # Build InstantSpaces with Swift Package Manager and assemble the app bundle.
 #
 #   make            debug build, no bundle
-#   make test       run the tests
+#   make test       run the Swift tests and the tests of the scripts in bin/
 #   make app        build/InstantSpaces.app with the login helper and Sparkle embedded
 #   make run        make app, then open it
 #   make clean
@@ -36,6 +36,7 @@ debug:
 
 test:
 	swift test
+	python3 -m unittest discover -s Tests/Scripts -p '*_test.py'
 
 app:
 	swift build -c release $(ARCH_FLAGS) --product InstantSpaces

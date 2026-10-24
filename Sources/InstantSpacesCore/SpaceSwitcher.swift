@@ -1,48 +1,48 @@
 import Foundation
 import os
-import SkyLightBridge
 
 public let log = Logger(subsystem: "io.alberti42.InstantSpaces", category: "switch")
 
-public struct SkyLightUnavailable: Error, CustomStringConvertible {
-    public let description: String
-}
-
-/// Switches Spaces with SkyLight's bridged operations: show the new Space, make
-/// it current, hide the others. WindowServer does this at once; the Dock, which
-/// draws the slide, is not involved.
+/// Switches Spaces: show the new Space, make it current, hide the others.
+/// WindowServer does this at once; the Dock, which draws the slide, is not involved.
 public final class SpaceSwitcher {
     /// The bridged operations are asynchronous, so WindowServer can still report
     /// the old Space right after a switch. For this long after a switch, the
     /// switcher counts from the Space it switched to, so that quick repeated
     /// presses move one Space each.
-    private static let pendingInterval: TimeInterval = 0.5
+    public static let pendingInterval: TimeInterval = 0.5
 
+    private let server: SpaceServer
+    private let now: () -> Date
     private var pending: (display: String, space: UInt64, time: Date)?
 
-    public init() throws {
-        var error: NSString?
-        guard SLBLoad(&error) else {
-            throw SkyLightUnavailable(description: (error as String?) ?? "SkyLight could not be loaded.")
-        }
+    /// `now` is the clock for the pending interval; tests pass their own.
+    public init(server: SpaceServer, now: @escaping () -> Date = Date.init) {
+        self.server = server
+        self.now = now
+    }
+
+    /// A switcher that talks to WindowServer through SkyLight.
+    public convenience init() throws {
+        try self.init(server: SkyLightServer())
     }
 
     public func displays() -> [DisplaySpaces] {
-        DisplaySpaces.parse((SLBCopyManagedDisplaySpaces() as? [[String: Any]]) ?? [])
+        DisplaySpaces.parse(server.managedDisplaySpaces())
     }
 
     /// The display with the active menu bar. When displays share Spaces,
     /// SkyLight lists a single display named "Main", which is returned instead.
     public func activeDisplay() -> DisplaySpaces? {
         let all = displays()
-        let active = SLBActiveMenuBarDisplay()
+        let active = server.activeMenuBarDisplay()
         return all.first { $0.identifier == active } ?? all.first
     }
 
     /// The current Space of `display`, taking a switch still in progress into account.
     public func currentSpace(of display: DisplaySpaces) -> UInt64 {
         if let pending, pending.display == display.identifier,
-           Date().timeIntervalSince(pending.time) < Self.pendingInterval {
+           now().timeIntervalSince(pending.time) < Self.pendingInterval {
             return pending.space
         }
         return display.current
@@ -76,16 +76,15 @@ public final class SpaceSwitcher {
         let current = currentSpace(of: display)
         guard space != current else { return }
         log.info("switch \(current, privacy: .public) -> \(space, privacy: .public) on \(display.identifier, privacy: .public)")
-        let others = display.spaces.map(\.id).filter { $0 != space }
-        SLBShowSpaces([NSNumber(value: space)])
-        SLBSetCurrentSpace(display.identifier, space)
-        SLBHideSpaces(others.map { NSNumber(value: $0) })
-        pending = (display.identifier, space, Date())
+        server.showSpaces([space])
+        server.setCurrentSpace(space, display: display.identifier)
+        server.hideSpaces(display.spaces.map(\.id).filter { $0 != space })
+        pending = (display.identifier, space, now())
     }
 
     /// Whether a system symbolic hotkey is enabled; see `SystemHotKey`.
     public func isSystemHotKeyEnabled(_ hotKey: SystemHotKey) -> Bool {
-        SLBSymbolicHotKeyEnabled(hotKey.rawValue)
+        server.isSymbolicHotKeyEnabled(hotKey.rawValue)
     }
 }
 

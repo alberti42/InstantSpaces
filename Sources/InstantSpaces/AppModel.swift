@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 import Combine
 import InstantSpacesCore
 
@@ -82,24 +81,15 @@ final class AppModel: ObservableObject {
         guard let switcher else { return }
         var failures: [HotKeyCenter.Failure] = []
 
-        if arrowKeysEnabled {
-            for (keyCode, direction, name) in [(kVK_LeftArrow, Direction.left, "⌃←"), (kVK_RightArrow, .right, "⌃→")] {
-                if let failure = hotKeys.register(name: name, keyCode: keyCode, modifiers: controlKey, action: { [weak self] in
-                    log.info("hotkey \(name, privacy: .public)")
-                    switcher.move(direction)
-                    self?.refresh()
-                }) { failures.append(failure) }
-            }
-        }
-        if desktopKeysEnabled {
-            for (index, keyCode) in digitKeyCodes.enumerated() {
-                let number = index + 1
-                if let failure = hotKeys.register(name: "⌃⌘\(number)", keyCode: keyCode, modifiers: controlKey | cmdKey, action: { [weak self] in
-                    log.info("hotkey ⌃⌘\(number, privacy: .public)")
-                    switcher.goToDesktop(number)
-                    self?.refresh()
-                }) { failures.append(failure) }
-            }
+        for binding in HotKeyBinding.enabled(arrowKeys: arrowKeysEnabled, desktopKeys: desktopKeysEnabled) {
+            if let failure = hotKeys.register(name: binding.name, keyCode: binding.keyCode, modifiers: binding.modifiers, action: { [weak self] in
+                log.info("hotkey \(binding.name, privacy: .public)")
+                switch binding.action {
+                case .move(let direction): switcher.move(direction)
+                case .desktop(let number): switcher.goToDesktop(number)
+                }
+                self?.refresh()
+            }) { failures.append(failure) }
         }
         hotKeyFailures = failures.map { "\($0.name) is taken (error \($0.status))" }
     }
@@ -108,20 +98,14 @@ final class AppModel: ObservableObject {
     /// report the old one, so the switcher's own record is used.
     private func refresh() {
         refreshSystemShortcuts()
-        guard let switcher, let display = switcher.activeDisplay() else {
-            menuBarTitle = "–"
-            statusLine = loadError ?? "No Spaces found."
-            return
-        }
-        let current = switcher.currentSpace(of: display)
-        let desktops = display.spaces.filter(\.isDesktop).count
-        if let number = SpaceNavigator.desktopNumber(of: current, in: display.spaces) {
-            menuBarTitle = "\(number)"
-            statusLine = "Desktop \(number) of \(desktops)"
+        let status: SpaceStatus
+        if let switcher, let display = switcher.activeDisplay() {
+            status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces)
         } else {
-            menuBarTitle = "F"
-            statusLine = "Full-screen Space"
+            status = .unavailable(loadError ?? "No Spaces found.")
         }
+        menuBarTitle = status.title
+        statusLine = status.line
     }
 
     private func refreshSystemShortcuts() {

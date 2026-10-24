@@ -4,13 +4,13 @@ import InstantSpacesCore
 /// Runs a command given on the command line and exits, for testing the switch
 /// without hotkeys. Returns without doing anything if there is no command.
 enum CommandLineMode {
-    static let usage = """
-        usage: InstantSpaces [--list | --move left|right | --desktop N | --space ID]
-        """
-
     static func runIfRequested(_ arguments: [String]) {
-        guard let command = arguments.first, command.hasPrefix("--") else { return }
-        let value = arguments.dropFirst().first
+        let command: Command
+        switch Command.parse(arguments) {
+        case .none: return
+        case .invalid: fail(Command.usage)
+        case .command(let parsed): command = parsed
+        }
 
         let switcher: SpaceSwitcher
         do {
@@ -20,22 +20,18 @@ enum CommandLineMode {
         }
 
         switch command {
-        case "--list":
+        case .list:
             list(switcher)
-        case "--move":
-            guard let value, let direction = Direction(rawValue: value) else { fail(usage) }
+        case .move(let direction):
             report(switcher.move(direction), switcher)
-        case "--desktop":
-            guard let value, let number = Int(value) else { fail(usage) }
+        case .desktop(let number):
             report(switcher.goToDesktop(number), switcher)
-        case "--space":
-            guard let value, let space = UInt64(value), let display = switcher.displays().first(where: {
-                $0.spaces.contains { $0.id == space }
-            }) else { fail("No display has Space \(value ?? "").") }
+        case .space(let space):
+            guard let display = switcher.displays().first(where: { $0.spaces.contains { $0.id == space } }) else {
+                fail("No display has Space \(space).")
+            }
             switcher.switchTo(space, on: display)
             report(space, switcher)
-        default:
-            fail(usage)
         }
         exit(0)
     }

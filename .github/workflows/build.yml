@@ -24,11 +24,10 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Run unit tests
-        run: swift test
-
-      - name: Test the scripts in bin/
-        run: python3 -m unittest discover -s Tests/Scripts -p '*_test.py'
+      # The Swift tests (Tests/InstantSpacesCoreTests) and the tests of the
+      # scripts in bin/ (Tests/Scripts), as `make test` runs them locally.
+      - name: Run the tests
+        run: make test
 
       - name: Build universal app
         run: make app ARCHS=universal
