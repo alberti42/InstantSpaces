@@ -11,7 +11,8 @@ public protocol SpaceServer: AnyObject {
     func showSpaces(_ spaces: [UInt64])
     func setCurrentSpace(_ space: UInt64, display: String)
     func hideSpaces(_ spaces: [UInt64])
-    func isSymbolicHotKeyEnabled(_ hotKey: Int32) -> Bool
+    /// The macOS keyboard shortcuts that are switched on.
+    func enabledSystemShortcuts() -> [SystemShortcut]
 }
 
 public struct SkyLightUnavailable: Error, CustomStringConvertible {
@@ -48,7 +49,11 @@ public final class SkyLightServer: SpaceServer {
         SLBHideSpaces(spaces.map { NSNumber(value: $0) })
     }
 
-    public func isSymbolicHotKeyEnabled(_ hotKey: Int32) -> Bool {
-        SLBSymbolicHotKeyEnabled(hotKey)
+    public func enabledSystemShortcuts() -> [SystemShortcut] {
+        SLBCopyEnabledSymbolicHotKeys().compactMap { entry in
+            guard let id = entry["id"]?.int32Value, let keyCode = entry["keyCode"]?.intValue,
+                  let flags = entry["flags"]?.uint64Value else { return nil }
+            return SystemShortcut(id: id, keyCode: keyCode, flags: flags)
+        }
     }
 }

@@ -7,6 +7,10 @@ public enum Command: Equatable, Sendable {
 
     public static let usage = "usage: InstantSpaces [--list | --move left|right | --desktop N | --space ID]"
 
+    /// Flags for the menu-bar app itself rather than a command (debug builds:
+    /// `--show-settings` opens the Settings window at launch).
+    public static let appFlags: Set<String> = ["--show-settings"]
+
     public enum ParseResult: Equatable, Sendable {
         /// No command: start the menu-bar app.
         case none
@@ -18,7 +22,7 @@ public enum Command: Equatable, Sendable {
     /// start with "--", such as the "-psn_…" that older systems pass to apps,
     /// mean no command.
     public static func parse(_ arguments: [String]) -> ParseResult {
-        guard let flag = arguments.first, flag.hasPrefix("--") else { return .none }
+        guard let flag = arguments.first, flag.hasPrefix("--"), !appFlags.contains(flag) else { return .none }
         let value = arguments.dropFirst().first
         switch flag {
         case "--list":

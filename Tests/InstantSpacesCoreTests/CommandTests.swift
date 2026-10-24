@@ -11,6 +11,10 @@ import Testing
         #expect(Command.parse(["-psn_0_12345"]) == .none)
     }
 
+    @Test func appFlagsStartTheApp() {
+        #expect(Command.parse(["--show-settings"]) == .none)
+    }
+
     @Test func parsesEachCommand() {
         #expect(Command.parse(["--list"]) == .command(.list))
         #expect(Command.parse(["--move", "left"]) == .command(.move(.left)))

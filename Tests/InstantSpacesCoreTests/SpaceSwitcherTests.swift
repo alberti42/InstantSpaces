@@ -12,7 +12,7 @@ private final class FakeServer: SpaceServer {
 
     var displays: [[String: Any]]
     var activeDisplay: String?
-    var enabledHotKeys: Set<Int32> = []
+    var shortcuts: [SystemShortcut] = []
     private(set) var calls: [Call] = []
 
     init(displays: [[String: Any]], activeDisplay: String?) {
@@ -25,7 +25,7 @@ private final class FakeServer: SpaceServer {
     func showSpaces(_ spaces: [UInt64]) { calls.append(.show(spaces)) }
     func setCurrentSpace(_ space: UInt64, display: String) { calls.append(.setCurrent(space, display: display)) }
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
-    func isSymbolicHotKeyEnabled(_ hotKey: Int32) -> Bool { enabledHotKeys.contains(hotKey) }
+    func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
 }
 
 /// A clock that only moves when the test moves it.
@@ -148,11 +148,11 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
         #expect(server.calls.isEmpty)
     }
 
-    @Test func systemHotKeysAreReadFromTheServer() {
+    @Test func clashesAreCheckedAgainstTheServersShortcuts() {
         let (switcher, server, _) = makeSwitcher()
-        #expect(!switcher.isSystemHotKeyEnabled(.moveLeftASpace))
-        server.enabledHotKeys = [79]
-        #expect(switcher.isSystemHotKeyEnabled(.moveLeftASpace))
-        #expect(!switcher.isSystemHotKeyEnabled(.moveRightASpace))
+        let bindings = HotKeyBinding.arrowKeys(.control)
+        #expect(switcher.clashes(with: bindings).isEmpty)
+        server.shortcuts = [SystemShortcut(id: 79, keyCode: bindings[0].keyCode, flags: 0x840000)]
+        #expect(switcher.clashes(with: bindings).map(\.binding) == [bindings[0]])
     }
 }

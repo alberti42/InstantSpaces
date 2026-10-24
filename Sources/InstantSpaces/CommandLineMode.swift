@@ -46,8 +46,9 @@ enum CommandLineMode {
                 print("  \(space.id == display.current ? "*" : " ") \(space.id)\t\(name)")
             }
         }
-        for hotKey in SystemHotKey.allCases {
-            print("system shortcut \(hotKey): \(switcher.isSystemHotKeyEnabled(hotKey) ? "on" : "off")")
+        for prefix in ModifierPrefix.allCases {
+            let clashes = switcher.clashes(with: HotKeyBinding.enabled(prefix: prefix, arrowKeys: true, desktopKeys: true))
+            print("\(prefix.symbols): \(clashes.isEmpty ? "no clash with macOS shortcuts" : clashes.map(\.description).joined(separator: "; "))")
         }
     }
 

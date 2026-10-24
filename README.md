@@ -34,11 +34,17 @@ appears at once.
 | Shortcut | Action |
 |---|---|
 | ⌃← / ⌃→ | Move one Space left / right |
-| ⌃⌘1 … ⌃⌘9 | Go to desktop 1 … 9 |
+| ⌃1 … ⌃9 | Go to desktop 1 … 9 |
+
+All shortcuts share the same modifier keys: ⌃ (the default, as in macOS's own
+Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Settings.
 
 - **Menu-bar item** showing the number of the current desktop, or "F" on a
   full-screen Space.
-- **Two shortcut groups** (arrows and numbers), each of which can be switched off in the menu.
+- **Settings window** (Settings… in the menu, ⌘,): the modifier keys, the two
+  shortcut groups (arrows and numbers), each of which can be switched off, Open
+  at Login and updates. It lists the shortcuts that macOS or another app
+  already uses with the same keys.
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
@@ -67,19 +73,22 @@ Not yet tested:
 1. Build the app (see [Building from source](#building-from-source)) and move
    `build/InstantSpaces.app` to the Applications folder.
 2. Open it. Its number appears in the menu bar.
-3. Turn off macOS's own ⌃← and ⌃→ shortcuts (next section).
-4. To start InstantSpaces when you log in, choose Open at Login in its menu.
+3. Turn off macOS's shortcuts that use the same keys (next section).
+4. To start InstantSpaces when you log in, turn on Open at Login in its Settings.
 
 ## Turn off the system shortcuts
 
 macOS binds ⌃← and ⌃→ to its own animated switch by default. If both
-InstantSpaces and macOS react to the same key, both switch. Turn them off in
-System Settings → Keyboard → Keyboard Shortcuts → Mission Control: untick "Move
-left a space" and "Move right a space". The InstantSpaces menu reports when they
-are still on and has a button that opens Keyboard settings.
+InstantSpaces and macOS react to the same key, both switch. With the default
+modifier ⌃, turn them off in System Settings → Keyboard → Keyboard Shortcuts →
+Mission Control: untick "Move left a space" and "Move right a space", and
+"Switch to Desktop 1 … 9" if you have turned those on (they are off by default).
 
-"Switch to Desktop 1 … 9" (⌃1 … ⌃9) is off by default in macOS and does not
-conflict with ⌃⌘1 … ⌃⌘9.
+The Settings window of InstantSpaces lists every macOS shortcut that uses the
+same keys as one of its own, and has a button that opens Keyboard settings.
+SkyLight reports these shortcuts by number only, so InstantSpaces names the
+Mission Control ones and shows the number for the others. Alternatively, choose
+other modifier keys.
 
 ## Permissions and privacy
 
@@ -89,10 +98,11 @@ conflict with ⌃⌘1 … ⌃⌘9.
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
   you install an update, `InstantSpaces.zip` from GitHub Releases. Sparkle sends
   no system profile; the requests carry the names and versions of InstantSpaces
-  and Sparkle in the User-Agent header. Turn off "Check for Updates
-  Automatically" in the menu to check only when you choose Check for Updates.
+  and Sparkle in the User-Agent header. Turn off "Check for updates
+  automatically" in Settings → General to check only when you choose Check for
+  Updates.
 - InstantSpaces collects no data.
-- Its settings are stored in
+- Its settings (modifier keys, shortcut groups) are stored in
   `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
 
 ## How it works

@@ -11,16 +11,40 @@ struct InstantSpacesApp: App {
         MenuBarExtra {
             MenuContent(model: model)
         } label: {
-            Text(model.menuBarTitle)
-                .monospacedDigit()
-                .accessibilityLabel(model.statusLine)
+            MenuBarLabel(model: model)
         }
         .menuBarExtraStyle(.menu)
+
+        Settings {
+            SettingsView(model: model)
+        }
+    }
+}
+
+/// The desktop number in the menu bar.
+private struct MenuBarLabel: View {
+    @ObservedObject var model: AppModel
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        Text(model.menuBarTitle)
+            .monospacedDigit()
+            .accessibilityLabel(model.statusLine)
+            #if DEBUG
+            // `--show-settings` opens the Settings window at launch, for
+            // screenshots and checks without clicking the menu.
+            .task {
+                guard CommandLine.arguments.contains("--show-settings") else { return }
+                NSApp.activate()
+                openSettings()
+            }
+            #endif
     }
 }
 
 private struct MenuContent: View {
     @ObservedObject var model: AppModel
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         if let loadError = model.loadError {
@@ -28,23 +52,19 @@ private struct MenuContent: View {
         } else {
             Text(model.statusLine)
         }
-        Divider()
-
-        Toggle("⌃← ⌃→ Move between Spaces", isOn: $model.arrowKeysEnabled)
-        Toggle("⌃⌘1–9 Go to a desktop", isOn: $model.desktopKeysEnabled)
-        if model.arrowKeysEnabled && model.systemShortcutsOn {
-            Text("macOS also switches on ⌃← ⌃→, with the animation.")
-            Button("Turn Off in Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
+        if model.needsAttention {
+            Text("Some shortcuts conflict; see Settings.")
         }
-        ForEach(model.hotKeyFailures, id: \.self) { Text($0) }
         Divider()
 
-        Toggle("Open at Login", isOn: Binding(
-            get: { model.opensAtLogin },
-            set: { model.setOpensAtLogin($0) }))
-        Divider()
-
-        UpdateItems(updater: Updater.shared)
+        // An app without a Dock icon opens its windows behind the active app
+        // unless it activates itself first.
+        Button("Settings…") {
+            NSApp.activate()
+            openSettings()
+        }
+        .keyboardShortcut(",")
+        UpdateItem(updater: Updater.shared)
         Divider()
 
         Button("Quit InstantSpaces") { NSApp.terminate(nil) }
@@ -52,9 +72,9 @@ private struct MenuContent: View {
     }
 }
 
-/// Sparkle's menu items (`Updater`). An unbundled build has no updater.
-private struct UpdateItems: View {
-    @Bindable var updater: Updater
+/// Sparkle's menu item (`Updater`). An unbundled build has no updater.
+private struct UpdateItem: View {
+    var updater: Updater
 
     var body: some View {
         if updater.isAvailable {
@@ -62,9 +82,6 @@ private struct UpdateItems: View {
                 updater.checkForUpdates()
             }
             .disabled(!updater.canCheckForUpdates)
-            Toggle("Check for Updates Automatically", isOn: $updater.automaticallyChecks)
-        } else {
-            Text("Updates are only available in InstantSpaces.app.")
         }
     }
 }

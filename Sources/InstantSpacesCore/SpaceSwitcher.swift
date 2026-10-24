@@ -82,14 +82,8 @@ public final class SpaceSwitcher {
         pending = (display.identifier, space, now())
     }
 
-    /// Whether a system symbolic hotkey is enabled; see `SystemHotKey`.
-    public func isSystemHotKeyEnabled(_ hotKey: SystemHotKey) -> Bool {
-        server.isSymbolicHotKeyEnabled(hotKey.rawValue)
+    /// The bindings among `bindings` that a switched-on macOS shortcut also uses.
+    public func clashes(with bindings: [HotKeyBinding]) -> [ShortcutClash] {
+        ShortcutClash.find(bindings, in: server.enabledSystemShortcuts())
     }
-}
-
-/// System shortcuts that switch Spaces with the Dock's animation.
-public enum SystemHotKey: Int32, CaseIterable, Sendable {
-    case moveLeftASpace = 79
-    case moveRightASpace = 81
 }

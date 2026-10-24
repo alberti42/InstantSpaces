@@ -2,11 +2,12 @@ import AppKit
 import Combine
 import InstantSpacesCore
 
-/// State behind the menu: the current desktop, the shortcut settings and the
-/// login item. Owns the switcher and the hotkeys.
+/// State behind the menu and the Settings window: the current desktop, the
+/// shortcut settings and the login item. Owns the switcher and the hotkeys.
 @MainActor
 final class AppModel: ObservableObject {
     private enum Key {
+        static let modifierPrefix = "modifierPrefix"
         static let arrowKeys = "arrowKeysEnabled"
         static let desktopKeys = "desktopKeysEnabled"
     }
@@ -14,12 +15,16 @@ final class AppModel: ObservableObject {
     /// Menu-bar text: the desktop number, or "F" on a full-screen Space.
     @Published private(set) var menuBarTitle = "–"
     @Published private(set) var statusLine = ""
-    /// Whether macOS's own Ctrl-arrow shortcut, which switches with the slide, is on.
-    @Published private(set) var systemShortcutsOn = false
+    /// Bindings that a switched-on macOS shortcut also uses.
+    @Published private(set) var clashes: [ShortcutClash] = []
+    /// Bindings that `RegisterEventHotKey` refused, usually because another app holds them.
     @Published private(set) var hotKeyFailures: [String] = []
     @Published private(set) var loadError: String?
     @Published private(set) var opensAtLogin = LoginItem.isEnabled
 
+    @Published var modifierPrefix: ModifierPrefix {
+        didSet { UserDefaults.standard.set(modifierPrefix.rawValue, forKey: Key.modifierPrefix); registerHotKeys() }
+    }
     @Published var arrowKeysEnabled: Bool {
         didSet { UserDefaults.standard.set(arrowKeysEnabled, forKey: Key.arrowKeys); registerHotKeys() }
     }
@@ -33,9 +38,12 @@ final class AppModel: ObservableObject {
     private var refreshTimer: Timer?
 
     init() {
-        UserDefaults.standard.register(defaults: [Key.arrowKeys: true, Key.desktopKeys: true])
-        arrowKeysEnabled = UserDefaults.standard.bool(forKey: Key.arrowKeys)
-        desktopKeysEnabled = UserDefaults.standard.bool(forKey: Key.desktopKeys)
+        let defaults = UserDefaults.standard
+        defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
+                                     Key.arrowKeys: true, Key.desktopKeys: true])
+        modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
+        arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
+        desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
 
         do {
             switcher = try SpaceSwitcher()
@@ -54,11 +62,19 @@ final class AppModel: ObservableObject {
             log.info("activeSpaceDidChange")
             MainActor.assumeIsolated { self?.refresh() }
         })
-        // The system shortcut can be switched on or off in System Settings at any time.
+        // macOS shortcuts can be switched on or off in System Settings at any time.
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refreshSystemShortcuts() }
+            MainActor.assumeIsolated { self?.refreshClashes() }
         }
     }
+
+    /// The shortcuts in use, as the Settings window lists them.
+    var enabledBindings: [HotKeyBinding] {
+        HotKeyBinding.enabled(prefix: modifierPrefix, arrowKeys: arrowKeysEnabled, desktopKeys: desktopKeysEnabled)
+    }
+
+    /// Whether the menu should point to the Settings window.
+    var needsAttention: Bool { !clashes.isEmpty || !hotKeyFailures.isEmpty }
 
     func setOpensAtLogin(_ enabled: Bool) {
         do {
@@ -81,7 +97,7 @@ final class AppModel: ObservableObject {
         guard let switcher else { return }
         var failures: [HotKeyCenter.Failure] = []
 
-        for binding in HotKeyBinding.enabled(arrowKeys: arrowKeysEnabled, desktopKeys: desktopKeysEnabled) {
+        for binding in enabledBindings {
             if let failure = hotKeys.register(name: binding.name, keyCode: binding.keyCode, modifiers: binding.modifiers, action: { [weak self] in
                 log.info("hotkey \(binding.name, privacy: .public)")
                 switch binding.action {
@@ -91,13 +107,14 @@ final class AppModel: ObservableObject {
                 self?.refresh()
             }) { failures.append(failure) }
         }
-        hotKeyFailures = failures.map { "\($0.name) is taken (error \($0.status))" }
+        hotKeyFailures = failures.map { "\($0.name) is taken by another app (error \($0.status))" }
+        refreshClashes()
     }
 
     /// Reads the current Space. Right after a switch WindowServer can still
     /// report the old one, so the switcher's own record is used.
     private func refresh() {
-        refreshSystemShortcuts()
+        refreshClashes()
         let status: SpaceStatus
         if let switcher, let display = switcher.activeDisplay() {
             status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces)
@@ -108,9 +125,8 @@ final class AppModel: ObservableObject {
         statusLine = status.line
     }
 
-    private func refreshSystemShortcuts() {
-        systemShortcutsOn = switcher.map { switcher in
-            SystemHotKey.allCases.contains { switcher.isSystemHotKeyEnabled($0) }
-        } ?? false
+    private func refreshClashes() {
+        let found = switcher?.clashes(with: enabledBindings) ?? []
+        if found != clashes { clashes = found }
     }
 }

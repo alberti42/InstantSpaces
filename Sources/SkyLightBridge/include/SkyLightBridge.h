@@ -23,8 +23,8 @@ BOOL SLBShowSpaces(NSArray<NSNumber *> *spaces);
 BOOL SLBHideSpaces(NSArray<NSNumber *> *spaces);
 BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
 
-/// Whether a system symbolic hotkey (79 = Move left a space, 81 = Move right a
-/// space, 118… = Switch to Desktop 1…) is enabled.
-BOOL SLBSymbolicHotKeyEnabled(int hotKey);
+/// The enabled system shortcuts ("symbolic hotkeys"): one dictionary per
+/// shortcut with "id", "keyCode" and "flags" (CGEventFlags). IDs 0–511 are read.
+NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(void);
 
 NS_ASSUME_NONNULL_END

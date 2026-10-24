@@ -22,6 +22,7 @@ static CFArrayRef (*sCopyManagedDisplaySpaces)(CGSConnectionID);
 static CFStringRef (*sCopyActiveMenuBarDisplayIdentifier)(CGSConnectionID);
 static uint64_t (*sGetActiveSpace)(CGSConnectionID);
 static bool (*sIsSymbolicHotKeyEnabled)(int);
+static int (*sGetSymbolicHotKeyValue)(int, uint16_t *, uint16_t *, uint64_t *);
 static void (*sPerform)(id);
 
 /// Finds a symbol, including a local one, in the symbol table of a loaded image.
@@ -79,6 +80,7 @@ BOOL SLBLoad(NSString **error)
     sCopyActiveMenuBarDisplayIdentifier = dlsym(skyLight, "SLSCopyActiveMenuBarDisplayIdentifier");
     sGetActiveSpace = dlsym(skyLight, "SLSGetActiveSpace");
     sIsSymbolicHotKeyEnabled = dlsym(skyLight, "SLSIsSymbolicHotKeyEnabled");
+    sGetSymbolicHotKeyValue = dlsym(skyLight, "SLSGetSymbolicHotKeyValue");
     sPerform = FindSymbol(kSkyLightPath, kPerformSymbol);
 
     NSMutableArray *missing = [NSMutableArray array];
@@ -87,6 +89,7 @@ BOOL SLBLoad(NSString **error)
     if (!sCopyActiveMenuBarDisplayIdentifier) [missing addObject:@"SLSCopyActiveMenuBarDisplayIdentifier"];
     if (!sGetActiveSpace) [missing addObject:@"SLSGetActiveSpace"];
     if (!sIsSymbolicHotKeyEnabled) [missing addObject:@"SLSIsSymbolicHotKeyEnabled"];
+    if (!sGetSymbolicHotKeyValue) [missing addObject:@"SLSGetSymbolicHotKeyValue"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation"]) {
@@ -145,7 +148,16 @@ BOOL SLBSetCurrentSpace(NSString *display, uint64_t space)
     return YES;
 }
 
-BOOL SLBSymbolicHotKeyEnabled(int hotKey)
+NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(void)
 {
-    return sIsSymbolicHotKeyEnabled(hotKey);
+    NSMutableArray *result = [NSMutableArray array];
+    for (int hotKey = 0; hotKey < 512; ++hotKey) {
+        uint16_t character = 0, keyCode = 0;
+        uint64_t flags = 0;
+        // 0xFFFF marks a shortcut without a key.
+        if (sGetSymbolicHotKeyValue(hotKey, &character, &keyCode, &flags) != 0 || keyCode == 0xFFFF) continue;
+        if (!sIsSymbolicHotKeyEnabled(hotKey)) continue;
+        [result addObject:@{@"id": @(hotKey), @"keyCode": @(keyCode), @"flags": @(flags)}];
+    }
+    return result;
 }
