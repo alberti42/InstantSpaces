@@ -26,5 +26,11 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Andrea Alberti. Licensed under GPL-3.0.</string>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/alberti42/InstantSpaces/main/Releases/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>VpJx96MOP5tJZgGh1ns9HnL8xQDeAg6FNfsaxXkf4LU=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>604800</integer>
 </dict>
 </plist>

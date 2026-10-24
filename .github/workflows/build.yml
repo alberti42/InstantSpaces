@@ -38,5 +38,6 @@ jobs:
           APP=build/InstantSpaces.app
           test -x "$APP/Contents/MacOS/InstantSpaces"
           test -x "$APP/Contents/Library/LoginItems/InstantSpacesLoginHelper.app/Contents/MacOS/InstantSpacesLoginHelper"
+          test -x "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate"
           lipo -archs "$APP/Contents/MacOS/InstantSpaces" | grep -q arm64
           lipo -archs "$APP/Contents/MacOS/InstantSpaces" | grep -q x86_64

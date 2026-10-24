@@ -3,6 +3,10 @@ import SwiftUI
 struct InstantSpacesApp: App {
     @StateObject private var model = AppModel()
 
+    init() {
+        Updater.shared.start()
+    }
+
     var body: some Scene {
         MenuBarExtra {
             MenuContent(model: model)
@@ -40,7 +44,27 @@ private struct MenuContent: View {
             set: { model.setOpensAtLogin($0) }))
         Divider()
 
+        UpdateItems(updater: Updater.shared)
+        Divider()
+
         Button("Quit InstantSpaces") { NSApp.terminate(nil) }
             .keyboardShortcut("q")
+    }
+}
+
+/// Sparkle's menu items (`Updater`). An unbundled build has no updater.
+private struct UpdateItems: View {
+    @Bindable var updater: Updater
+
+    var body: some View {
+        if updater.isAvailable {
+            Button(updater.pendingVersion.map { "Update to \($0)…" } ?? "Check for Updates…") {
+                updater.checkForUpdates()
+            }
+            .disabled(!updater.canCheckForUpdates)
+            Toggle("Check for Updates Automatically", isOn: $updater.automaticallyChecks)
+        } else {
+            Text("Updates are only available in InstantSpaces.app.")
+        }
     }
 }

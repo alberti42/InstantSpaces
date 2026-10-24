@@ -1,3 +1,6 @@
+<!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires updating signatures in appcasts that reference this file! This will involve re-running generate_appcast or sign_update.
+-->
 # InstantSpaces
 
 **A menu-bar app for macOS that switches between Spaces without the slide animation.**
@@ -41,6 +44,9 @@ appears at once.
   full-screen Spaces, as macOS does, and stop at the first and last Space.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
 - **Open at login**, through a login helper registered with macOS.
+- **Updates** through [Sparkle](https://sparkle-project.org): InstantSpaces
+  checks for a new version once a week, or when you choose Check for Updates in
+  its menu.
 
 ## Status
 
@@ -79,8 +85,14 @@ conflict with ⌃⌘1 … ⌃⌘9.
 
 - InstantSpaces needs no permission. Its shortcuts are registered with
   `RegisterEventHotKey`, which does not require Accessibility access.
-- It makes no network connections and collects no data.
-- Its two settings (`arrowKeysEnabled`, `desktopKeysEnabled`) are stored in
+- InstantSpaces connects to the network only for updates: it downloads the
+  update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
+  you install an update, `InstantSpaces.zip` from GitHub Releases. Sparkle sends
+  no system profile; the requests carry the names and versions of InstantSpaces
+  and Sparkle in the User-Agent header. Turn off "Check for Updates
+  Automatically" in the menu to check only when you choose Check for Updates.
+- InstantSpaces collects no data.
+- Its settings are stored in
   `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
 
 ## How it works
@@ -123,6 +135,9 @@ To use your own signing identity, also change the bundle identifiers
 `io.alberti42.InstantSpaces` and `io.alberti42.InstantSpaces.LoginHelper` in
 `Resources/Info.plist`, `Resources/LoginHelper-Info.plist`,
 `Sources/LoginHelper/main.swift` and `Sources/InstantSpaces/LoginItem.swift`.
+To publish your own updates, set `SUFeedURL` (your appcast) and
+`SUPublicEDKey` (your EdDSA public key) in `Resources/Info.plist`; otherwise
+your build offers the updates published in this repository.
 
 The executable also takes commands, which switch once and exit:
 

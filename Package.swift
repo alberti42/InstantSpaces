@@ -4,6 +4,10 @@ import PackageDescription
 let package = Package(
     name: "InstantSpaces",
     platforms: [.macOS(.v26)],
+    dependencies: [
+        // Software updates. The Makefile embeds Sparkle.framework in the app.
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.0"),
+    ],
     targets: [
         // Private SkyLight calls: symbol lookup and bridged window-management operations.
         .target(
@@ -20,9 +24,15 @@ let package = Package(
         // The menu-bar app.
         .executableTarget(
             name: "InstantSpaces",
-            dependencies: ["InstantSpacesCore"],
+            dependencies: ["InstantSpacesCore", .product(name: "Sparkle", package: "Sparkle")],
             path: "Sources/InstantSpaces",
-            swiftSettings: [.swiftLanguageMode(.v5)]
+            swiftSettings: [.swiftLanguageMode(.v5)],
+            // SwiftPM sets no run path for Sparkle.framework. It lies next to the
+            // executable in .build/debug, and in Contents/Frameworks of the app.
+            linkerSettings: [.unsafeFlags([
+                "-Xlinker", "-rpath", "-Xlinker", "@executable_path",
+                "-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks",
+            ])]
         ),
         // Login item embedded in InstantSpaces.app/Contents/Library/LoginItems.
         .executableTarget(
