@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-25
+
 ### Added
 
 - Switch Spaces without the slide animation: ⌃← and ⌃→ move one Space, ⌃1 … ⌃9 go to a desktop. All shortcuts share the same modifier keys, which can be ⌃ (the default, as in macOS's Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘.
@@ -17,4 +19,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). InstantSpaces checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/InstantSpaces/commits/main
+[Unreleased]: https://github.com/alberti42/InstantSpaces/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/alberti42/InstantSpaces/releases/tag/v0.1.0
