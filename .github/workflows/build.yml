@@ -1,0 +1,42 @@
+name: Build
+
+# Runs the unit tests and builds the universal app, signed ad hoc, on every push
+# to main and every pull request. Catches test failures and compile errors with
+# the runner's Xcode before a release tag is pushed. Needs no secrets.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Run unit tests
+        run: swift test
+
+      - name: Test the scripts in bin/
+        run: python3 -m unittest discover -s Tests/Scripts -p '*_test.py'
+
+      - name: Build universal app
+        run: make app ARCHS=universal
+
+      - name: Check the bundle
+        run: |
+          APP=build/InstantSpaces.app
+          test -x "$APP/Contents/MacOS/InstantSpaces"
+          test -x "$APP/Contents/Library/LoginItems/InstantSpacesLoginHelper.app/Contents/MacOS/InstantSpacesLoginHelper"
+          lipo -archs "$APP/Contents/MacOS/InstantSpaces" | grep -q arm64
+          lipo -archs "$APP/Contents/MacOS/InstantSpaces" | grep -q x86_64
