@@ -5,6 +5,8 @@ import Testing
 // Values as SkyLight reported them on macOS 27.0.1.
 private let tileLeftHalf = SystemShortcut(id: 240, keyCode: kVK_LeftArrow, flags: 0x840000, identifier: "WindowTileLeftHalf")
 private let splitViewMakeLeft = SystemShortcut(id: 199, keyCode: kVK_LeftArrow, flags: 0x840000, identifier: "SplitViewMakeLeft")
+private let moveLeftASpace = SystemShortcut(id: 79, keyCode: kVK_LeftArrow, flags: 0x840000, identifier: "WorkspacesLeft")
+private let moveLeftASpaceSlow = SystemShortcut(id: 80, keyCode: kVK_LeftArrow, flags: 0x860000, identifier: "WorkspacesLeftSlow")
 private let switchToDesktop1 = SystemShortcut(id: 118, keyCode: kVK_ANSI_1, flags: 0x40000, identifier: "Workspaces1")
 
 @Suite struct SystemShortcutTests {
@@ -29,18 +31,41 @@ private let switchToDesktop1 = SystemShortcut(id: 118, keyCode: kVK_ANSI_1, flag
 
     @Test func findAsksOnlyAboutShortcutsOnTheSameKey() {
         var asked: [Int32] = []
-        let clashes = ShortcutClash.find(HotKeyBinding.arrowKeys(.control), in: [tileLeftHalf, switchToDesktop1]) { _, shortcut in
+        let clashes = ShortcutClash.find(HotKeyBinding.desktopKeys(.control), in: [moveLeftASpace, switchToDesktop1]) { _, shortcut in
             asked.append(shortcut.id)
             return true
         }
-        #expect(asked == [240])
-        #expect(clashes.map(\.binding.name) == ["⌃←"])
+        #expect(asked == [118])
+        #expect(clashes.map(\.binding.name) == ["⌃1"])
     }
 
     @Test func findKeepsOnlyWhatTheMatcherConfirms() {
-        let clashes = ShortcutClash.find(HotKeyBinding.arrowKeys(.control), in: [tileLeftHalf, splitViewMakeLeft]) { _, shortcut in
-            shortcut.id == 240
+        let clashes = ShortcutClash.find(HotKeyBinding.arrowKeys(.control), in: [moveLeftASpace, moveLeftASpaceSlow]) { _, shortcut in
+            shortcut.id == 79
         }
-        #expect(clashes.map(\.shortcut.id) == [240])
+        #expect(clashes.map(\.shortcut.id) == [79])
+    }
+
+    /// Stored like ⌃← and matched by WindowServer, but pressing ⌃← does not
+    /// trigger the tiling and split-view shortcuts (default fn⌃←).
+    @Test func arrowShortcutsOutsideMissionControlDoNotCount() {
+        let clashes = ShortcutClash.find(HotKeyBinding.arrowKeys(.control),
+                                         in: [tileLeftHalf, splitViewMakeLeft, moveLeftASpace]) { _, _ in true }
+        #expect(clashes.map(\.shortcut.id) == [79])
+    }
+
+    @Test func missionControlFamilyReactsToPlainArrows() {
+        #expect(moveLeftASpace.reactsToPlainArrowKeys)
+        #expect(SystemShortcut(id: 32, keyCode: kVK_UpArrow, flags: 0x840000, identifier: "WindowVousAll").reactsToPlainArrowKeys)
+        #expect(!tileLeftHalf.reactsToPlainArrowKeys)
+        #expect(!splitViewMakeLeft.reactsToPlainArrowKeys)
+        #expect(!SystemShortcut(id: 79, keyCode: kVK_LeftArrow, flags: 0x840000).reactsToPlainArrowKeys)
+    }
+
+    /// Digits carry no fn flag, so the tiling exception does not apply.
+    @Test func digitShortcutsCountWhateverTheirName() {
+        let other = SystemShortcut(id: 300, keyCode: kVK_ANSI_1, flags: 0x40000, identifier: "SomethingElse")
+        let clashes = ShortcutClash.find(HotKeyBinding.desktopKeys(.control), in: [other]) { _, _ in true }
+        #expect(clashes.map(\.shortcut.id) == [300])
     }
 }

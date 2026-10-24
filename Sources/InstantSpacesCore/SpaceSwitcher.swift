@@ -83,15 +83,17 @@ public final class SpaceSwitcher {
     }
 
     /// The bindings among `bindings` that would also trigger a switched-on
-    /// macOS shortcut, as WindowServer decides it. Names are looked up only for
-    /// the shortcuts found.
+    /// macOS shortcut (see `ShortcutClash.find`). Names are looked up only for
+    /// shortcuts on the keys of `bindings`.
     public func clashes(with bindings: [HotKeyBinding]) -> [ShortcutClash] {
-        ShortcutClash.find(bindings, in: server.enabledSystemShortcuts()) { binding, shortcut in
+        let keys = Set(bindings.map(\.keyCode))
+        let candidates = server.enabledSystemShortcuts().filter { keys.contains($0.keyCode) }.map { shortcut in
+            var named = shortcut
+            named.identifier = server.systemShortcutName(shortcut.id)
+            return named
+        }
+        return ShortcutClash.find(bindings, in: candidates) { binding, shortcut in
             server.eventTriggers(shortcut.id, keyCode: binding.keyCode, flags: binding.keyboardEventFlags)
-        }.map { clash in
-            var shortcut = clash.shortcut
-            shortcut.identifier = server.systemShortcutName(shortcut.id)
-            return ShortcutClash(binding: clash.binding, shortcut: shortcut)
         }
     }
 }

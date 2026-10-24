@@ -47,6 +47,20 @@ public struct SystemShortcut: Equatable, Sendable {
         }
     }
 
+    /// Whether the shortcut reacts to an arrow key without fn (Globe), as far
+    /// as InstantSpaces can tell. For arrow keys SkyLight stores ⌃← and fn⌃←
+    /// the same way (key 123, flags 0x840000, identical records), and
+    /// WindowServer's matching reports both. Pressing ⌃← on macOS 27 does
+    /// not trigger the window-tiling shortcuts (default fn⌃←), while the
+    /// Mission Control family is defined with plain arrows: "Move left/right a
+    /// Space" (`Workspaces…`) and Mission Control / Application windows
+    /// (`WindowVous…`). Only that family counts; a shortcut the user rebinds
+    /// to a plain arrow is missed.
+    public var reactsToPlainArrowKeys: Bool {
+        guard let identifier else { return false }
+        return identifier.hasPrefix("Workspaces") || identifier.hasPrefix("WindowVous")
+    }
+
     /// E.g. "“Tile Left Half” (Windows)", or "macOS shortcut 199
     /// (SplitViewMakeLeft)" when System Settings' label is not known.
     public var name: String {
@@ -65,14 +79,17 @@ public struct ShortcutClash: Equatable, Sendable {
         "\(binding.name) also triggers \(shortcut.name)"
     }
 
-    /// The clashes among `bindings`. Shortcuts on other keys are skipped;
-    /// for the rest, `matches` decides, which in the app asks WindowServer
-    /// with the key event the keyboard would send.
+    /// The clashes among `bindings`. Shortcuts on other keys are skipped; on
+    /// arrow keys only those that react to plain arrows count (see
+    /// `SystemShortcut.reactsToPlainArrowKeys`), which needs `identifier`. For
+    /// the rest, `matches` decides, which in the app asks WindowServer with the
+    /// key event the keyboard would send.
     public static func find(_ bindings: [HotKeyBinding], in shortcuts: [SystemShortcut],
                             matches: (HotKeyBinding, SystemShortcut) -> Bool) -> [ShortcutClash] {
         bindings.flatMap { binding in
-            shortcuts
-                .filter { $0.keyCode == binding.keyCode && matches(binding, $0) }
+            let isArrow = HotKeyBinding.arrowKeyCodes.contains(binding.keyCode)
+            return shortcuts
+                .filter { $0.keyCode == binding.keyCode && (!isArrow || $0.reactsToPlainArrowKeys) && matches(binding, $0) }
                 .map { ShortcutClash(binding: binding, shortcut: $0) }
         }
     }

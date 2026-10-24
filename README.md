@@ -84,14 +84,16 @@ modifier ⌃, turn them off in System Settings → Keyboard → Keyboard Shortcu
 Mission Control: untick "Move left a space" and "Move right a space", and
 "Switch to Desktop 1 … 9" if you have turned those on (they are off by default).
 
-Other macOS shortcuts can use the same keys. With ⌃, the window-tiling
-shortcuts "Tile Left Half" and "Tile Right Half" (Keyboard Shortcuts →
-Windows) react to ⌃← and ⌃→ as well: macOS shows them as fn⌃← and fn⌃→, but
-arrow keys always send the fn flag. The Settings window of InstantSpaces lists
-every switched-on macOS shortcut that its keys would also trigger, as
-WindowServer decides it, with the name System Settings uses where InstantSpaces
-knows it. It has a button that opens Keyboard settings. Alternatively, choose
-other modifier keys.
+The Settings window of InstantSpaces lists the switched-on macOS shortcuts
+that its keys would also trigger, with the name System Settings uses where
+InstantSpaces knows it, and has a button that opens Keyboard settings.
+Alternatively, choose other modifier keys.
+
+For arrow keys, macOS stores ⌃← and fn⌃← the same way, so InstantSpaces cannot
+tell them apart. It counts only the Mission Control shortcuts, which macOS
+defines with plain arrows; the window-tiling shortcuts (fn⌃←, fn⌃→) do not
+react to ⌃← and ⌃→. A macOS shortcut that you rebind yourself to a plain arrow
+is not detected.
 
 ## Permissions and privacy
 

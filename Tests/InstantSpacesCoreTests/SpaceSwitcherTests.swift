@@ -158,18 +158,20 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
     }
 
     /// WindowServer decides, for the event the keyboard sends (⌃← carries fn
-    /// and numeric pad, 0xA40000); the name is looked up for the clash found.
+    /// and numeric pad, 0xA40000), among the shortcuts that react to plain
+    /// arrows; the tiling shortcut on the same key is not asked about.
     @Test func clashesAreDecidedByWindowServer() {
         let (switcher, server, _) = makeSwitcher()
         let bindings = HotKeyBinding.arrowKeys(.control)
-        server.shortcuts = [SystemShortcut(id: 240, keyCode: bindings[0].keyCode, flags: 0x840000),
-                            SystemShortcut(id: 199, keyCode: bindings[0].keyCode, flags: 0x840000)]
-        server.names = [240: "WindowTileLeftHalf"]
+        server.shortcuts = [SystemShortcut(id: 79, keyCode: bindings[0].keyCode, flags: 0x840000),
+                            SystemShortcut(id: 240, keyCode: bindings[0].keyCode, flags: 0x840000)]
+        server.names = [79: "WorkspacesLeft", 240: "WindowTileLeftHalf"]
         #expect(switcher.clashes(with: bindings).isEmpty)
-        #expect(server.matchQueries.map(\.flags).allSatisfy { $0 == 0xA40000 })
+        #expect(server.matchQueries.map(\.id) == [79])
+        #expect(server.matchQueries.map(\.flags) == [0xA40000])
 
-        server.triggers = ["240-\(bindings[0].keyCode)-\(0xA40000)"]
+        server.triggers = ["79-\(bindings[0].keyCode)-\(0xA40000)", "240-\(bindings[0].keyCode)-\(0xA40000)"]
         let clashes = switcher.clashes(with: bindings)
-        #expect(clashes.map(\.description) == ["⌃← also triggers “Tile Left Half” (Windows)"])
+        #expect(clashes.map(\.description) == ["⌃← also triggers “Move left a Space” (Mission Control)"])
     }
 }
