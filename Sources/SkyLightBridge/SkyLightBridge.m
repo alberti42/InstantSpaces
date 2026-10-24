@@ -1,5 +1,6 @@
 #import "SkyLightBridge.h"
 
+#import <CoreGraphics/CoreGraphics.h>
 #import <dlfcn.h>
 #import <mach-o/dyld.h>
 #import <mach-o/loader.h>
@@ -23,6 +24,9 @@ static CFStringRef (*sCopyActiveMenuBarDisplayIdentifier)(CGSConnectionID);
 static uint64_t (*sGetActiveSpace)(CGSConnectionID);
 static bool (*sIsSymbolicHotKeyEnabled)(int);
 static int (*sGetSymbolicHotKeyValue)(int, uint16_t *, uint16_t *, uint64_t *);
+// Returns a pointer to a static buffer, overwritten by the next call.
+static const char *(*sSymbolicHotKeyName)(int);
+static bool (*sIsEventMatchingSymbolicHotKey)(CGSConnectionID, CGEventRef, int);
 static void (*sPerform)(id);
 
 /// Finds a symbol, including a local one, in the symbol table of a loaded image.
@@ -81,6 +85,8 @@ BOOL SLBLoad(NSString **error)
     sGetActiveSpace = dlsym(skyLight, "SLSGetActiveSpace");
     sIsSymbolicHotKeyEnabled = dlsym(skyLight, "SLSIsSymbolicHotKeyEnabled");
     sGetSymbolicHotKeyValue = dlsym(skyLight, "SLSGetSymbolicHotKeyValue");
+    sSymbolicHotKeyName = dlsym(skyLight, "SLSSymbolicHotKeyName");
+    sIsEventMatchingSymbolicHotKey = dlsym(skyLight, "SLSIsEventMatchingSymbolicHotKey");
     sPerform = FindSymbol(kSkyLightPath, kPerformSymbol);
 
     NSMutableArray *missing = [NSMutableArray array];
@@ -90,6 +96,8 @@ BOOL SLBLoad(NSString **error)
     if (!sGetActiveSpace) [missing addObject:@"SLSGetActiveSpace"];
     if (!sIsSymbolicHotKeyEnabled) [missing addObject:@"SLSIsSymbolicHotKeyEnabled"];
     if (!sGetSymbolicHotKeyValue) [missing addObject:@"SLSGetSymbolicHotKeyValue"];
+    if (!sSymbolicHotKeyName) [missing addObject:@"SLSSymbolicHotKeyName"];
+    if (!sIsEventMatchingSymbolicHotKey) [missing addObject:@"SLSIsEventMatchingSymbolicHotKey"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation"]) {
@@ -160,4 +168,20 @@ NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(v
         [result addObject:@{@"id": @(hotKey), @"keyCode": @(keyCode), @"flags": @(flags)}];
     }
     return result;
+}
+
+NSString *SLBSymbolicHotKeyName(int hotKey)
+{
+    const char *name = sSymbolicHotKeyName(hotKey);
+    return name && name[0] ? [NSString stringWithUTF8String:name] : nil;
+}
+
+BOOL SLBEventMatchesSymbolicHotKey(uint16_t keyCode, uint64_t flags, int hotKey)
+{
+    CGEventRef event = CGEventCreateKeyboardEvent(NULL, keyCode, true);
+    if (!event) return NO;
+    CGEventSetFlags(event, flags);
+    BOOL matches = sIsEventMatchingSymbolicHotKey(sMainConnectionID(), event, hotKey);
+    CFRelease(event);
+    return matches;
 }

@@ -16,6 +16,14 @@ public struct HotKeyBinding: Equatable, Sendable {
 
     public var modifiers: Int { prefix.carbonModifiers }
 
+    /// The `CGEventFlags` of the key-down event the keyboard sends for this
+    /// shortcut. Arrow keys add the fn and numeric-pad flags to every event.
+    public var keyboardEventFlags: UInt64 {
+        prefix.eventFlags | (Self.arrowKeyCodes.contains(keyCode) ? EventFlag.function | EventFlag.numericPad : 0)
+    }
+
+    static let arrowKeyCodes: Set<Int> = [kVK_LeftArrow, kVK_RightArrow, kVK_UpArrow, kVK_DownArrow]
+
     /// Key codes of the digits 1–9 on an ANSI keyboard, in order.
     static let digitKeyCodes = [kVK_ANSI_1, kVK_ANSI_2, kVK_ANSI_3, kVK_ANSI_4, kVK_ANSI_5,
                                 kVK_ANSI_6, kVK_ANSI_7, kVK_ANSI_8, kVK_ANSI_9]

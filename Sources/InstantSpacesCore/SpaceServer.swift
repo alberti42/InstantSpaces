@@ -11,8 +11,13 @@ public protocol SpaceServer: AnyObject {
     func showSpaces(_ spaces: [UInt64])
     func setCurrentSpace(_ space: UInt64, display: String)
     func hideSpaces(_ spaces: [UInt64])
-    /// The macOS keyboard shortcuts that are switched on.
+    /// The macOS keyboard shortcuts that are switched on, without names.
     func enabledSystemShortcuts() -> [SystemShortcut]
+    /// SkyLight's internal name of a shortcut, e.g. "WindowTileLeftHalf".
+    func systemShortcutName(_ id: Int32) -> String?
+    /// Whether WindowServer would trigger the shortcut for a key-down event
+    /// with this key code and these `CGEventFlags`.
+    func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool
 }
 
 public struct SkyLightUnavailable: Error, CustomStringConvertible {
@@ -55,5 +60,13 @@ public final class SkyLightServer: SpaceServer {
                   let flags = entry["flags"]?.uint64Value else { return nil }
             return SystemShortcut(id: id, keyCode: keyCode, flags: flags)
         }
+    }
+
+    public func systemShortcutName(_ id: Int32) -> String? {
+        SLBSymbolicHotKeyName(id)
+    }
+
+    public func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool {
+        SLBEventMatchesSymbolicHotKey(UInt16(keyCode), flags, id)
     }
 }

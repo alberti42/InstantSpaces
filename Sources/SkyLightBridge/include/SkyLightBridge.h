@@ -27,4 +27,13 @@ BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
 /// shortcut with "id", "keyCode" and "flags" (CGEventFlags). IDs 0–511 are read.
 NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(void);
 
+/// The internal name of a system shortcut, e.g. "WorkspacesLeft" for 79 or
+/// "WindowTileLeftHalf" for 240 (`SLSSymbolicHotKeyName`).
+NSString *_Nullable SLBSymbolicHotKeyName(int hotKey);
+
+/// Whether a key-down event with this key code and these CGEventFlags triggers
+/// the system shortcut, as WindowServer decides it
+/// (`SLSIsEventMatchingSymbolicHotKey`). A switched-off shortcut never matches.
+BOOL SLBEventMatchesSymbolicHotKey(uint16_t keyCode, uint64_t flags, int hotKey);
+
 NS_ASSUME_NONNULL_END

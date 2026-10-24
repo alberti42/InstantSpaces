@@ -51,8 +51,8 @@ enum EventFlag {
     static let control: UInt64 = 0x40000
     static let option: UInt64 = 0x80000
     static let command: UInt64 = 0x100000
+    /// Set on every arrow-key event, with `function`.
+    static let numericPad: UInt64 = 0x200000
     /// Set by the fn (Globe) key, and on every arrow-key event.
     static let function: UInt64 = 0x800000
-    /// Shift, Control, Option and Command.
-    static let modifiers: UInt64 = shift | control | option | command
 }

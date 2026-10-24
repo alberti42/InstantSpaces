@@ -45,6 +45,14 @@ import Testing
         #expect(Set(ModifierPrefix.allCases.map(\.symbols)).count == ModifierPrefix.allCases.count)
     }
 
+    /// The flags of a real key-down event: arrows always add fn (0x800000) and
+    /// numeric pad (0x200000); digits add nothing.
+    @Test func keyboardEventFlags() {
+        #expect(HotKeyBinding.arrowKeys(.control)[0].keyboardEventFlags == 0xA40000)
+        #expect(HotKeyBinding.arrowKeys(.controlOption)[1].keyboardEventFlags == 0xAC0000)
+        #expect(HotKeyBinding.desktopKeys(.control)[0].keyboardEventFlags == 0x40000)
+    }
+
     @Test func eventFlagsMatchTheCarbonModifiers() {
         #expect(ModifierPrefix.control.eventFlags == 0x40000)
         #expect(ModifierPrefix.controlOption.eventFlags == 0xC0000)

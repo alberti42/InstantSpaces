@@ -13,6 +13,10 @@ private final class FakeServer: SpaceServer {
     var displays: [[String: Any]]
     var activeDisplay: String?
     var shortcuts: [SystemShortcut] = []
+    var names: [Int32: String] = [:]
+    /// (shortcut, key code, flags) that WindowServer would trigger.
+    var triggers: Set<String> = []
+    private(set) var matchQueries: [(id: Int32, keyCode: Int, flags: UInt64)] = []
     private(set) var calls: [Call] = []
 
     init(displays: [[String: Any]], activeDisplay: String?) {
@@ -26,6 +30,11 @@ private final class FakeServer: SpaceServer {
     func setCurrentSpace(_ space: UInt64, display: String) { calls.append(.setCurrent(space, display: display)) }
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
     func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
+    func systemShortcutName(_ id: Int32) -> String? { names[id] }
+    func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool {
+        matchQueries.append((id, keyCode, flags))
+        return triggers.contains("\(id)-\(keyCode)-\(flags)")
+    }
 }
 
 /// A clock that only moves when the test moves it.
@@ -148,11 +157,19 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
         #expect(server.calls.isEmpty)
     }
 
-    @Test func clashesAreCheckedAgainstTheServersShortcuts() {
+    /// WindowServer decides, for the event the keyboard sends (⌃← carries fn
+    /// and numeric pad, 0xA40000); the name is looked up for the clash found.
+    @Test func clashesAreDecidedByWindowServer() {
         let (switcher, server, _) = makeSwitcher()
         let bindings = HotKeyBinding.arrowKeys(.control)
+        server.shortcuts = [SystemShortcut(id: 240, keyCode: bindings[0].keyCode, flags: 0x840000),
+                            SystemShortcut(id: 199, keyCode: bindings[0].keyCode, flags: 0x840000)]
+        server.names = [240: "WindowTileLeftHalf"]
         #expect(switcher.clashes(with: bindings).isEmpty)
-        server.shortcuts = [SystemShortcut(id: 79, keyCode: bindings[0].keyCode, flags: 0x840000)]
-        #expect(switcher.clashes(with: bindings).map(\.binding) == [bindings[0]])
+        #expect(server.matchQueries.map(\.flags).allSatisfy { $0 == 0xA40000 })
+
+        server.triggers = ["240-\(bindings[0].keyCode)-\(0xA40000)"]
+        let clashes = switcher.clashes(with: bindings)
+        #expect(clashes.map(\.description) == ["⌃← also triggers “Tile Left Half” (Windows)"])
     }
 }

@@ -1,56 +1,79 @@
 import Carbon.HIToolbox
 
 /// An enabled macOS keyboard shortcut ("symbolic hotkey"), as SkyLight reports
-/// it: an ID, a key code and `CGEventFlags`.
+/// it: a number, a key code, `CGEventFlags` and an internal name.
 public struct SystemShortcut: Equatable, Sendable {
     public let id: Int32
     public let keyCode: Int
     public let flags: UInt64
+    /// SkyLight's internal name, e.g. "WindowTileLeftHalf"; nil until looked up.
+    public var identifier: String?
 
-    public init(id: Int32, keyCode: Int, flags: UInt64) {
+    public init(id: Int32, keyCode: Int, flags: UInt64, identifier: String? = nil) {
         self.id = id
         self.keyCode = keyCode
         self.flags = flags
+        self.identifier = identifier
     }
 
-    /// The name System Settings shows, for the shortcuts InstantSpaces knows;
-    /// otherwise the ID. SkyLight does not report names.
-    public var name: String {
-        switch id {
-        case 79: "Move left a space"
-        case 81: "Move right a space"
-        case 118...133: "Switch to Desktop \(id - 117)"
-        default: "macOS shortcut \(id)"
+    /// Where System Settings lists a shortcut: its label and its section under
+    /// Keyboard → Keyboard Shortcuts.
+    public struct Label: Equatable, Sendable {
+        public let title: String
+        public let section: String
+    }
+
+    /// The System Settings label for the internal names InstantSpaces knows.
+    /// Each title is the English text of System Settings' table
+    /// (`KeyboardSettings.appex/Contents/Resources/DefaultShortcutsTable.loctable`).
+    public var label: Label? {
+        guard let identifier else { return nil }
+        switch identifier {
+        case "WorkspacesLeft": return Label(title: "Move left a Space", section: "Mission Control")
+        case "WorkspacesRight": return Label(title: "Move right a Space", section: "Mission Control")
+        case "WindowTileLeftHalf": return Label(title: "Tile Left Half", section: "Windows")
+        case "WindowTileRightHalf": return Label(title: "Tile Right Half", section: "Windows")
+        case "WindowTileTopHalf": return Label(title: "Tile Top Half", section: "Windows")
+        case "WindowTileBottomHalf": return Label(title: "Tile Bottom Half", section: "Windows")
+        case "WindowArrangeLeftAndRight": return Label(title: "Arrange Left and Right", section: "Windows")
+        case "WindowArrangeRightAndLeft": return Label(title: "Arrange Right and Left", section: "Windows")
+        case "WindowArrangeTopAndBottom": return Label(title: "Arrange Top and Bottom", section: "Windows")
+        case "WindowArrangeBottomAndTop": return Label(title: "Arrange Bottom and Top", section: "Windows")
+        default:
+            if identifier.hasPrefix("Workspaces"), let number = Int(identifier.dropFirst("Workspaces".count)) {
+                return Label(title: "Switch to Desktop \(number)", section: "Mission Control")
+            }
+            return nil
         }
     }
 
-    static let arrowKeyCodes: Set<Int> = [kVK_LeftArrow, kVK_RightArrow, kVK_UpArrow, kVK_DownArrow]
-
-    /// Whether pressing `binding` also triggers this shortcut. Shift, Control,
-    /// Option and Command must match. Arrow-key events always carry the fn flag,
-    /// so for arrows the flag cannot tell ⌃← from fn⌃← and is ignored; for
-    /// other keys a shortcut that needs fn does not clash.
-    public func clashes(with binding: HotKeyBinding) -> Bool {
-        guard keyCode == binding.keyCode,
-              flags & EventFlag.modifiers == binding.prefix.eventFlags
-        else { return false }
-        return Self.arrowKeyCodes.contains(keyCode) || flags & EventFlag.function == 0
+    /// E.g. "“Tile Left Half” (Windows)", or "macOS shortcut 199
+    /// (SplitViewMakeLeft)" when System Settings' label is not known.
+    public var name: String {
+        if let label { return "“\(label.title)” (\(label.section))" }
+        return "macOS shortcut \(id)" + (identifier.map { " (\($0))" } ?? "")
     }
 }
 
-/// A binding of InstantSpaces that a macOS shortcut also uses.
+/// A binding of InstantSpaces that a macOS shortcut also reacts to.
 public struct ShortcutClash: Equatable, Sendable {
     public let binding: HotKeyBinding
     public let shortcut: SystemShortcut
 
-    /// E.g. "⌃← is also macOS's “Move left a space”".
+    /// E.g. "⌃← also triggers “Tile Left Half” (Windows)".
     public var description: String {
-        "\(binding.name) is also used by macOS (\(shortcut.name))"
+        "\(binding.name) also triggers \(shortcut.name)"
     }
 
-    public static func find(_ bindings: [HotKeyBinding], in shortcuts: [SystemShortcut]) -> [ShortcutClash] {
+    /// The clashes among `bindings`. Shortcuts on other keys are skipped;
+    /// for the rest, `matches` decides, which in the app asks WindowServer
+    /// with the key event the keyboard would send.
+    public static func find(_ bindings: [HotKeyBinding], in shortcuts: [SystemShortcut],
+                            matches: (HotKeyBinding, SystemShortcut) -> Bool) -> [ShortcutClash] {
         bindings.flatMap { binding in
-            shortcuts.filter { $0.clashes(with: binding) }.map { ShortcutClash(binding: binding, shortcut: $0) }
+            shortcuts
+                .filter { $0.keyCode == binding.keyCode && matches(binding, $0) }
+                .map { ShortcutClash(binding: binding, shortcut: $0) }
         }
     }
 }

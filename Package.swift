@@ -12,7 +12,8 @@ let package = Package(
         // Private SkyLight calls: symbol lookup and bridged window-management operations.
         .target(
             name: "SkyLightBridge",
-            path: "Sources/SkyLightBridge"
+            path: "Sources/SkyLightBridge",
+            linkerSettings: [.linkedFramework("CoreGraphics")]
         ),
         // Space model, navigation and the switch itself.
         .target(
