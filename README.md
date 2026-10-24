@@ -39,6 +39,9 @@ appears at once.
 All shortcuts share the same modifier keys: ⌃ (the default, as in macOS's own
 Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Settings.
 
+- **Trackpad swipes** between Spaces switch instantly too (on by default; can be
+  switched off in Settings). This needs Accessibility access; see
+  [Permissions and privacy](#permissions-and-privacy).
 - **Menu-bar item** showing the number of the current desktop, or "F" on a
   full-screen Space.
 - **Settings window** (Settings… in the menu, ⌘,): the modifier keys, the two
@@ -65,6 +68,8 @@ Not yet tested:
 - macOS 26, and any Mac with System Integrity Protection enabled.
 - Switching to full-screen Spaces.
 - More than one display.
+- Trackpad swipes: the direction on real hardware, with and without natural
+  scrolling, and Karabiner-Elements running.
 - Whether the Dock's own record of the current Space (used by Mission Control
   and the trackpad swipe) stays correct after InstantSpaces switches.
 
@@ -97,8 +102,15 @@ is not detected.
 
 ## Permissions and privacy
 
-- InstantSpaces needs no permission. Its shortcuts are registered with
+- The keyboard shortcuts need no permission: they are registered with
   `RegisterEventHotKey`, which does not require Accessibility access.
+- Instant trackpad swipes need Accessibility access. InstantSpaces reads the
+  trackpad's swipe events before the Dock does, drops them and switches
+  instead; macOS allows that only to apps with Accessibility access. On first
+  launch InstantSpaces asks for it; Settings shows whether it has it. Without
+  it, or with "Switch instantly on trackpad swipes" off, swipes keep macOS's
+  animation. InstantSpaces only looks at the trackpad's Dock swipe events and
+  does not read the keyboard.
 - InstantSpaces connects to the network only for updates: it downloads the
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
   you install an update, `InstantSpaces.zip` from GitHub Releases. Sparkle sends
@@ -107,10 +119,12 @@ is not detected.
   automatically" in Settings → General to check only when you choose Check for
   Updates.
 - InstantSpaces collects no data.
-- Its settings (modifier keys, shortcut groups) are stored in
+- Its settings (modifier keys, shortcut groups, swipes) are stored in
   `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
 
 ## How it works
+
+### Keyboard shortcuts
 
 The animation is drawn by the Dock. When you switch Spaces, the Dock shows both
 Spaces, slides them across the screen, and then tells WindowServer to make the
@@ -127,6 +141,17 @@ The plain SkyLight functions are not enough. Called from an app other than the
 Dock, `SLSManagedDisplaySetCurrentSpace` changes the Space, but
 `SLSShowSpaces` and `SLSHideSpaces` are refused, so the windows of both Spaces
 stay on screen. The bridged operations are accepted.
+
+### Trackpad swipes
+
+A swipe between Spaces reaches the Dock as a series of "Dock swipe" events:
+began, changed (with the distance moved), ended. InstantSpaces watches them
+with an event tap placed before the Dock. It drops the began event, so the
+Dock never starts its slide; at the first changed event that moved, it
+switches one Space in that direction, as the keyboard shortcuts do. From macOS
+27 on, the ended event is passed on with its motion set to zero, because the
+Dock needs it to finish the gesture. Swipes that begin while Mission Control or
+App Exposé is open are left to the Dock.
 
 ## Building from source
 
@@ -166,8 +191,9 @@ build/InstantSpaces.app/Contents/MacOS/InstantSpaces --desktop 2
 
 - [InstantSpaceSwitcher](https://github.com/jurplel/InstantSpaceSwitcher) by
   jurplel skips the animation by sending the Dock a trackpad swipe with a very
-  high velocity. Its notes on the Dock's swipe events are the basis for gesture
-  support planned in InstantSpaces.
+  high velocity. InstantSpaces intercepts swipes following its findings on the
+  Dock's swipe events: the event fields, the handling of the ended event on
+  macOS 27, and how to tell when Mission Control is open.
 - [yabai](https://github.com/asmvik/yabai) by asmvik uses the bridged
   operations to move windows between Spaces
   ([#2788](https://github.com/asmvik/yabai/issues/2788)); InstantSpaces looks up

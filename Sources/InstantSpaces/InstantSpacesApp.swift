@@ -52,8 +52,8 @@ private struct MenuContent: View {
         } else {
             Text(model.statusLine)
         }
-        if model.needsAttention {
-            Text("Some shortcuts conflict; see Settings.")
+        if let message = model.attentionMessage {
+            Text(message)
         }
         Divider()
 

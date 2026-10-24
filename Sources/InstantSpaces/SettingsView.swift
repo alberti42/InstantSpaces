@@ -43,6 +43,25 @@ private struct ShortcutsPane: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section {
+                Toggle(isOn: $model.swipesEnabled) {
+                    Text("Switch instantly on trackpad swipes")
+                    Text("Swiping left or right between Spaces, with the fingers set in Trackpad settings")
+                }
+                if model.swipesNeedAccess {
+                    Label("InstantSpaces needs Accessibility access to intercept swipes.", systemImage: "exclamationmark.triangle")
+                    HStack {
+                        Button("Open Accessibility Settings…") { model.openAccessibilitySettings() }
+                        Button("Ask Again") { model.requestAccessibilityPermission() }
+                    }
+                }
+            } header: {
+                Text("Trackpad")
+            } footer: {
+                Text("Turn it off to keep macOS's swipe with its animation; InstantSpaces then needs no Accessibility access.")
+                    .foregroundStyle(.secondary)
+            }
+
             if !model.clashes.isEmpty || !model.hotKeyFailures.isEmpty {
                 Section {
                     ForEach(model.clashes, id: \.description) { clash in
