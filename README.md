@@ -66,18 +66,17 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
 InstantSpaces is early work. It relies on private macOS interfaces (see
 [How it works](#how-it-works)), which Apple can change in any update.
 
-Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled:
-the keyboard shortcuts, trackpad swipes in both directions with natural
-scrolling on and off (the direction follows macOS's), trackpad swipes inside
-Mission Control and App Exposé, and switching to and from full-screen Spaces.
+Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled,
+with Karabiner-Elements running: the keyboard shortcuts, trackpad swipes in
+both directions with natural scrolling on and off (the direction follows
+macOS's), trackpad swipes inside Mission Control and App Exposé, and switching
+to and from full-screen Spaces. After each switch the Dock records the new
+Space, and Mission Control shows it.
 
 Not yet tested:
 
 - macOS 26, and any Mac with System Integrity Protection enabled.
-- Trackpad swipes with Karabiner-Elements running.
 - More than one display.
-- Whether the Dock's own record of the current Space (used by Mission Control
-  and by macOS's swipe) stays correct after InstantSpaces switches.
 
 Known issue, not yet reproduced: once, after a long session of tests, the menu
 bar, set to hide automatically, no longer appeared when the pointer reached the
