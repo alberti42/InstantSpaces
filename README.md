@@ -6,7 +6,7 @@
 **A menu-bar app for macOS that switches between Spaces without the slide animation, or with a slide as long as you choose.**
 
 Ever wished you could jump between your Mac's Spaces like a Star Wars starship
-jumping to hyperspace? SpaceJumper switches Spaces instantly, without macOS's slide. And
+making the jump to lightspeed? SpaceJumper switches Spaces instantly, without macOS's slide. And
 if you'd like to see the jump, you can set how long it takes.
 
 **[Download SpaceJumper.zip](https://github.com/alberti42/SpaceJumper/releases/latest/download/SpaceJumper.zip)** (latest release, signed and notarized). See [Installation](#installation).
