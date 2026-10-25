@@ -48,14 +48,10 @@ SpaceJumper was called InstantSpaces up to version 0.1.1; see
 
 ## Features
 
-| Shortcut | Action |
-|---|---|
-| ⌃← / ⌃→ | Move one Space left / right |
-| ⌃1 … ⌃9 | Go to desktop 1 … 9 |
-
-All shortcuts share the same modifier keys: ⌃ (the default, as in macOS's own
-Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Settings.
-
+- **Keyboard shortcuts**: the modifier keys you choose in Settings, followed by
+  ← or → to move one Space, or by 1 … 9 to go to that desktop. The modifier
+  keys are ⌃ (the default, as in macOS's own Mission Control shortcuts), ⌃⌥,
+  ⌃⌘, ⌥⌘ or ⌃⌥⌘, the same for both groups. Either group can be switched off.
 - **Trackpad swipes** between Spaces switch instantly too (on by default; can be
   switched off in Settings). This needs Accessibility access; see
   [Permissions and privacy](#permissions-and-privacy).
@@ -63,10 +59,12 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
   full-screen Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
   rounded rectangle or a capsule.
-- **Settings window** (Settings… in the menu, ⌘,): the modifier keys, the two
-  shortcut groups (arrows and numbers), each of which can be switched off, Open
-  at Login and updates. It lists the shortcuts that macOS or another app
-  already uses with the same keys.
+- **Settings window** (Settings… in the menu, ⌘,), shown
+  [above](#spacejumper). Besides the options in this list, it lists the
+  shortcuts that macOS or another app already uses with the same keys, and
+  shows the macOS settings that affect SpaceJumper: how swiping between Spaces
+  is set in Trackpad settings, and whether macOS rearranges Spaces by recent
+  use.
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
