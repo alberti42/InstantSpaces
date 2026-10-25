@@ -126,6 +126,8 @@ downloaded ZIP was built:
 gh attestation verify SpaceJumper.zip --repo alberti42/SpaceJumper
 ```
 
+To report a security problem privately, see [SECURITY.md](SECURITY.md).
+
 ### Moving from InstantSpaces
 
 SpaceJumper was called InstantSpaces up to version 0.1.1. The two apps have
