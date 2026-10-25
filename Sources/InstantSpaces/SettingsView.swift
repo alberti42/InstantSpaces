@@ -39,9 +39,6 @@ private struct ShortcutsPane: View {
                     Text("Go to a desktop")
                     Text("\(prefix)1 … \(prefix)9")
                 }
-            } footer: {
-                Text("All shortcuts use the same modifier keys. ⌃ matches macOS's own Mission Control shortcuts.")
-                    .foregroundStyle(.secondary)
             }
 
             Section {
