@@ -5,5 +5,39 @@
         <link>https://raw.githubusercontent.com/alberti42/InstantSpaces/main/Releases/appcast.xml</link>
         <description>Updates of InstantSpaces. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Sun, 25 Oct 2026 00:11:07 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/alberti42/InstantSpaces/releases/download/v0.1.0/InstantSpaces.zip" length="1401100" type="application/octet-stream" sparkle:edSignature="UtVFUXTt6j4oRwJQUS+H8MPg2W+qUwgE3GzYXNppSU9nUilk3LIN7eXOD+7xegxf4odAfyRf2g/WCQZ+1KUWDA=="/>
+        
+            <description><![CDATA[
+<p>The first release of InstantSpaces, a menu-bar app that switches between Spaces without the slide animation. macOS has no setting to turn the animation off; "Reduce motion" only replaces it with a cross-fade. With InstantSpaces the new Space appears at once.</p>
+<h3>What it does</h3>
+<ul>
+<li><strong>Keyboard shortcuts:</strong> ⌃← and ⌃→ move one Space left or right; ⌃1 … ⌃9 go to a desktop. All shortcuts share one set of modifier keys, which you choose in Settings: ⌃ (the default, as in macOS's own Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘.</li>
+<li><strong>Trackpad swipes:</strong> swiping between Spaces with the trackpad switches at once too. This is on by default and can be switched off in Settings.</li>
+<li><strong>Wrap around</strong> (off by default): moving past the last Space, with the arrows or a swipe, goes to the first, and back.</li>
+<li><strong>Menu bar:</strong> shows the number of the current desktop, or "F" on a full-screen Space.</li>
+<li><strong>Settings window</strong> (⌘,): modifier keys, the shortcut groups, swipes, wrapping, Open at Login and updates. It lists the macOS shortcuts and other apps' shortcuts that use the same keys as yours.</li>
+<li><strong>Updates:</strong> InstantSpaces checks for a new version once a week, or when you choose Check for Updates in its menu.</li>
+</ul>
+<h3>Getting started</h3>
+<ol>
+<li>Download <code>InstantSpaces.zip</code> below, unzip it and move <code>InstantSpaces.app</code> to the Applications folder.</li>
+<li>Open it. On first launch macOS asks whether InstantSpaces may use Accessibility. Allow it for instant trackpad swipes; the keyboard shortcuts work without it.</li>
+<li>With the default modifier ⌃, turn off macOS's own "Move left a space" and "Move right a space" in System Settings → Keyboard → Keyboard Shortcuts → Mission Control. Otherwise macOS switches as well, with its animation. InstantSpaces' Settings window lists any macOS shortcut that still uses the same keys.</li>
+</ol>
+<h3>Requirements and limits</h3>
+<ul>
+<li>macOS 26 or later, on Apple silicon or Intel. The app is signed with a Developer ID and notarized by Apple.</li>
+<li>InstantSpaces uses private macOS interfaces, which Apple can change in any macOS update.</li>
+<li>This release was tested on one Mac with macOS 27.0.1. Untested so far: macOS 26, several displays, full-screen Spaces, and trackpad swipes with natural scrolling off. Please report problems in the <a href="https://github.com/alberti42/InstantSpaces/issues">issues</a>.</li>
+</ul>
+<p>Source code and how it works: <a href="https://github.com/alberti42/InstantSpaces#readme">README</a> · <a href="https://github.com/alberti42/InstantSpaces/commits/v0.1.0">all commits</a></p>
+            ]]></description>
+        </item>
     </channel>
 </rss>
