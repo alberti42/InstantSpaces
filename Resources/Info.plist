@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>InstantSpaces</string>
+	<string>SpaceJumper</string>
 	<key>CFBundleIdentifier</key>
-	<string>io.alberti42.InstantSpaces</string>
+	<string>io.alberti42.SpaceJumper</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>InstantSpaces</string>
+	<string>SpaceJumper</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -27,7 +27,7 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Andrea Alberti. Licensed under GPL-3.0.</string>
 	<key>SUFeedURL</key>
-	<string>https://raw.githubusercontent.com/alberti42/InstantSpaces/main/Releases/appcast.xml</string>
+	<string>https://raw.githubusercontent.com/alberti42/SpaceJumper/main/Releases/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>VpJx96MOP5tJZgGh1ns9HnL8xQDeAg6FNfsaxXkf4LU=</string>
 	<key>SUScheduledCheckInterval</key>

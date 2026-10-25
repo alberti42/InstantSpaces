@@ -1,4 +1,5 @@
-"""Tests for bin/merge_appcast_item.py, bin/inject_appcast_notes.py and bin/md_to_html.py:
+"""Tests for bin/merge_appcast_item.py, bin/inject_appcast_notes.py, bin/md_to_html.py
+and bin/mark_informational_for_old_builds.py:
 python3 -m unittest discover -s Tests/Scripts -p '*_test.py'"""
 
 import pathlib
@@ -11,14 +12,14 @@ BIN = pathlib.Path(__file__).resolve().parents[2] / "bin"
 EMPTY = """<?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <title>InstantSpaces</title>
+        <title>SpaceJumper</title>
         <language>en</language>
     </channel>
 </rss>
 """
 
-OLD_URL = "https://github.com/alberti42/InstantSpaces/releases/download/v1.0.0/InstantSpaces.zip"
-NEW_URL = "https://github.com/alberti42/InstantSpaces/releases/download/v1.1.0/InstantSpaces.zip"
+OLD_URL = "https://github.com/alberti42/SpaceJumper/releases/download/v1.0.0/SpaceJumper.zip"
+NEW_URL = "https://github.com/alberti42/SpaceJumper/releases/download/v1.1.0/SpaceJumper.zip"
 
 
 def item(build, url):
@@ -50,6 +51,19 @@ class AppcastTest(unittest.TestCase):
         path = self.tmp / name
         path.write_text(text)
         return path
+
+    def test_newest_item_is_informational_for_instantspaces_builds(self):
+        path = self.write("appcast.xml", appcast(item(4, NEW_URL), item(3, OLD_URL)))
+        release = "https://github.com/alberti42/SpaceJumper/releases/tag/v0.2.0"
+        self.assertEqual(run("mark_informational_for_old_builds.py", path, release).returncode, 0)
+        text = path.read_text()
+        newest, older = text.split("</item>")[0], text.split("</item>")[1]
+        self.assertIn(f"<link>{release}</link>", newest)
+        self.assertIn("<sparkle:belowVersion>4</sparkle:belowVersion>", newest)
+        self.assertNotIn("informationalUpdate", older)
+        # A second run changes nothing.
+        run("mark_informational_for_old_builds.py", path, release)
+        self.assertEqual(path.read_text(), text)
 
     def test_merge_into_empty_appcast(self):
         new = self.write("new.xml", appcast(item(2, NEW_URL)))

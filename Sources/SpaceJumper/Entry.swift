@@ -4,6 +4,7 @@ import Foundation
 enum Entry {
     static func main() {
         CommandLineMode.runIfRequested(Array(CommandLine.arguments.dropFirst()))
-        InstantSpacesApp.main()
+        SettingsMigration.run()
+        SpaceJumperApp.main()
     }
 }

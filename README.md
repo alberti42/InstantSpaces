@@ -1,19 +1,27 @@
-# InstantSpaces
+# SpaceJumper
 
-[![notarized download](https://img.shields.io/github/actions/workflow/status/alberti42/InstantSpaces/verify-release.yml?label=notarized%20download&logo=apple)](https://github.com/alberti42/InstantSpaces/actions/workflows/verify-release.yml)
-[![build](https://img.shields.io/github/actions/workflow/status/alberti42/InstantSpaces/build.yml?branch=main&label=build)](https://github.com/alberti42/InstantSpaces/actions/workflows/build.yml)
+[![notarized download](https://img.shields.io/github/actions/workflow/status/alberti42/SpaceJumper/verify-release.yml?label=notarized%20download&logo=apple)](https://github.com/alberti42/SpaceJumper/actions/workflows/verify-release.yml)
+[![build](https://img.shields.io/github/actions/workflow/status/alberti42/SpaceJumper/build.yml?branch=main&label=build)](https://github.com/alberti42/SpaceJumper/actions/workflows/build.yml)
 
-**A menu-bar app for macOS that switches between Spaces without the slide animation.**
+**A menu-bar app for macOS that switches between Spaces without the slide animation, or with a slide as long as you choose.**
 
-**[Download InstantSpaces.zip](https://github.com/alberti42/InstantSpaces/releases/latest/download/InstantSpaces.zip)** (latest release, signed and notarized). See [Installation](#installation).
+Ever wished you could jump between your Mac's Spaces like a starship jumping to
+hyperspace? SpaceJumper switches Spaces instantly, without macOS's slide. And
+if you'd like to see the jump, you can set how long it takes.
+
+**[Download SpaceJumper.zip](https://github.com/alberti42/SpaceJumper/releases/latest/download/SpaceJumper.zip)** (latest release, signed and notarized). See [Installation](#installation).
 
 Free and open source (GPL-3.0). Requires macOS 26 or later; runs natively on
 Apple silicon and Intel Macs.
 
 macOS has no setting to turn off the animation that plays when you switch
 Spaces. "Reduce motion" replaces the slide with a cross-fade, which is still an
-animation. InstantSpaces switches with no animation at all: the new Space
-appears at once.
+animation. SpaceJumper switches with no animation at all: the new Space
+appears at once. If you prefer a slide, SpaceJumper draws its own, as long as
+you set it.
+
+SpaceJumper was called InstantSpaces up to version 0.1.1; see
+[Moving from InstantSpaces](#moving-from-instantspaces).
 
 ---
 
@@ -55,19 +63,19 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
 - **Slide animation** (off by default): a slide of your chosen length, 0 to
-  500 ms in 10 ms steps, for the shortcuts and swipes. InstantSpaces draws it
+  500 ms in 10 ms steps, for the shortcuts and swipes. SpaceJumper draws it
   itself, so ⌃1 … ⌃9 slide straight to the desktop.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
 - **Open at login**, through a login helper registered with macOS.
-- **Updates** through [Sparkle](https://sparkle-project.org): InstantSpaces
+- **Updates** through [Sparkle](https://sparkle-project.org): SpaceJumper
   checks for a new version once a week, or when you choose Check for Updates in
   its menu.
 
 ## Status
 
-InstantSpaces is early work. It relies on private macOS interfaces (see
+SpaceJumper is early work. It relies on private macOS interfaces (see
 [How it works](#how-it-works)), which Apple can change in any update.
 
 Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled,
@@ -79,51 +87,65 @@ Space, and Mission Control shows it.
 
 Not yet tested:
 
-- macOS 26, and any Mac with System Integrity Protection enabled. InstantSpaces
+- macOS 26, and any Mac with System Integrity Protection enabled. SpaceJumper
   declares macOS 26 as its minimum, but no one has run it there yet. If you
   find a problem on macOS 26, please open an
-  [issue](https://github.com/alberti42/InstantSpaces/issues).
+  [issue](https://github.com/alberti42/SpaceJumper/issues).
 - More than one display.
 
 Known issue, not yet reproduced: once, after a long session of tests, the menu
 bar, set to hide automatically, no longer appeared when the pointer reached the
-top of the screen. Quitting InstantSpaces and restarting the Dock did not bring
-it back; logging out did. Whether InstantSpaces caused it is not known.
+top of the screen. Quitting SpaceJumper and restarting the Dock did not bring
+it back; logging out did. Whether SpaceJumper caused it is not known.
 
 ## Installation
 
-1. Download [`InstantSpaces.zip`](https://github.com/alberti42/InstantSpaces/releases/latest/download/InstantSpaces.zip)
-   from the [latest release](https://github.com/alberti42/InstantSpaces/releases/latest).
-2. Unzip it and move `InstantSpaces.app` to the Applications folder.
+1. Download [`SpaceJumper.zip`](https://github.com/alberti42/SpaceJumper/releases/latest/download/SpaceJumper.zip)
+   from the [latest release](https://github.com/alberti42/SpaceJumper/releases/latest).
+2. Unzip it and move `SpaceJumper.app` to the Applications folder.
 3. Open it. The number of the current desktop appears in the menu bar.
-4. macOS asks whether InstantSpaces may use Accessibility. Allow it for instant
+4. macOS asks whether SpaceJumper may use Accessibility. Allow it for instant
    trackpad swipes (System Settings → Privacy & Security → Accessibility); the
    keyboard shortcuts work without it. See
    [Permissions and privacy](#permissions-and-privacy).
 5. Turn off macOS's shortcuts that use the same keys (next section).
-6. To start InstantSpaces when you log in, turn on Open at Login in its Settings.
+6. To start SpaceJumper when you log in, turn on Open at Login in its Settings.
 
 The app is signed with a Developer ID and notarized by Apple. To check where a
 downloaded ZIP was built:
 
 ```sh
-gh attestation verify InstantSpaces.zip --repo alberti42/InstantSpaces
+gh attestation verify SpaceJumper.zip --repo alberti42/SpaceJumper
 ```
+
+### Moving from InstantSpaces
+
+SpaceJumper was called InstantSpaces up to version 0.1.1. The two apps have
+different bundle identifiers, so InstantSpaces cannot update itself to
+SpaceJumper; it shows the new release with a link to this page instead.
+
+1. Quit InstantSpaces and move `InstantSpaces.app` to the Trash. This also
+   removes its login item.
+2. Install SpaceJumper as above. On first launch it copies the InstantSpaces
+   settings: modifier keys, shortcut groups, swipes, wrap-around and updates.
+3. Allow Accessibility access for SpaceJumper, and turn on Open at Login again
+   if you used it. You can remove InstantSpaces from System Settings → Privacy &
+   Security → Accessibility.
 
 ## Turn off the system shortcuts
 
 macOS binds ⌃← and ⌃→ to its own animated switch by default. If both
-InstantSpaces and macOS react to the same key, both switch. With the default
+SpaceJumper and macOS react to the same key, both switch. With the default
 modifier ⌃, turn them off in System Settings → Keyboard → Keyboard Shortcuts →
 Mission Control: untick "Move left a space" and "Move right a space", and
 "Switch to Desktop 1 … 9" if you have turned those on (they are off by default).
 
-The Settings window of InstantSpaces lists the switched-on macOS shortcuts
+The Settings window of SpaceJumper lists the switched-on macOS shortcuts
 that its keys would also trigger, with the name System Settings uses where
-InstantSpaces knows it, and has a button that opens Keyboard settings.
+SpaceJumper knows it, and has a button that opens Keyboard settings.
 Alternatively, choose other modifier keys.
 
-For arrow keys, macOS stores ⌃← and fn⌃← the same way, so InstantSpaces cannot
+For arrow keys, macOS stores ⌃← and fn⌃← the same way, so SpaceJumper cannot
 tell them apart. It counts only the Mission Control shortcuts, which macOS
 defines with plain arrows; the window-tiling shortcuts (fn⌃←, fn⌃→) do not
 react to ⌃← and ⌃→. A macOS shortcut that you rebind yourself to a plain arrow
@@ -133,28 +155,28 @@ is not detected.
 
 - The keyboard shortcuts need no permission: they are registered with
   `RegisterEventHotKey`, which does not require Accessibility access.
-- Instant trackpad swipes need Accessibility access. InstantSpaces reads the
+- Instant trackpad swipes need Accessibility access. SpaceJumper reads the
   trackpad's swipe events before the Dock does, drops them and switches
   instead; macOS allows that only to apps with Accessibility access. On first
-  launch InstantSpaces asks for it; Settings shows whether it has it. Without
+  launch SpaceJumper asks for it; Settings shows whether it has it. Without
   it, or with "Switch instantly on trackpad swipes" off, swipes keep macOS's
-  animation. InstantSpaces only looks at the trackpad's Dock swipe events and,
+  animation. SpaceJumper only looks at the trackpad's Dock swipe events and,
   when a swipe begins, at the Dock's accessibility elements to tell whether
   App Exposé is open. It does not read the keyboard.
-- InstantSpaces connects to the network only for updates: it downloads the
+- SpaceJumper connects to the network only for updates: it downloads the
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
-  you install an update, `InstantSpaces.zip` from GitHub Releases. Sparkle sends
-  no system profile; the requests carry the names and versions of InstantSpaces
+  you install an update, `SpaceJumper.zip` from GitHub Releases. Sparkle sends
+  no system profile; the requests carry the names and versions of SpaceJumper
   and Sparkle in the User-Agent header. Turn off "Check for updates
   automatically" in Settings → General to check only when you choose Check for
   Updates.
-- InstantSpaces collects no data.
+- SpaceJumper collects no data.
 - Its settings (modifier keys, shortcut groups, swipes, wrapping) are stored in
-  `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
+  `~/Library/Preferences/io.alberti42.SpaceJumper.plist`.
 
 ## Troubleshooting
 
-- **Swipes switch with macOS's animation.** InstantSpaces lacks Accessibility
+- **Swipes switch with macOS's animation.** SpaceJumper lacks Accessibility
   access, or "Switch instantly on trackpad swipes" is off. Settings →
   Shortcuts shows both.
 - **Swipes do nothing.** Check how many fingers macOS uses: Settings →
@@ -174,11 +196,11 @@ is not detected.
   it off in Desktop & Dock → Mission Control to keep the order you set.
 
 If none of these applies, please open an
-[issue](https://github.com/alberti42/InstantSpaces/issues) with your macOS
+[issue](https://github.com/alberti42/SpaceJumper/issues) with your macOS
 version and what you did. A log helps: run
 
 ```sh
-/usr/bin/log stream --level debug --predicate 'subsystem == "io.alberti42.InstantSpaces"'
+/usr/bin/log stream --level debug --predicate 'subsystem == "io.alberti42.SpaceJumper"'
 ```
 
 in Terminal, repeat the problem, and attach the output.
@@ -191,7 +213,7 @@ The animation is drawn by the Dock. When you switch Spaces, the Dock shows both
 Spaces, slides them across the screen, and then tells WindowServer to make the
 new Space current. WindowServer makes that change at once.
 
-InstantSpaces sends WindowServer the same three requests the Dock sends,
+SpaceJumper sends WindowServer the same three requests the Dock sends,
 without the slide: show the new Space, make it current, hide the other Spaces.
 It uses SkyLight's bridged window-management operations
 (`SLSBridgedShowSpacesOperation`, `SLSBridgedManagedDisplaySetCurrentSpaceOperation`,
@@ -203,7 +225,7 @@ Dock, `SLSManagedDisplaySetCurrentSpace` changes the Space, but
 `SLSShowSpaces` and `SLSHideSpaces` are refused, so the windows of both Spaces
 stay on screen. The bridged operations are accepted.
 
-With a slide animation set, InstantSpaces draws the slide itself, as the Dock
+With a slide animation set, SpaceJumper draws the slide itself, as the Dock
 does: it shows the new Space shifted one screen width to the side, moves both
 Spaces across the screen about 120 times a second
 (`SLSBridgedSpaceSetTransformOperation`), and then sends the same three
@@ -212,14 +234,14 @@ requests and puts both Spaces back in place.
 ### Trackpad swipes
 
 A swipe between Spaces reaches the Dock as a series of "Dock swipe" events:
-began, changed (with the distance moved), ended. InstantSpaces watches them
+began, changed (with the distance moved), ended. SpaceJumper watches them
 with an event tap placed before the Dock. It drops the began event, so the
 Dock never starts its slide; at the first changed event that moved, it
 switches one Space in that direction, as the keyboard shortcuts do. From macOS
 27 on, the ended event is passed on with its motion set to zero, because the
 Dock needs it to finish the gesture. Swipes inside Mission Control are
 intercepted in the same way. Swipes inside App Exposé are left to the Dock,
-which does not switch Spaces there; InstantSpaces recognises App Exposé from
+which does not switch Spaces there; SpaceJumper recognises App Exposé from
 the Dock's accessibility elements when a swipe begins.
 
 ## Building from source
@@ -228,13 +250,13 @@ Requires the Swift 6.2 toolchain or later (Xcode or the Command Line Tools).
 No Xcode project is involved.
 
 ```sh
-make app     # build/InstantSpaces.app, signed ad hoc
+make app     # build/SpaceJumper.app, signed ad hoc
 make run     # build and open it
 make test    # run the tests
 ```
 
-Open the app from the Finder or with `open build/InstantSpaces.app`. Started
-from a shell as `Contents/MacOS/InstantSpaces`, macOS attributes its
+Open the app from the Finder or with `open build/SpaceJumper.app`. Started
+from a shell as `Contents/MacOS/SpaceJumper`, macOS attributes its
 Accessibility request to the shell. macOS also ties the Accessibility
 permission to the app's signature: an app signed ad hoc gets a new signature
 with every build, so the permission has to be granted again after each build.
@@ -248,9 +270,9 @@ SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" make app
 ```
 
 To use your own signing identity, also change the bundle identifiers
-`io.alberti42.InstantSpaces` and `io.alberti42.InstantSpaces.LoginHelper` in
+`io.alberti42.SpaceJumper` and `io.alberti42.SpaceJumper.LoginHelper` in
 `Resources/Info.plist`, `Resources/LoginHelper-Info.plist`,
-`Sources/LoginHelper/main.swift` and `Sources/InstantSpaces/LoginItem.swift`.
+`Sources/LoginHelper/main.swift` and `Sources/SpaceJumper/LoginItem.swift`.
 To publish your own updates, set `SUFeedURL` (your appcast) and
 `SUPublicEDKey` (your EdDSA public key) in `Resources/Info.plist`; otherwise
 your build offers the updates published in this repository.
@@ -258,21 +280,21 @@ your build offers the updates published in this repository.
 The executable also takes commands, which switch once and exit:
 
 ```sh
-build/InstantSpaces.app/Contents/MacOS/InstantSpaces --list            # displays and Spaces
-build/InstantSpaces.app/Contents/MacOS/InstantSpaces --move right
-build/InstantSpaces.app/Contents/MacOS/InstantSpaces --desktop 2
+build/SpaceJumper.app/Contents/MacOS/SpaceJumper --list            # displays and Spaces
+build/SpaceJumper.app/Contents/MacOS/SpaceJumper --move right
+build/SpaceJumper.app/Contents/MacOS/SpaceJumper --desktop 2
 ```
 
 ## Credits
 
 - [InstantSpaceSwitcher](https://github.com/jurplel/InstantSpaceSwitcher) by
   jurplel skips the animation by sending the Dock a trackpad swipe with a very
-  high velocity. InstantSpaces intercepts swipes following its findings on the
+  high velocity. SpaceJumper intercepts swipes following its findings on the
   Dock's swipe events: the event fields and the handling of the ended event on
   macOS 27.
 - [yabai](https://github.com/asmvik/yabai) by asmvik uses the bridged
   operations to move windows between Spaces
-  ([#2788](https://github.com/asmvik/yabai/issues/2788)); InstantSpaces looks up
+  ([#2788](https://github.com/asmvik/yabai/issues/2788)); SpaceJumper looks up
   SkyLight's private perform function the same way.
 
 The app was created with AI assistance (Claude).

@@ -5,7 +5,7 @@ name: Publish Release (Update Appcast)
 # for pre-releases, so publishing a pre-release leaves the appcast alone, and
 # promoting it to a full release later updates the appcast.
 # This workflow:
-#   1. Downloads InstantSpaces.zip from the release assets.
+#   1. Downloads SpaceJumper.zip from the release assets.
 #   2. Adds an item for it to the Sparkle appcast (Releases/appcast.xml), with
 #      the GitHub release asset as the download URL.
 #   3. Commits only the updated appcast to main.
@@ -13,7 +13,7 @@ name: Publish Release (Update Appcast)
 # Secret (repository settings > Secrets and variables > Actions):
 #   SPARKLE_ED_PRIVATE_KEY  base64 of the EdDSA private key (Sparkle's key-file
 #                           format: base64 of the 32-byte Ed25519 seed). The key
-#                           is kept in 1Password, item "InstantSpaces", section
+#                           is kept in 1Password, item "SpaceJumper", section
 #                           "Sparkle"; see AGENTS.md.
 
 on:
@@ -48,7 +48,7 @@ jobs:
         run: |
           TAG="${{ github.event.release.tag_name || inputs.tag }}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "zip=InstantSpaces.zip" >> "$GITHUB_OUTPUT"
+          echo "zip=SpaceJumper.zip" >> "$GITHUB_OUTPUT"
 
       # generate_appcast comes from the Sparkle version in Package.resolved, the
       # one the app embeds. SwiftPM downloads it with the Sparkle package.
@@ -66,7 +66,7 @@ jobs:
           ZIP:      ${{ steps.info.outputs.zip }}
         run: |
           # generate_appcast uses this filename to build the enclosure URL:
-          # https://github.com/<repo>/releases/download/<tag>/InstantSpaces.zip
+          # https://github.com/<repo>/releases/download/<tag>/SpaceJumper.zip
           gh release download "$TAG" --pattern "$ZIP" --output "Releases/$ZIP"
 
       - name: Update Sparkle appcast
@@ -116,6 +116,16 @@ jobs:
           python3 bin/md_to_html.py "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/notes.html"
           # Adds <description><![CDATA[…]]></description> to the newest <item>
           python3 bin/inject_appcast_notes.py Releases/appcast.xml "$RUNNER_TEMP/notes.html"
+
+      - name: Point InstantSpaces installs to the release page
+        env:
+          REPO: ${{ github.repository }}
+          TAG:  ${{ steps.info.outputs.tag }}
+        run: |
+          # InstantSpaces 0.1.x has another bundle identifier, which Sparkle
+          # cannot update; it shows the release with a link instead.
+          python3 bin/mark_informational_for_old_builds.py Releases/appcast.xml \
+            "https://github.com/${REPO}/releases/tag/${TAG}"
 
       - name: Commit and push changes to main
         env:

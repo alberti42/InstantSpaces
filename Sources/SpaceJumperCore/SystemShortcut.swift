@@ -23,7 +23,7 @@ public struct SystemShortcut: Equatable, Sendable {
         public let section: String
     }
 
-    /// The System Settings label for the internal names InstantSpaces knows.
+    /// The System Settings label for the internal names SpaceJumper knows.
     /// Each title is the English text of System Settings' table
     /// (`KeyboardSettings.appex/Contents/Resources/DefaultShortcutsTable.loctable`).
     public var label: Label? {
@@ -48,7 +48,7 @@ public struct SystemShortcut: Equatable, Sendable {
     }
 
     /// Whether the shortcut reacts to an arrow key without fn (Globe), as far
-    /// as InstantSpaces can tell. For arrow keys SkyLight stores ⌃← and fn⌃←
+    /// as SpaceJumper can tell. For arrow keys SkyLight stores ⌃← and fn⌃←
     /// the same way (key 123, flags 0x840000, identical records), and
     /// WindowServer's matching reports both. Pressing ⌃← on macOS 27 does
     /// not trigger the window-tiling shortcuts (default fn⌃←), while the
@@ -69,7 +69,7 @@ public struct SystemShortcut: Equatable, Sendable {
     }
 }
 
-/// A binding of InstantSpaces that a macOS shortcut also reacts to.
+/// A binding of SpaceJumper that a macOS shortcut also reacts to.
 public struct ShortcutClash: Equatable, Sendable {
     public let binding: HotKeyBinding
     public let shortcut: SystemShortcut

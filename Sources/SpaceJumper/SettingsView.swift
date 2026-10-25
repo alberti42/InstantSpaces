@@ -1,4 +1,4 @@
-import InstantSpacesCore
+import SpaceJumperCore
 import SwiftUI
 
 /// The Settings window, opened from the menu with Settings… (⌘,).
@@ -55,10 +55,10 @@ private struct ShortcutsPane: View {
                     }
                 } label: {
                     Text("Swipe set in macOS")
-                    Text("InstantSpaces reacts to the swipe macOS uses between Spaces: Trackpad → More Gestures → Swipe between full-screen applications.")
+                    Text("SpaceJumper reacts to the swipe macOS uses between Spaces: Trackpad → More Gestures → Swipe between full-screen applications.")
                 }
                 if model.swipesNeedAccess {
-                    Label("InstantSpaces needs Accessibility access to intercept swipes.", systemImage: "exclamationmark.triangle")
+                    Label("SpaceJumper needs Accessibility access to intercept swipes.", systemImage: "exclamationmark.triangle")
                     HStack {
                         Button("Open Accessibility Settings…") { model.openAccessibilitySettings() }
                         Button("Ask Again") { model.requestAccessibilityPermission() }
@@ -67,7 +67,7 @@ private struct ShortcutsPane: View {
             } header: {
                 Text("Trackpad")
             } footer: {
-                Text("Turn it off to keep macOS's swipe with its animation; InstantSpaces then needs no Accessibility access.")
+                Text("Turn it off to keep macOS's swipe with its animation; SpaceJumper then needs no Accessibility access.")
                     .foregroundStyle(.secondary)
             }
 
@@ -111,7 +111,7 @@ private struct ShortcutsPane: View {
                             Button("Open Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
                         } label: {
                             Text("Turn the macOS shortcut off")
-                            Text("When macOS uses the same keys, both macOS and InstantSpaces react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
+                            Text("When macOS uses the same keys, both macOS and SpaceJumper react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
                         }
                     }
                 } header: {
@@ -164,8 +164,8 @@ private struct GeneralPane: View {
                 Text("Updates")
             } footer: {
                 Text(updater.isAvailable
-                     ? "InstantSpaces checks once a week."
-                     : "Updates are only available in InstantSpaces.app.")
+                     ? "SpaceJumper checks once a week."
+                     : "Updates are only available in SpaceJumper.app.")
                     .foregroundStyle(.secondary)
             }
             .disabled(!updater.isAvailable)

@@ -1,4 +1,4 @@
-/// The macOS settings that change how InstantSpaces behaves, as the Settings
+/// The macOS settings that change how SpaceJumper behaves, as the Settings
 /// window reports them. Nil means the preference is not set.
 public struct MacOSSettings: Equatable, Sendable {
     /// `com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture`;
@@ -37,12 +37,12 @@ public struct MacOSSettings: Equatable, Sendable {
     /// while the option has its default, on (confirmed on macOS 27.0.1).
     public var rearrangesSpacesEffectively: Bool { rearrangesSpaces ?? true }
 
-    /// What the rearranging means for InstantSpaces, for the General tab. It
-    /// does not conflict with InstantSpaces, which follows the order macOS
+    /// What the rearranging means for SpaceJumper, for the General tab. It
+    /// does not conflict with SpaceJumper, which follows the order macOS
     /// shows.
     public var rearrangeExplanation: String {
         rearrangesSpacesEffectively
-            ? "macOS moves Spaces as you use them, so desktop numbers can change. InstantSpaces follows the order macOS shows. To keep the order fixed, turn this off in Desktop & Dock → Mission Control."
+            ? "macOS moves Spaces as you use them, so desktop numbers can change. SpaceJumper follows the order macOS shows. To keep the order fixed, turn this off in Desktop & Dock → Mission Control."
             : "macOS keeps Spaces in the order you set (Desktop & Dock → Mission Control)."
     }
 }

@@ -1,5 +1,5 @@
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 private let spaces = [Space(id: 1, type: 0), Space(id: 475, type: 0), Space(id: 600, type: 4)]
 

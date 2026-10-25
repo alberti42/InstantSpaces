@@ -1,5 +1,5 @@
 import Foundation
-import InstantSpacesCore
+import SpaceJumperCore
 
 /// Runs a command given on the command line and exits, for testing the switch
 /// without hotkeys. Returns without doing anything if there is no command.

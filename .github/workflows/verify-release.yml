@@ -1,6 +1,6 @@
 name: Verify Published Release
 
-# Checks the InstantSpaces.zip attached to the latest published release — the
+# Checks the SpaceJumper.zip attached to the latest published release — the
 # file users download — the way a user's Mac would:
 #   1. Build provenance: the ZIP was built by draft-release.yml from a tag.
 #   2. Code signature: valid, and made with the Developer ID of team 9V3X7C8VCK.
@@ -39,15 +39,15 @@ jobs:
           # Without a tag, gh picks the latest release: not a draft, not a pre-release.
           TAG=$(gh release view --repo "$REPO" --json tagName -q .tagName)
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          gh release download "$TAG" --repo "$REPO" --pattern InstantSpaces.zip
-          shasum -a 256 InstantSpaces.zip
+          gh release download "$TAG" --repo "$REPO" --pattern SpaceJumper.zip
+          shasum -a 256 SpaceJumper.zip
           echo "Latest release: $TAG"
 
       - name: Verify build provenance
         env:
           TAG: ${{ steps.rel.outputs.tag }}
         run: |
-          gh attestation verify InstantSpaces.zip \
+          gh attestation verify SpaceJumper.zip \
             --repo "$REPO" \
             --signer-workflow "$REPO/.github/workflows/draft-release.yml" \
             --source-ref "refs/tags/$TAG"
@@ -55,23 +55,23 @@ jobs:
       - name: Extract the app
         run: |
           # ditto keeps the extended attributes that hold the stapled ticket.
-          ditto -x -k InstantSpaces.zip extracted
-          test -d "extracted/InstantSpaces.app"
+          ditto -x -k SpaceJumper.zip extracted
+          test -d "extracted/SpaceJumper.app"
 
       - name: Verify code signature and team
         run: |
-          APP="extracted/InstantSpaces.app"
+          APP="extracted/SpaceJumper.app"
           codesign --verify --deep --strict --verbose=2 "$APP"
           TEAM=$(codesign -dv "$APP" 2>&1 | sed -n 's/^TeamIdentifier=//p')
           echo "TeamIdentifier: $TEAM"
           test "$TEAM" = "$TEAM_ID"
 
       - name: Verify stapled notarization ticket
-        run: xcrun stapler validate "extracted/InstantSpaces.app"
+        run: xcrun stapler validate "extracted/SpaceJumper.app"
 
       - name: Verify Gatekeeper accepts the app
         run: |
-          OUT=$(spctl --assess --type execute --verbose=4 "extracted/InstantSpaces.app" 2>&1)
+          OUT=$(spctl --assess --type execute --verbose=4 "extracted/SpaceJumper.app" 2>&1)
           echo "$OUT"
           echo "$OUT" | grep -q "source=Notarized Developer ID"
 
@@ -84,4 +84,4 @@ jobs:
             -H "Accept: application/vnd.github.raw" \
             | grep -o -m1 '<enclosure url="[^"]*"' | cut -d'"' -f2)
           echo "Newest appcast item: $URL"
-          test "$URL" = "https://github.com/$REPO/releases/download/$TAG/InstantSpaces.zip"
+          test "$URL" = "https://github.com/$REPO/releases/download/$TAG/SpaceJumper.zip"

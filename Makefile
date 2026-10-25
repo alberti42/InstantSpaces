@@ -1,8 +1,8 @@
-# Build InstantSpaces with Swift Package Manager and assemble the app bundle.
+# Build SpaceJumper with Swift Package Manager and assemble the app bundle.
 #
 #   make            debug build, no bundle
 #   make test       run the Swift tests and the tests of the scripts in bin/
-#   make app        build/InstantSpaces.app with the login helper and Sparkle embedded
+#   make app        build/SpaceJumper.app with the login helper and Sparkle embedded
 #   make run        make app, then open it
 #   make clean
 #
@@ -24,8 +24,8 @@ else
 TIMESTAMP := --timestamp
 endif
 
-APP := build/InstantSpaces.app
-HELPER := $(APP)/Contents/Library/LoginItems/InstantSpacesLoginHelper.app
+APP := build/SpaceJumper.app
+HELPER := $(APP)/Contents/Library/LoginItems/SpaceJumperLoginHelper.app
 SPARKLE := $(APP)/Contents/Frameworks/Sparkle.framework
 SIGN := codesign --force --options runtime $(TIMESTAMP) --sign "$(SIGN_IDENTITY)"
 
@@ -39,14 +39,14 @@ test:
 	python3 -m unittest discover -s Tests/Scripts -p '*_test.py'
 
 app:
-	swift build -c release $(ARCH_FLAGS) --product InstantSpaces
+	swift build -c release $(ARCH_FLAGS) --product SpaceJumper
 	swift build -c release $(ARCH_FLAGS) --product LoginHelper
 	rm -rf "$(APP)"
 	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Frameworks" "$(HELPER)/Contents/MacOS"
 	# ditto keeps the symbolic links inside the framework.
 	BIN="$$(swift build -c release $(ARCH_FLAGS) --show-bin-path)"; \
-	cp "$$BIN/InstantSpaces" "$(APP)/Contents/MacOS/InstantSpaces"; \
-	cp "$$BIN/LoginHelper" "$(HELPER)/Contents/MacOS/InstantSpacesLoginHelper"; \
+	cp "$$BIN/SpaceJumper" "$(APP)/Contents/MacOS/SpaceJumper"; \
+	cp "$$BIN/LoginHelper" "$(HELPER)/Contents/MacOS/SpaceJumperLoginHelper"; \
 	ditto "$$BIN/Sparkle.framework" "$(SPARKLE)"
 	cp Resources/Info.plist "$(APP)/Contents/Info.plist"
 	cp Resources/LoginHelper-Info.plist "$(HELPER)/Contents/Info.plist"

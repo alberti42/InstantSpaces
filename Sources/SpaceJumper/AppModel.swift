@@ -1,6 +1,6 @@
 import AppKit
 import Combine
-import InstantSpacesCore
+import SpaceJumperCore
 
 /// State behind the menu and the Settings window: the current desktop, the
 /// shortcut settings and the login item. Owns the switcher and the hotkeys.
@@ -13,7 +13,7 @@ final class AppModel: ObservableObject {
         static let swipes = "swipesEnabled"
         static let wrapsAround = "wrapsAround"
         static let animationDuration = "animationDurationMilliseconds"
-        /// Set once InstantSpaces has shown macOS's Accessibility dialog by itself.
+        /// Set once SpaceJumper has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
 
@@ -140,7 +140,7 @@ final class AppModel: ObservableObject {
         do {
             try LoginItem.setEnabled(enabled)
         } catch {
-            NSLog("InstantSpaces: could not change the login item: \(error.localizedDescription)")
+            NSLog("SpaceJumper: could not change the login item: \(error.localizedDescription)")
         }
         opensAtLogin = LoginItem.isEnabled
         if LoginItem.status == .requiresApproval { LoginItem.openSystemSettings() }

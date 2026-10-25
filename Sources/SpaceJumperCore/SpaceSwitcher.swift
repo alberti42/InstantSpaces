@@ -1,7 +1,7 @@
 import Foundation
 import os
 
-public let log = Logger(subsystem: "io.alberti42.InstantSpaces", category: "switch")
+public let log = Logger(subsystem: "io.alberti42.SpaceJumper", category: "switch")
 
 /// Switches Spaces: show the new Space, make it current, hide the others.
 /// WindowServer does this at once; the Dock, which draws macOS's slide, is not

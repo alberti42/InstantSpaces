@@ -17,7 +17,7 @@ import re
 import sys
 
 CHANGELOG = pathlib.Path(__file__).resolve().parent.parent / "CHANGELOG.md"
-REPO_URL = "https://github.com/alberti42/InstantSpaces"
+REPO_URL = "https://github.com/alberti42/SpaceJumper"
 
 
 def section_body(text, name):

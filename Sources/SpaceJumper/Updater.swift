@@ -11,7 +11,7 @@ final class Updater: NSObject, SPUStandardUserDriverDelegate {
     static let shared = Updater()
 
     /// Sparkle reads its settings from the app bundle, so an unbundled build
-    /// (`.build/debug/InstantSpaces`) does not start the updater.
+    /// (`.build/debug/SpaceJumper`) does not start the updater.
     let isAvailable = Bundle.main.bundleURL.pathExtension == "app"
 
     /// False while a check or an update is in progress.
@@ -62,7 +62,7 @@ final class Updater: NSObject, SPUStandardUserDriverDelegate {
 
     // MARK: SPUStandardUserDriverDelegate
 
-    /// InstantSpaces has no Dock icon. With gentle reminders, Sparkle shows the update
+    /// SpaceJumper has no Dock icon. With gentle reminders, Sparkle shows the update
     /// found by a scheduled check without taking the focus, and the menu
     /// offers the update until the user opens it.
     nonisolated var supportsGentleScheduledUpdateReminders: Bool { true }

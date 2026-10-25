@@ -56,7 +56,7 @@ jobs:
             echo "ERROR: tag $TAG does not match CFBundleShortVersionString $PLIST_VERSION"
             exit 1
           fi
-          ZIP="InstantSpaces.zip"
+          ZIP="SpaceJumper.zip"
           echo "tag=$TAG"     >> "$GITHUB_OUTPUT"
           echo "short=$SHORT" >> "$GITHUB_OUTPUT"
           echo "build=$BUILD" >> "$GITHUB_OUTPUT"
@@ -97,7 +97,7 @@ jobs:
           TEAM_ID: ${{ secrets.NOTARIZATION_TEAM_ID }}
         run: |
           make app ARCHS=universal SIGN_IDENTITY="Developer ID Application: Andrea Alberti ($TEAM_ID)"
-          codesign -vv --deep --strict build/InstantSpaces.app
+          codesign -vv --deep --strict build/SpaceJumper.app
 
       # ── Notarize ──────────────────────────────────────────────────────────────
       - name: Notarize with Apple and staple ticket
@@ -107,7 +107,7 @@ jobs:
           APP_PASS: ${{ secrets.NOTARIZATION_PASSWORD }}
           ZIP:      ${{ steps.ver.outputs.zip }}
         run: |
-          APP="build/InstantSpaces.app"
+          APP="build/SpaceJumper.app"
 
           # Package for submission
           ditto -c -k --keepParent "$APP" "$ZIP"
@@ -132,7 +132,7 @@ jobs:
       # built by this workflow, from this commit and tag. publish-release.yml
       # signs the ZIP for Sparkle without changing the file, so the attestation
       # stays valid for the file users download. To verify a downloaded ZIP:
-      #   gh attestation verify InstantSpaces.zip --repo alberti42/InstantSpaces
+      #   gh attestation verify SpaceJumper.zip --repo alberti42/SpaceJumper
       - name: Attest build provenance
         uses: actions/attest@v4
         with:

@@ -5,7 +5,7 @@ public enum Command: Equatable, Sendable {
     case desktop(Int)
     case space(UInt64)
 
-    public static let usage = "usage: InstantSpaces [--list | --move left|right | --desktop N | --space ID]"
+    public static let usage = "usage: SpaceJumper [--list | --move left|right | --desktop N | --space ID]"
 
     /// Flags for the menu-bar app itself rather than a command (debug builds:
     /// `--show-settings` opens the Settings window at launch).

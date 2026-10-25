@@ -1,6 +1,6 @@
 import AppKit
 import ApplicationServices
-import InstantSpacesCore
+import SpaceJumperCore
 
 /// A session event tap that hands horizontal Dock swipes from the trackpad to
 /// `SwipeInterceptor` and drops or edits them before the Dock sees them.

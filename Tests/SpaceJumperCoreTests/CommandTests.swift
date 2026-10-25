@@ -1,5 +1,5 @@
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 @Suite struct CommandTests {
     @Test func noArgumentsStartTheApp() {

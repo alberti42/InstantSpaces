@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 private let spaces = [
     Space(id: 1, type: 0),

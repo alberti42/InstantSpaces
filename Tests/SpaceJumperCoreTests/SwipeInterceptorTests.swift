@@ -1,5 +1,5 @@
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 private func began() -> DockSwipeEvent { DockSwipeEvent(phase: .began) }
 private func changed(_ progress: Double) -> DockSwipeEvent { DockSwipeEvent(phase: .changed, progress: progress) }

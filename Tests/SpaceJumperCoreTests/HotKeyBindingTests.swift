@@ -1,6 +1,6 @@
 import Carbon.HIToolbox
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 @Suite struct HotKeyBindingTests {
     @Test func defaultPrefixIsControl() {

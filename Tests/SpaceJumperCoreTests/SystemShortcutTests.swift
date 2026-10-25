@@ -1,6 +1,6 @@
 import Carbon.HIToolbox
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 // Values as SkyLight reported them on macOS 27.0.1.
 private let tileLeftHalf = SystemShortcut(id: 240, keyCode: kVK_LeftArrow, flags: 0x840000, identifier: "WindowTileLeftHalf")

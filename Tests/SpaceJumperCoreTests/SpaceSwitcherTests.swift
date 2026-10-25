@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import InstantSpacesCore
+@testable import SpaceJumperCore
 
 /// A `SpaceServer` that serves fixed displays and records the switch calls.
 private final class FakeServer: SpaceServer {

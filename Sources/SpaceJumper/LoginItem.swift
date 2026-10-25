@@ -2,12 +2,12 @@ import Foundation
 import ServiceManagement
 
 /// Open at Login through the embedded helper app
-/// (`Contents/Library/LoginItems/InstantSpacesLoginHelper.app`).
+/// (`Contents/Library/LoginItems/SpaceJumperLoginHelper.app`).
 ///
 /// The registration state lives in the system, not in user defaults: the user can
 /// switch the item off in System Settings > General > Login Items & Extensions.
 enum LoginItem {
-    static let helperIdentifier = "io.alberti42.InstantSpaces.LoginHelper"
+    static let helperIdentifier = "io.alberti42.SpaceJumper.LoginHelper"
 
     static var service: SMAppService { .loginItem(identifier: helperIdentifier) }
 

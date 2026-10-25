@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct InstantSpacesApp: App {
+struct SpaceJumperApp: App {
     @StateObject private var model = AppModel()
 
     init() {
@@ -68,7 +68,7 @@ private struct MenuContent: View {
         UpdateItem(updater: Updater.shared)
         Divider()
 
-        Button("Quit InstantSpaces") { NSApp.terminate(nil) }
+        Button("Quit SpaceJumper") { NSApp.terminate(nil) }
             .keyboardShortcut("q")
     }
 }
