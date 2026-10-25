@@ -289,15 +289,24 @@ build/SpaceJumper.app/Contents/MacOS/SpaceJumper --desktop 2
 
 ## Credits
 
+SpaceJumper builds on findings of two projects and works differently from both.
+
 - [InstantSpaceSwitcher](https://github.com/jurplel/InstantSpaceSwitcher) by
   jurplel skips the animation by sending the Dock a trackpad swipe with a very
-  high velocity. SpaceJumper intercepts swipes following its findings on the
-  Dock's swipe events: the event fields and the handling of the ended event on
-  macOS 27.
-- [yabai](https://github.com/asmvik/yabai) by asmvik uses the bridged
-  operations to move windows between Spaces
-  ([#2788](https://github.com/asmvik/yabai/issues/2788)); SpaceJumper looks up
-  SkyLight's private perform function the same way.
+  high velocity, so the Dock still makes the switch.
+  - **Taken:** its findings on the Dock's swipe events, namely the event fields
+    and the handling of the ended event on macOS 27. SpaceJumper intercepts
+    trackpad swipes with them.
+  - **Different:** SpaceJumper creates no events of its own. It switches through
+    WindowServer itself (see [How it works](#how-it-works)), and it adds its own
+    slide, the menu-bar number, ⌃1 … ⌃9 and wrap-around.
+- [yabai](https://github.com/asmvik/yabai) by asmvik is a tiling window manager.
+  It uses the bridged operations to move windows between Spaces
+  ([#2788](https://github.com/asmvik/yabai/issues/2788)).
+  - **Taken:** how to look up SkyLight's private perform function for the
+    bridged operations.
+  - **Different:** SpaceJumper manages no windows and loads no code into the
+    Dock; it only switches Spaces.
 
 The app was created with AI assistance (Claude).
 
