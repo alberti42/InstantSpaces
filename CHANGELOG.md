@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-25
+
 ### Changed
 
 - InstantSpaces is now called SpaceJumper, with the bundle identifier `io.alberti42.SpaceJumper`. On first launch SpaceJumper copies the InstantSpaces settings; macOS asks again for Accessibility access, and Open at Login has to be switched on again. InstantSpaces cannot update itself to SpaceJumper: install SpaceJumper by hand and delete InstantSpaces.
@@ -43,6 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/alberti42/SpaceJumper/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/alberti42/SpaceJumper/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alberti42/SpaceJumper/releases/tag/v0.1.0
