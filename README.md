@@ -23,6 +23,11 @@ you set it.
 SpaceJumper was called InstantSpaces up to version 0.1.1; see
 [Moving from InstantSpaces](#moving-from-instantspaces).
 
+<p align="left">
+  <img src="Images/Settings-General.png" width="380" align="top" alt="SpaceJumper's Settings, General tab: slide animation, the macOS option to rearrange Spaces, the menu-bar frame, startup and updates">
+  <img src="Images/Settings-Shortcuts.png" width="380" align="top" alt="SpaceJumper's Settings, Shortcuts tab: modifier keys, the two shortcut groups, trackpad swipes with the swipe set in macOS, and wrap-around">
+</p>
+
 ---
 
 ## Table of Contents
