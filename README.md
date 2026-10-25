@@ -68,13 +68,14 @@ InstantSpaces is early work. It relies on private macOS interfaces (see
 
 Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled:
 the keyboard shortcuts, trackpad swipes in both directions with natural
-scrolling on, and switching to and from full-screen Spaces.
+scrolling on and off (the direction follows macOS's), and switching to and from
+full-screen Spaces.
 
 Not yet tested:
 
 - macOS 26, and any Mac with System Integrity Protection enabled.
-- Trackpad swipes with natural scrolling off, inside Mission Control and App
-  Exposé, and with Karabiner-Elements running.
+- Trackpad swipes inside Mission Control and App Exposé, and with
+  Karabiner-Elements running.
 - More than one display.
 - Whether the Dock's own record of the current Space (used by Mission Control
   and by macOS's swipe) stays correct after InstantSpaces switches.
