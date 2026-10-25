@@ -46,6 +46,23 @@ private func ended(velocity: Double = 0) -> DockSwipeEvent { DockSwipeEvent(phas
     }
 
 
+    @Test func swipesBeganInAppExposeAreLeftToTheDock() {
+        var interceptor = SwipeInterceptor(passesEndedWithoutMotion: true)
+        #expect(interceptor.handle(began(), leftToDock: true) == .pass)
+        #expect(interceptor.handleCompanionGesture() == .pass)
+        #expect(interceptor.handle(changed(0.2)) == .pass)
+        #expect(interceptor.handle(ended(velocity: 2)) == .pass)
+    }
+
+    @Test func dockExposeViews() {
+        #expect(DockExposeView(topLevelIdentifiers: []) == DockExposeView.none)
+        #expect(DockExposeView(topLevelIdentifiers: ["mc"]) == .missionControl)
+        #expect(DockExposeView(topLevelIdentifiers: ["appexpose"]) == .appExpose)
+        #expect(DockExposeView.appExpose.leavesSwipesToDock)
+        #expect(!DockExposeView.missionControl.leavesSwipesToDock)
+        #expect(!DockExposeView.none.leavesSwipesToDock)
+    }
+
     @Test func cancelledEndsTracking() {
         var interceptor = SwipeInterceptor(passesEndedWithoutMotion: true)
         _ = interceptor.handle(began())

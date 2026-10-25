@@ -106,8 +106,9 @@ final class GestureTap {
                 phase: DockSwipeEvent.Phase(rawValue: Int(event.getIntegerValueField(Field.phase))),
                 progress: event.getDoubleValueField(Field.progress),
                 velocity: event.getDoubleValueField(Field.velocityX))
-            verdict = interceptor.handle(swipe)
-            log.debug("swipe phase \(event.getIntegerValueField(Field.phase), privacy: .public) progress \(swipe.progress, privacy: .public) velocity \(swipe.velocity, privacy: .public) -> \(String(describing: verdict.action), privacy: .public) \(verdict.switchDirection?.rawValue ?? "", privacy: .public)")
+            let leftToDock = swipe.phase == .began && Self.dockExposeView().leavesSwipesToDock
+            verdict = interceptor.handle(swipe, leftToDock: leftToDock)
+            log.debug("swipe phase \(event.getIntegerValueField(Field.phase), privacy: .public) progress \(swipe.progress, privacy: .public) velocity \(swipe.velocity, privacy: .public) leftToDock \(leftToDock, privacy: .public) -> \(String(describing: verdict.action), privacy: .public) \(verdict.switchDirection?.rawValue ?? "", privacy: .public)")
         default:
             return Unmanaged.passUnretained(event)
         }
@@ -127,5 +128,26 @@ final class GestureTap {
             event.setDoubleValueField(Field.velocityY, value: 0)
             return Unmanaged.passUnretained(event)
         }
+    }
+
+    /// Mission Control or App Exposé, from the Dock's accessibility tree; see
+    /// `DockExposeView`. Asked once per swipe, at Began. A slow Dock counts
+    /// as neither after 50 ms.
+    private static func dockExposeView() -> DockExposeView {
+        guard let dock = NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.dock").first
+        else { return .none }
+        let app = AXUIElementCreateApplication(dock.processIdentifier)
+        AXUIElementSetMessagingTimeout(app, 0.05)
+        var value: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(app, kAXChildrenAttribute as CFString, &value) == .success,
+              let children = value as? [AXUIElement]
+        else { return .none }
+        let identifiers = children.compactMap { child -> String? in
+            var identifier: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(child, kAXIdentifierAttribute as CFString, &identifier) == .success
+            else { return nil }
+            return identifier as? String
+        }
+        return DockExposeView(topLevelIdentifiers: identifiers)
     }
 }

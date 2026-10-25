@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Trackpad swipes inside Mission Control and App Exposé switch at once too. On macOS 27 this was already the case, because InstantSpaces did not recognise Mission Control there; it no longer tries to.
+- Trackpad swipes inside Mission Control switch at once too. On macOS 27 this was already the case, because InstantSpaces did not recognise Mission Control there.
+
+### Fixed
+
+- Trackpad swipes inside App Exposé no longer switch Spaces, as in macOS.
 
 ## [0.1.0] - 2026-10-25
 

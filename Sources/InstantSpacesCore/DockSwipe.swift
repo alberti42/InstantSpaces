@@ -74,11 +74,17 @@ public struct SwipeInterceptor: Sendable {
         value == 0 ? nil : (value > 0 ? .right : .left)
     }
 
-    /// Swipes inside Mission Control are intercepted too: the switch is instant
-    /// there as well, and Mission Control shows the new Space.
-    public mutating func handle(_ event: DockSwipeEvent) -> SwipeVerdict {
+    /// `leftToDock`: the swipe begins in a Dock view that handles swipes
+    /// itself (App Exposé, see `DockExposeView`); all its events are passed
+    /// on. Swipes inside Mission Control are intercepted: the switch is
+    /// instant there as well, and Mission Control shows the new Space.
+    public mutating func handle(_ event: DockSwipeEvent, leftToDock: Bool = false) -> SwipeVerdict {
         switch event.phase {
         case .began:
+            if leftToDock {
+                isTracking = false
+                return .pass
+            }
             isTracking = true
             hasSwitched = false
             return .drop
@@ -114,4 +120,27 @@ public struct SwipeInterceptor: Sendable {
     public func handleCompanionGesture() -> SwipeVerdict {
         isTracking ? .drop : .pass
     }
+}
+
+/// The Exposé view the Dock shows, judged from the identifiers of the Dock's
+/// top-level accessibility elements: Mission Control adds a group with
+/// identifier `mc`, App Exposé one with `appexpose` (macOS 27.0.1).
+public enum DockExposeView: Equatable, Sendable {
+    case none
+    case missionControl
+    case appExpose
+
+    public init(topLevelIdentifiers identifiers: [String]) {
+        if identifiers.contains("appexpose") {
+            self = .appExpose
+        } else if identifiers.contains("mc") {
+            self = .missionControl
+        } else {
+            self = .none
+        }
+    }
+
+    /// In App Exposé macOS does not switch Spaces on a swipe, so swipes are
+    /// left to the Dock there.
+    public var leavesSwipesToDock: Bool { self == .appExpose }
 }

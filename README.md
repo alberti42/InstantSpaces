@@ -173,8 +173,10 @@ with an event tap placed before the Dock. It drops the began event, so the
 Dock never starts its slide; at the first changed event that moved, it
 switches one Space in that direction, as the keyboard shortcuts do. From macOS
 27 on, the ended event is passed on with its motion set to zero, because the
-Dock needs it to finish the gesture. Swipes inside Mission Control and App
-Exposé are intercepted in the same way.
+Dock needs it to finish the gesture. Swipes inside Mission Control are
+intercepted in the same way. Swipes inside App Exposé are left to the Dock,
+which does not switch Spaces there; InstantSpaces recognises App Exposé from
+the Dock's accessibility elements when a swipe begins.
 
 ## Building from source
 
