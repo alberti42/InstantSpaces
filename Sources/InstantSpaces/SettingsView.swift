@@ -87,13 +87,15 @@ private struct ShortcutsPane: View {
                         Label(failure, systemImage: "exclamationmark.triangle")
                     }
                     if !model.clashes.isEmpty {
-                        Button("Open Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
+                        LabeledContent {
+                            Button("Open Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
+                        } label: {
+                            Text("Turn the macOS shortcut off")
+                            Text("When macOS uses the same keys, both macOS and InstantSpaces react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
+                        }
                     }
                 } header: {
                     Text("Conflicts")
-                } footer: {
-                    Text("When macOS uses the same keys, both macOS and InstantSpaces react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
-                        .foregroundStyle(.secondary)
                 }
             }
         }
