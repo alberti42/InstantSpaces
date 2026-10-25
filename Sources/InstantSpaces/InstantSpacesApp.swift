@@ -36,6 +36,7 @@ private struct MenuBarLabel: View {
                 guard CommandLine.arguments.contains("--show-settings") else { return }
                 NSApp.activate()
                 openSettings()
+                SettingsWindow.bringToFront()
             }
             #endif
     }
@@ -61,6 +62,7 @@ private struct MenuContent: View {
         Button("Settings…") {
             NSApp.activate()
             openSettings()
+            SettingsWindow.bringToFront()
         }
         .keyboardShortcut(",")
         UpdateItem(updater: Updater.shared)
@@ -81,6 +83,23 @@ private struct UpdateItem: View {
                 updater.checkForUpdates()
             }
             .disabled(!updater.canCheckForUpdates)
+        }
+    }
+}
+
+/// Since macOS 14 `NSApp.activate()` is a request that macOS can decline while
+/// another app is active; the Settings window then opened behind it (seen
+/// with Ghostty). Ordering the window itself to the front works regardless.
+@MainActor
+enum SettingsWindow {
+    static func bringToFront() {
+        // `openSettings` creates the window on a later pass of the run loop.
+        DispatchQueue.main.async {
+            guard let window = NSApp.windows.first(where: {
+                $0.identifier?.rawValue == "com_apple_SwiftUI_Settings_window"
+            }) else { return }
+            window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
         }
     }
 }

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- The Settings window comes to the front when opened from the menu; it could stay behind the active app.
+
 ## [0.1.1] - 2026-10-25
 
 ### Changed
