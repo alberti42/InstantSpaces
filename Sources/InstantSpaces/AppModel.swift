@@ -27,6 +27,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var opensAtLogin = LoginItem.isEnabled
     /// Swipes are switched on but the app lacks Accessibility permission.
     @Published private(set) var swipesNeedAccess = false
+    /// The macOS settings the Settings window reports.
+    @Published private(set) var macOSSettings = MacOSSettings()
 
     @Published var modifierPrefix: ModifierPrefix {
         didSet { UserDefaults.standard.set(modifierPrefix.rawValue, forKey: Key.modifierPrefix); registerHotKeys() }
@@ -82,6 +84,7 @@ final class AppModel: ObservableObject {
             self.refresh()
         }
         updateGestureTap()
+        refreshMacOSSettings()
 
         // Also posted when another tool, or the Dock, changes the Space.
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(
@@ -92,7 +95,10 @@ final class AppModel: ObservableObject {
         })
         // macOS shortcuts can be switched on or off in System Settings at any time.
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refreshClashes() }
+            MainActor.assumeIsolated {
+                self?.refreshClashes()
+                self?.refreshMacOSSettings()
+            }
         }
     }
 
@@ -126,6 +132,35 @@ final class AppModel: ObservableObject {
         }
         opensAtLogin = LoginItem.isEnabled
         if LoginItem.status == .requiresApproval { LoginItem.openSystemSettings() }
+    }
+
+    /// Reads the trackpad and Mission Control preferences again; System
+    /// Settings can change them at any time.
+    func refreshMacOSSettings() {
+        func value(_ key: String, _ domain: String) -> CFPropertyList? {
+            CFPreferencesAppSynchronize(domain as CFString)
+            return CFPreferencesCopyAppValue(key as CFString, domain as CFString)
+        }
+        let trackpad = "com.apple.AppleMultitouchTrackpad"
+        let settings = MacOSSettings(
+            threeFingerHorizontalSwipe: value("TrackpadThreeFingerHorizSwipeGesture", trackpad) as? Int,
+            fourFingerHorizontalSwipe: value("TrackpadFourFingerHorizSwipeGesture", trackpad) as? Int,
+            rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool)
+        if settings != macOSSettings { macOSSettings = settings }
+    }
+
+    func openTrackpadSettings() {
+        openSystemSettings("com.apple.Trackpad-Settings.extension")
+    }
+
+    func openMissionControlSettings() {
+        openSystemSettings("com.apple.Desktop-Settings.extension")
+    }
+
+    private func openSystemSettings(_ pane: String) {
+        if let url = URL(string: "x-apple.systempreferences:\(pane)") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     func openKeyboardShortcutsSettings() {

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- The Settings window shows the macOS settings that affect InstantSpaces: how swiping between Spaces is set in Trackpad settings (three fingers, four fingers or off), and whether macOS rearranges Spaces based on most recent use. Change… buttons open the matching panes of System Settings.
+
 ### Fixed
 
 - The Settings window comes to the front when opened from the menu; it could stay behind the active app.

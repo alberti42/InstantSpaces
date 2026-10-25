@@ -12,6 +12,7 @@ struct SettingsView: View {
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
+        .onAppear { model.refreshMacOSSettings() }
     }
 }
 
@@ -46,7 +47,18 @@ private struct ShortcutsPane: View {
             Section {
                 Toggle(isOn: $model.swipesEnabled) {
                     Text("Switch instantly on trackpad swipes")
-                    Text("Swiping left or right between Spaces, with the fingers set in Trackpad settings")
+                    Text("Swiping left or right between Spaces")
+                }
+                LabeledContent {
+                    HStack {
+                        if let setting = model.macOSSettings.swipeSetting {
+                            Text(setting)
+                        }
+                        Button("Change…") { model.openTrackpadSettings() }
+                    }
+                } label: {
+                    Text("Swipe set in macOS")
+                    Text("InstantSpaces reacts to the swipe macOS uses between Spaces: Trackpad → More Gestures → Swipe between full-screen applications.")
                 }
                 if model.swipesNeedAccess {
                     Label("InstantSpaces needs Accessibility access to intercept swipes.", systemImage: "exclamationmark.triangle")
@@ -103,6 +115,23 @@ private struct GeneralPane: View {
 
     var body: some View {
         Form {
+            Section {
+                LabeledContent {
+                    HStack {
+                        Text(model.macOSSettings.rearrangesSpacesEffectively ? "On" : "Off")
+                        Button("Change…") { model.openMissionControlSettings() }
+                    }
+                } label: {
+                    Label {
+                        Text("Automatically rearrange Spaces based on most recent use")
+                        Text(model.macOSSettings.rearrangeExplanation)
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            } header: {
+                Text("Mission Control")
+            }
             Section("Startup") {
                 Toggle("Open at login", isOn: Binding(
                     get: { model.opensAtLogin },
