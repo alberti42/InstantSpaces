@@ -69,12 +69,12 @@ InstantSpaces is early work. It relies on private macOS interfaces (see
 Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled:
 the keyboard shortcuts, trackpad swipes in both directions with natural
 scrolling on and off (the direction follows macOS's), trackpad swipes inside
-Mission Control, and switching to and from full-screen Spaces.
+Mission Control and App Exposé, and switching to and from full-screen Spaces.
 
 Not yet tested:
 
 - macOS 26, and any Mac with System Integrity Protection enabled.
-- Trackpad swipes inside App Exposé, and with Karabiner-Elements running.
+- Trackpad swipes with Karabiner-Elements running.
 - More than one display.
 - Whether the Dock's own record of the current Space (used by Mission Control
   and by macOS's swipe) stays correct after InstantSpaces switches.
@@ -173,8 +173,8 @@ with an event tap placed before the Dock. It drops the began event, so the
 Dock never starts its slide; at the first changed event that moved, it
 switches one Space in that direction, as the keyboard shortcuts do. From macOS
 27 on, the ended event is passed on with its motion set to zero, because the
-Dock needs it to finish the gesture. Swipes inside Mission Control are
-intercepted in the same way, and Mission Control shows the new Space.
+Dock needs it to finish the gesture. Swipes inside Mission Control and App
+Exposé are intercepted in the same way.
 
 ## Building from source
 
