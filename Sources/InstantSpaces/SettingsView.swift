@@ -89,6 +89,9 @@ private struct ShortcutsPane: View {
             }
         }
         .formStyle(.grouped)
+        // The window grows to fit the pane instead of scrolling it.
+        .scrollDisabled(true)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -120,5 +123,8 @@ private struct GeneralPane: View {
             .disabled(!updater.isAvailable)
         }
         .formStyle(.grouped)
+        // The window grows to fit the pane instead of scrolling it.
+        .scrollDisabled(true)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
