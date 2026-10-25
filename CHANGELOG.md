@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Slide animation, off by default: switches slide for a duration you choose, 0 to 500 ms in 10 ms steps (Settings → General). It applies to the shortcuts and swipes; ⌃1 … ⌃9 slide straight to the desktop, and wrap-around keeps the direction of the move.
 - The Settings window shows the macOS settings that affect SpaceJumper: how swiping between Spaces is set in Trackpad settings (three fingers, four fingers or off), and whether macOS rearranges Spaces based on most recent use. Change… buttons open the matching panes of System Settings.
+- A frame around the desktop number in the menu bar, to tell it apart from other numbers there (Settings → General → Menu Bar): none, an outline, or a filled shape with the number cut out; as a rounded rectangle or a capsule, which is a circle around one digit.
 
 ### Fixed
 

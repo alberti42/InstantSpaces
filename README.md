@@ -54,7 +54,9 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
   switched off in Settings). This needs Accessibility access; see
   [Permissions and privacy](#permissions-and-privacy).
 - **Menu-bar item** showing the number of the current desktop, or "F" on a
-  full-screen Space.
+  full-screen Space. It can have a frame, to tell it apart from other numbers
+  in the menu bar: an outline or a filled shape with the number cut out, as a
+  rounded rectangle or a capsule.
 - **Settings window** (Settings… in the menu, ⌘,): the modifier keys, the two
   shortcut groups (arrows and numbers), each of which can be switched off, Open
   at Login and updates. It lists the shortcuts that macOS or another app

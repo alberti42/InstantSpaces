@@ -13,6 +13,8 @@ final class AppModel: ObservableObject {
         static let swipes = "swipesEnabled"
         static let wrapsAround = "wrapsAround"
         static let animationDuration = "animationDurationMilliseconds"
+        static let menuBarFrame = "menuBarFrame"
+        static let menuBarFrameShape = "menuBarFrameShape"
         /// Set once SpaceJumper has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -59,6 +61,14 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The frame around the desktop number in the menu bar.
+    @Published var menuBarFrame: MenuBarFrame {
+        didSet { UserDefaults.standard.set(menuBarFrame.rawValue, forKey: Key.menuBarFrame) }
+    }
+    @Published var menuBarFrameShape: MenuBarFrameShape {
+        didSet { UserDefaults.standard.set(menuBarFrameShape.rawValue, forKey: Key.menuBarFrameShape) }
+    }
+
     private let switcher: SpaceSwitcher?
     private let hotKeys = HotKeyCenter()
     private let gestureTap = GestureTap()
@@ -77,6 +87,8 @@ final class AppModel: ObservableObject {
         swipesEnabled = defaults.bool(forKey: Key.swipes)
         wrapsAround = defaults.bool(forKey: Key.wrapsAround)
         animationMilliseconds = defaults.integer(forKey: Key.animationDuration)
+        menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
+        menuBarFrameShape = MenuBarFrameShape(rawValue: defaults.string(forKey: Key.menuBarFrameShape) ?? "") ?? .roundedRectangle
 
         do {
             switcher = try SpaceSwitcher()

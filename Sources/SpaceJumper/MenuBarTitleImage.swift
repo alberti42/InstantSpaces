@@ -1,4 +1,5 @@
 import AppKit
+import SpaceJumperCore
 
 /// The menu-bar label as a template image of fixed width. A `Text` label changes
 /// the item's width with each number ("1" is narrower than "2"; the menu bar
@@ -36,7 +37,44 @@ enum MenuBarTitleImage {
         title.count <= 1 ? singleCharacterSize : twoCharacterSize
     }
 
-    static func make(_ title: String) -> NSImage {
+    /// The number in a frame: an outline, or a filled shape with the number
+    /// cut out (drawn with `destinationOut`, so the menu bar shows through).
+    /// The text is centred on its cap height inside the frame, and the frame
+    /// has the same width for all one-character labels.
+    private static func makeFramed(_ title: String, frame: MenuBarFrame, shape: MenuBarFrameShape) -> NSImage {
+        let framedFont = NSFont.monospacedDigitSystemFont(ofSize: font.pointSize - 1, weight: frame == .filled ? .semibold : .medium)
+        let attributes: [NSAttributedString.Key: Any] = [.font: framedFont, .foregroundColor: NSColor.black]
+        let widest = (title.count <= 1 ? widestSingleCharacters : widestTwoCharacters)
+            .map { ($0 as NSString).size(withAttributes: attributes).width }.max() ?? 8
+        let layout = MenuBarBadgeLayout(textWidth: widest, shape: shape)
+        let image = NSImage(size: NSSize(width: layout.width, height: layout.height), flipped: false) { rect in
+            let lineWidth: CGFloat = 1.25
+            let inset = frame == .outline ? lineWidth / 2 : 0
+            let radius = max(0, layout.cornerRadius - inset)
+            let path = NSBezierPath(roundedRect: rect.insetBy(dx: inset, dy: inset), xRadius: radius, yRadius: radius)
+            NSColor.black.set()
+            if frame == .filled {
+                path.fill()
+            } else {
+                path.lineWidth = lineWidth
+                path.stroke()
+            }
+            let text = title as NSString
+            let width = text.size(withAttributes: attributes).width
+            // `draw(at:)` places the bottom of the line, below the baseline by the
+            // descender; the digits' baseline goes where they are centred.
+            let baseline = (rect.height - framedFont.capHeight) / 2
+            let origin = NSPoint(x: (rect.width - width) / 2, y: baseline + framedFont.descender)
+            if frame == .filled { NSGraphicsContext.current?.compositingOperation = .destinationOut }
+            text.draw(at: origin, withAttributes: attributes)
+            return true
+        }
+        image.isTemplate = true
+        return image
+    }
+
+    static func make(_ title: String, frame: MenuBarFrame = .none, shape: MenuBarFrameShape = .roundedRectangle) -> NSImage {
+        if frame != .none { return makeFramed(title, frame: frame, shape: shape) }
         let image = NSImage(size: size(for: title), flipped: false) { rect in
             let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: NSColor.black]
             let text = title as NSString

@@ -151,6 +151,20 @@ private struct GeneralPane: View {
             } header: {
                 Text("Mission Control")
             }
+            Section {
+                Picker("Frame", selection: $model.menuBarFrame) {
+                    ForEach(MenuBarFrame.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+                Picker("Shape", selection: $model.menuBarFrameShape) {
+                    ForEach(MenuBarFrameShape.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+                .disabled(model.menuBarFrame == .none)
+            } header: {
+                Text("Menu Bar")
+            } footer: {
+                Text("A frame tells the desktop number apart from other numbers in the menu bar. Filled cuts the number out of the shape; a capsule around one digit is a circle.")
+                    .foregroundStyle(.secondary)
+            }
             Section("Startup") {
                 Toggle("Open at login", isOn: Binding(
                     get: { model.opensAtLogin },
