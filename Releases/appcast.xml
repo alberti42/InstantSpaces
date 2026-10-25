@@ -6,6 +6,46 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.2.0</title>
+            <pubDate>Sun, 25 Oct 2026 11:03:44 +0000</pubDate>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.2.0</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.2.0/SpaceJumper.zip" length="1474981" type="application/octet-stream" sparkle:edSignature="NzHtWRdYI8+tPpavvadG8l012GKekjlTdXoUI5mGbZZ+xBj7DST7ovv2KUp6DIPbquTImm140Z53500bodc1BQ=="/>
+        
+            <description><![CDATA[
+<p>InstantSpaces is now <strong>SpaceJumper</strong>, and it can slide too.</p>
+<p>Ever wished you could jump between your Mac's Spaces like a starship jumping to hyperspace? SpaceJumper switches Spaces instantly, without macOS's slide. And if you'd like to see the jump, you can set how long it takes.</p>
+<h3>New name</h3>
+<p>InstantSpaces was too close to the name of <a href="https://github.com/jurplel/InstantSpaceSwitcher">InstantSpaceSwitcher</a>, whose findings this app builds on. The app is now SpaceJumper, with a new bundle identifier, so macOS treats it as a new app:</p>
+<ul>
+<li><strong>InstantSpaces cannot update itself to SpaceJumper.</strong> It shows this release with a link to this page. Quit InstantSpaces, move it to the Trash, and install SpaceJumper below.</li>
+<li><strong>Your settings carry over:</strong> on first launch SpaceJumper copies the InstantSpaces settings (modifier keys, shortcut groups, swipes, wrap-around, updates).</li>
+<li><strong>Grant Accessibility again</strong> when macOS asks, and turn Open at Login on again if you used it.</li>
+</ul>
+<h3>Added</h3>
+<ul>
+<li><strong>Slide animation</strong> (Settings → General, off by default): switches slide for the time you set, from 0 to 500 ms in 10 ms steps. SpaceJumper draws the slide itself, for the shortcuts and the swipes. ⌃1 … ⌃9 slide straight to the desktop, and wrap-around keeps the direction of the move.</li>
+<li><strong>The macOS settings that affect SpaceJumper</strong> are shown in Settings, each with a Change… button to its pane in System Settings:</li>
+</ul>
+<p>- how swiping between Spaces is set in Trackpad → More Gestures (three fingers, four fingers or off); - whether macOS rearranges Spaces based on most recent use, which changes the desktop numbers.</p>
+<ul>
+<li><strong>A frame around the menu-bar number</strong> (Settings → General → Menu Bar), to tell it apart from other numbers in the menu bar: an outline, or a filled shape with the number cut out, as a rounded rectangle or a capsule (a circle around one digit).</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>The Settings window comes to the front when opened from the menu; it could stay behind the active app.</li>
+</ul>
+<h3>Tested</h3>
+<p>Tested on one Mac with macOS 27.0.1, with Karabiner-Elements running. Still untested: macOS 26 and more than one display. Please report problems in the <a href="https://github.com/alberti42/SpaceJumper/issues">issues</a>.</p>
+<p><a href="https://github.com/alberti42/SpaceJumper/compare/v0.1.1...v0.2.0">All changes since 0.1.1</a></p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.1.1</title>
             <pubDate>Sun, 25 Oct 2026 08:40:38 +0000</pubDate>
             <sparkle:version>3</sparkle:version>
