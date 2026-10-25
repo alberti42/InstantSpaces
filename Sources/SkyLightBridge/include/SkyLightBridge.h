@@ -23,6 +23,17 @@ BOOL SLBShowSpaces(NSArray<NSNumber *> *spaces);
 BOOL SLBHideSpaces(NSArray<NSNumber *> *spaces);
 BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
 
+/// Draws `space` shifted `x` points to the right of its place (negative: to
+/// the left), through `SLSBridgedSpaceSetTransformOperation`. WindowServer
+/// reads the transform's translation the other way round, so this passes −x.
+/// 0 puts the Space back. Asynchronous, like the operations above.
+BOOL SLBSetSpaceOffset(uint64_t space, double x);
+
+/// The width in points of the display with this identifier (a UUID), or of
+/// the main display when no display has it, as for "Main" when displays
+/// share Spaces.
+double SLBDisplayWidth(NSString *display);
+
 /// The enabled system shortcuts ("symbolic hotkeys"): one dictionary per
 /// shortcut with "id", "keyCode" and "flags" (CGEventFlags). IDs 0–511 are read.
 NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(void);

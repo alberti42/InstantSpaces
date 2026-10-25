@@ -11,6 +11,10 @@ public protocol SpaceServer: AnyObject {
     func showSpaces(_ spaces: [UInt64])
     func setCurrentSpace(_ space: UInt64, display: String)
     func hideSpaces(_ spaces: [UInt64])
+    /// Draws `space` shifted `x` points to the right of its place; 0 puts it back.
+    func setSpaceOffset(_ space: UInt64, x: Double)
+    /// The width in points of the display with this identifier.
+    func displayWidth(_ display: String) -> Double
     /// The macOS keyboard shortcuts that are switched on, without names.
     func enabledSystemShortcuts() -> [SystemShortcut]
     /// SkyLight's internal name of a shortcut, e.g. "WindowTileLeftHalf".
@@ -52,6 +56,14 @@ public final class SkyLightServer: SpaceServer {
 
     public func hideSpaces(_ spaces: [UInt64]) {
         SLBHideSpaces(spaces.map { NSNumber(value: $0) })
+    }
+
+    public func setSpaceOffset(_ space: UInt64, x: Double) {
+        SLBSetSpaceOffset(space, x)
+    }
+
+    public func displayWidth(_ display: String) -> Double {
+        SLBDisplayWidth(display)
     }
 
     public func enabledSystemShortcuts() -> [SystemShortcut] {

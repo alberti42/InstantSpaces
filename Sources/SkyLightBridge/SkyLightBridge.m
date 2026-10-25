@@ -1,5 +1,6 @@
 #import "SkyLightBridge.h"
 
+#import <ColorSync/ColorSync.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import <dlfcn.h>
 #import <mach-o/dyld.h>
@@ -100,7 +101,8 @@ BOOL SLBLoad(NSString **error)
     if (!sIsEventMatchingSymbolicHotKey) [missing addObject:@"SLSIsEventMatchingSymbolicHotKey"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
-                             @"SLSBridgedManagedDisplaySetCurrentSpaceOperation"]) {
+                             @"SLSBridgedManagedDisplaySetCurrentSpaceOperation",
+                             @"SLSBridgedSpaceSetTransformOperation"]) {
         if (!NSClassFromString(name)) [missing addObject:name];
     }
     if (missing.count > 0) {
@@ -154,6 +156,36 @@ BOOL SLBSetCurrentSpace(NSString *display, uint64_t space)
     if (!operation) return NO;
     sPerform(operation);
     return YES;
+}
+
+BOOL SLBSetSpaceOffset(uint64_t space, double x)
+{
+    Class cls = NSClassFromString(@"SLSBridgedSpaceSetTransformOperation");
+    if (!cls) return NO;
+    id operation = ((id (*)(id, SEL, uint64_t, CGAffineTransform, unsigned))objc_msgSend)(
+        [cls alloc], sel_registerName("initWithSpaceID:transform:options:"), space,
+        CGAffineTransformMakeTranslation(-x, 0), 0);
+    if (!operation) return NO;
+    sPerform(operation);
+    return YES;
+}
+
+double SLBDisplayWidth(NSString *display)
+{
+    CGDirectDisplayID displays[16];
+    uint32_t count = 0;
+    if (CGGetActiveDisplayList(16, displays, &count) == kCGErrorSuccess) {
+        for (uint32_t i = 0; i < count; ++i) {
+            CFUUIDRef uuid = CGDisplayCreateUUIDFromDisplayID(displays[i]);
+            if (!uuid) continue;
+            NSString *identifier = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+            CFRelease(uuid);
+            if ([identifier caseInsensitiveCompare:display] == NSOrderedSame) {
+                return CGDisplayBounds(displays[i]).size.width;
+            }
+        }
+    }
+    return CGDisplayBounds(CGMainDisplayID()).size.width;
 }
 
 NSArray<NSDictionary<NSString *, NSNumber *> *> *SLBCopyEnabledSymbolicHotKeys(void)

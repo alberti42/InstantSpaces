@@ -8,6 +8,7 @@ private final class FakeServer: SpaceServer {
         case show([UInt64])
         case setCurrent(UInt64, display: String)
         case hide([UInt64])
+        case offset(UInt64, x: Double)
     }
 
     var displays: [[String: Any]]
@@ -29,11 +30,37 @@ private final class FakeServer: SpaceServer {
     func showSpaces(_ spaces: [UInt64]) { calls.append(.show(spaces)) }
     func setCurrentSpace(_ space: UInt64, display: String) { calls.append(.setCurrent(space, display: display)) }
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
+    func setSpaceOffset(_ space: UInt64, x: Double) { calls.append(.offset(space, x: x)) }
+    func displayWidth(_ display: String) -> Double { 1000 }
     func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
     func systemShortcutName(_ id: Int32) -> String? { names[id] }
     func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool {
         matchQueries.append((id, keyCode, flags))
         return triggers.contains("\(id)-\(keyCode)-\(flags)")
+    }
+}
+
+/// Runs a slide only when the test calls `step` or `finish`.
+private final class ManualAnimator: SlideAnimator {
+    private(set) var duration: TimeInterval?
+    private var step: ((Double) -> Void)?
+    private var completion: (() -> Void)?
+    var isRunning: Bool { completion != nil }
+
+    func run(duration: TimeInterval, step: @escaping (Double) -> Void, completion: @escaping () -> Void) {
+        self.duration = duration
+        self.step = step
+        self.completion = completion
+    }
+
+    func step(to progress: Double) { step?(progress) }
+
+    func finish() {
+        let step = self.step, completion = self.completion
+        self.step = nil
+        self.completion = nil
+        step?(1)
+        completion?()
     }
 }
 
@@ -59,6 +86,14 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
     let server = FakeServer(displays: [display("A", current: current, spaces: mainSpaces)], activeDisplay: "A")
     let clock = Clock()
     return (SpaceSwitcher(server: server, now: { clock.now }), server, clock)
+}
+
+private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, ManualAnimator) {
+    let server = FakeServer(displays: [display("A", current: current, spaces: mainSpaces)], activeDisplay: "A")
+    let animator = ManualAnimator()
+    let switcher = SpaceSwitcher(server: server, animator: animator)
+    switcher.animationDuration = 0.3
+    return (switcher, server, animator)
 }
 
 @Suite struct SpaceSwitcherTests {
@@ -193,5 +228,65 @@ private func makeSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeServer, Cl
         server.triggers = ["79-\(bindings[0].keyCode)-\(0xA40000)", "240-\(bindings[0].keyCode)-\(0xA40000)"]
         let clashes = switcher.clashes(with: bindings)
         #expect(clashes.map(\.description) == ["⌃← also triggers “Move left a Space” (Mission Control)"])
+    }
+
+    @Test func slideMovesBothSpacesThenSwitches() {
+        let (switcher, server, animator) = makeAnimatedSwitcher()
+        #expect(switcher.move(.right) == 475)
+        #expect(animator.duration == 0.3)
+        // The new Space waits one display width to the right, then is shown.
+        #expect(server.calls == [.offset(475, x: 1000), .show([475])])
+
+        animator.step(to: 0.5)
+        #expect(Array(server.calls.suffix(2)) == [.offset(1, x: -500), .offset(475, x: 500)])
+
+        animator.finish()
+        #expect(Array(server.calls.suffix(6)) == [
+            .offset(1, x: -1000), .offset(475, x: 0),
+            .setCurrent(475, display: "A"), .hide([1, 600, 610]),
+            .offset(1, x: 0), .offset(475, x: 0),
+        ])
+    }
+
+    @Test func slideComesFromTheLeftWhenMovingLeft() {
+        let (switcher, server, animator) = makeAnimatedSwitcher(current: 475)
+        switcher.move(.left)
+        #expect(server.calls.first == .offset(1, x: -1000))
+        animator.finish()
+    }
+
+    /// Wrapping from the last Space to the first keeps the direction of the move.
+    @Test func wrappingSlidesInTheDirectionOfTheMove() {
+        let (switcher, server, animator) = makeAnimatedSwitcher(current: 610)
+        switcher.wrapsAround = true
+        #expect(switcher.move(.right) == 1)
+        #expect(server.calls.first == .offset(1, x: 1000))
+        animator.finish()
+    }
+
+    @Test func goToDesktopSlidesFromWhereTheDesktopLies() {
+        let (switcher, server, animator) = makeAnimatedSwitcher(current: 610)
+        #expect(switcher.goToDesktop(1) == 1)
+        #expect(server.calls.first == .offset(1, x: -1000))
+        animator.finish()
+    }
+
+    /// A press during a slide ends it at once and moves on from the new Space.
+    @Test func switchDuringASlideFinishesItFirst() {
+        let (switcher, server, animator) = makeAnimatedSwitcher()
+        switcher.move(.right)
+        animator.step(to: 0.3)
+        #expect(switcher.move(.right) == 600)
+        #expect(server.calls.contains(.setCurrent(475, display: "A")))
+        #expect(animator.isRunning)
+        #expect(Array(server.calls.suffix(2)) == [.offset(600, x: 1000), .show([600])])
+        animator.finish()
+    }
+
+    @Test func zeroDurationSwitchesWithoutOffsets() {
+        let (switcher, server, _) = makeAnimatedSwitcher()
+        switcher.animationDuration = 0
+        switcher.move(.right)
+        #expect(server.calls == [.show([475]), .setCurrent(475, display: "A"), .hide([1, 600, 610])])
     }
 }

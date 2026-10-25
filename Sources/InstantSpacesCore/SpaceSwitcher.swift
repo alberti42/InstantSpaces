@@ -4,7 +4,9 @@ import os
 public let log = Logger(subsystem: "io.alberti42.InstantSpaces", category: "switch")
 
 /// Switches Spaces: show the new Space, make it current, hide the others.
-/// WindowServer does this at once; the Dock, which draws the slide, is not involved.
+/// WindowServer does this at once; the Dock, which draws macOS's slide, is not
+/// involved. With an `animationDuration`, the switcher draws its own slide by
+/// shifting the two Spaces on screen before the switch completes.
 public final class SpaceSwitcher {
     /// The bridged operations are asynchronous, so WindowServer can still report
     /// the old Space right after a switch. For this long after a switch, the
@@ -16,14 +18,21 @@ public final class SpaceSwitcher {
     /// of stopping at the ends as macOS does.
     public var wrapsAround = false
 
+    /// How long a switch slides; 0 switches at once.
+    public var animationDuration: TimeInterval = 0
+
     private let server: SpaceServer
     private let now: () -> Date
+    private let animator: SlideAnimator
     private var pending: (display: String, space: UInt64, time: Date)?
 
-    /// `now` is the clock for the pending interval; tests pass their own.
-    public init(server: SpaceServer, now: @escaping () -> Date = Date.init) {
+    /// `now` is the clock for the pending interval and `animator` runs slides;
+    /// tests pass their own.
+    public init(server: SpaceServer, now: @escaping () -> Date = Date.init,
+                animator: SlideAnimator = TimerSlideAnimator()) {
         self.server = server
         self.now = now
+        self.animator = animator
     }
 
     /// A switcher that talks to WindowServer through SkyLight.
@@ -60,7 +69,7 @@ public final class SpaceSwitcher {
               let target = SpaceNavigator.neighbour(of: currentSpace(of: display), in: display.spaces,
                                                     direction: direction, wraps: wrapsAround)
         else { return nil }
-        switchTo(target, on: display)
+        switchTo(target, on: display, direction: direction)
         return target
     }
 
@@ -77,14 +86,43 @@ public final class SpaceSwitcher {
     /// Switches `display` to `space`. Every other Space of the display is
     /// hidden, not only the current one, so a wrong idea of the current Space
     /// cannot leave two Spaces on screen.
-    public func switchTo(_ space: UInt64, on display: DisplaySpaces) {
+    ///
+    /// With an `animationDuration` the new Space slides in from `direction`;
+    /// without one, from the side where it lies in Mission Control. A switch
+    /// during a slide first ends that slide at once.
+    public func switchTo(_ space: UInt64, on display: DisplaySpaces, direction: Direction? = nil) {
+        animator.finish()
         let current = currentSpace(of: display)
         guard space != current else { return }
         log.info("switch \(current, privacy: .public) -> \(space, privacy: .public) on \(display.identifier, privacy: .public)")
+        let others = display.spaces.map(\.id).filter { $0 != space }
+        guard animationDuration > 0 else {
+            server.showSpaces([space])
+            server.setCurrentSpace(space, display: display.identifier)
+            server.hideSpaces(others)
+            pending = (display.identifier, space, now())
+            return
+        }
+
+        let ids = display.spaces.map(\.id)
+        let side = direction
+            ?? ((ids.firstIndex(of: space) ?? 0) > (ids.firstIndex(of: current) ?? 0) ? .right : .left)
+        let slide = Slide(direction: side, width: server.displayWidth(display.identifier))
+        // Until the slide ends and WindowServer catches up, count from the new Space.
+        pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
+        server.setSpaceOffset(space, x: slide.startOffset)
         server.showSpaces([space])
-        server.setCurrentSpace(space, display: display.identifier)
-        server.hideSpaces(display.spaces.map(\.id).filter { $0 != space })
-        pending = (display.identifier, space, now())
+        animator.run(duration: animationDuration, step: { [server] progress in
+            let offsets = slide.offsets(at: progress)
+            server.setSpaceOffset(current, x: offsets.old)
+            server.setSpaceOffset(space, x: offsets.new)
+        }, completion: { [weak self, server] in
+            server.setCurrentSpace(space, display: display.identifier)
+            server.hideSpaces(others)
+            server.setSpaceOffset(current, x: 0)
+            server.setSpaceOffset(space, x: 0)
+            if let self { self.pending = (display.identifier, space, self.now()) }
+        })
     }
 
     /// The bindings among `bindings` that would also trigger a switched-on

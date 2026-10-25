@@ -13,7 +13,7 @@ let package = Package(
         .target(
             name: "SkyLightBridge",
             path: "Sources/SkyLightBridge",
-            linkerSettings: [.linkedFramework("CoreGraphics")]
+            linkerSettings: [.linkedFramework("CoreGraphics"), .linkedFramework("ColorSync")]
         ),
         // Space model, navigation and the switch itself.
         .target(

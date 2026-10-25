@@ -12,6 +12,7 @@ final class AppModel: ObservableObject {
         static let desktopKeys = "desktopKeysEnabled"
         static let swipes = "swipesEnabled"
         static let wrapsAround = "wrapsAround"
+        static let animationDuration = "animationDurationMilliseconds"
         /// Set once InstantSpaces has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -49,6 +50,15 @@ final class AppModel: ObservableObject {
         didSet { UserDefaults.standard.set(wrapsAround, forKey: Key.wrapsAround); switcher?.wrapsAround = wrapsAround }
     }
 
+    /// How long a switch slides, in milliseconds; 0 switches at once. For the
+    /// shortcuts and swipes.
+    @Published var animationMilliseconds: Int {
+        didSet {
+            UserDefaults.standard.set(animationMilliseconds, forKey: Key.animationDuration)
+            switcher?.animationDuration = Double(animationMilliseconds) / 1000
+        }
+    }
+
     private let switcher: SpaceSwitcher?
     private let hotKeys = HotKeyCenter()
     private let gestureTap = GestureTap()
@@ -60,16 +70,18 @@ final class AppModel: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
-                                     Key.wrapsAround: false])
+                                     Key.wrapsAround: false, Key.animationDuration: 0])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
         swipesEnabled = defaults.bool(forKey: Key.swipes)
         wrapsAround = defaults.bool(forKey: Key.wrapsAround)
+        animationMilliseconds = defaults.integer(forKey: Key.animationDuration)
 
         do {
             switcher = try SpaceSwitcher()
             switcher?.wrapsAround = wrapsAround
+            switcher?.animationDuration = Double(animationMilliseconds) / 1000
         } catch {
             switcher = nil
             loadError = "\(error)"

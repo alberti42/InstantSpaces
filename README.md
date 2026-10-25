@@ -54,6 +54,9 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
+- **Slide animation** (off by default): a slide of your chosen length, 0 to
+  500 ms in 10 ms steps, for the shortcuts and swipes. InstantSpaces draws it
+  itself, so ⌃1 … ⌃9 slide straight to the desktop.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
@@ -199,6 +202,12 @@ The plain SkyLight functions are not enough. Called from an app other than the
 Dock, `SLSManagedDisplaySetCurrentSpace` changes the Space, but
 `SLSShowSpaces` and `SLSHideSpaces` are refused, so the windows of both Spaces
 stay on screen. The bridged operations are accepted.
+
+With a slide animation set, InstantSpaces draws the slide itself, as the Dock
+does: it shows the new Space shifted one screen width to the side, moves both
+Spaces across the screen about 120 times a second
+(`SLSBridgedSpaceSetTransformOperation`), and then sends the same three
+requests and puts both Spaces back in place.
 
 ### Trackpad swipes
 
