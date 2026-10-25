@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-25
+
 ### Changed
 
 - Trackpad swipes inside Mission Control switch at once too. On macOS 27 this was already the case, because InstantSpaces did not recognise Mission Control there.
@@ -27,5 +29,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). InstantSpaces checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/InstantSpaces/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/alberti42/InstantSpaces/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/alberti42/InstantSpaces/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alberti42/InstantSpaces/releases/tag/v0.1.0
