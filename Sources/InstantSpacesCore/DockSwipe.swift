@@ -74,15 +74,11 @@ public struct SwipeInterceptor: Sendable {
         value == 0 ? nil : (value > 0 ? .right : .left)
     }
 
-    /// `overlayIsOpen`: Mission Control or App Exposé is on screen. Swipes
-    /// that begin then are left to the Dock.
-    public mutating func handle(_ event: DockSwipeEvent, overlayIsOpen: Bool) -> SwipeVerdict {
+    /// Swipes inside Mission Control are intercepted too: the switch is instant
+    /// there as well, and Mission Control shows the new Space.
+    public mutating func handle(_ event: DockSwipeEvent) -> SwipeVerdict {
         switch event.phase {
         case .began:
-            if overlayIsOpen {
-                isTracking = false
-                return .pass
-            }
             isTracking = true
             hasSwitched = false
             return .drop
@@ -117,14 +113,5 @@ public struct SwipeInterceptor: Sendable {
     /// dropped while a swipe is intercepted.
     public func handleCompanionGesture() -> SwipeVerdict {
         isTracking ? .drop : .pass
-    }
-}
-
-/// Whether Mission Control or App Exposé is on screen, judged from the
-/// Dock's on-screen windows: both show Dock windows in layers 18 and 20. A
-/// heuristic from InstantSpaceSwitcher, which found it empirically.
-public enum DockOverlay {
-    public static func isOpen(dockWindowLayers layers: [Int]) -> Bool {
-        layers.contains(18) && layers.contains(20)
     }
 }

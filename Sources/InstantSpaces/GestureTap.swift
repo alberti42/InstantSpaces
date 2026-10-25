@@ -106,9 +106,8 @@ final class GestureTap {
                 phase: DockSwipeEvent.Phase(rawValue: Int(event.getIntegerValueField(Field.phase))),
                 progress: event.getDoubleValueField(Field.progress),
                 velocity: event.getDoubleValueField(Field.velocityX))
-            let overlayIsOpen = swipe.phase == .began && Self.dockOverlayIsOpen()
-            verdict = interceptor.handle(swipe, overlayIsOpen: overlayIsOpen)
-            log.debug("swipe phase \(event.getIntegerValueField(Field.phase), privacy: .public) progress \(swipe.progress, privacy: .public) velocity \(swipe.velocity, privacy: .public) overlay \(overlayIsOpen, privacy: .public) -> \(String(describing: verdict.action), privacy: .public) \(verdict.switchDirection?.rawValue ?? "", privacy: .public)")
+            verdict = interceptor.handle(swipe)
+            log.debug("swipe phase \(event.getIntegerValueField(Field.phase), privacy: .public) progress \(swipe.progress, privacy: .public) velocity \(swipe.velocity, privacy: .public) -> \(String(describing: verdict.action), privacy: .public) \(verdict.switchDirection?.rawValue ?? "", privacy: .public)")
         default:
             return Unmanaged.passUnretained(event)
         }
@@ -128,15 +127,5 @@ final class GestureTap {
             event.setDoubleValueField(Field.velocityY, value: 0)
             return Unmanaged.passUnretained(event)
         }
-    }
-
-    /// Mission Control or App Exposé is open; see `DockOverlay`.
-    private static func dockOverlayIsOpen() -> Bool {
-        let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] ?? []
-        let layers = windows.compactMap { window -> Int? in
-            guard window[kCGWindowOwnerName as String] as? String == "Dock" else { return nil }
-            return window[kCGWindowLayer as String] as? Int
-        }
-        return DockOverlay.isOpen(dockWindowLayers: layers)
     }
 }
