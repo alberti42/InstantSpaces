@@ -1,12 +1,14 @@
-<!-- sparkle-sign-warning:
-IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires updating signatures in appcasts that reference this file! This will involve re-running generate_appcast or sign_update.
--->
 # InstantSpaces
+
+[![notarized download](https://img.shields.io/github/actions/workflow/status/alberti42/InstantSpaces/verify-release.yml?label=notarized%20download&logo=apple)](https://github.com/alberti42/InstantSpaces/actions/workflows/verify-release.yml)
+[![build](https://img.shields.io/github/actions/workflow/status/alberti42/InstantSpaces/build.yml?branch=main&label=build)](https://github.com/alberti42/InstantSpaces/actions/workflows/build.yml)
 
 **A menu-bar app for macOS that switches between Spaces without the slide animation.**
 
-Free and open source (GPL-3.0). Requires macOS 26 or later. There is no release
-yet; see [Building from source](#building-from-source).
+**[Download InstantSpaces.zip](https://github.com/alberti42/InstantSpaces/releases/latest/download/InstantSpaces.zip)** (latest release, signed and notarized). See [Installation](#installation).
+
+Free and open source (GPL-3.0). Requires macOS 26 or later; runs natively on
+Apple silicon and Intel Macs.
 
 macOS has no setting to turn off the animation that plays when you switch
 Spaces. "Reduce motion" replaces the slide with a cross-fade, which is still an
@@ -64,24 +66,44 @@ Mission Control shortcuts), ⌃⌥, ⌃⌘, ⌥⌘ or ⌃⌥⌘, chosen in Setti
 InstantSpaces is early work. It relies on private macOS interfaces (see
 [How it works](#how-it-works)), which Apple can change in any update.
 
-Tested so far on macOS 27.0.1 only, with System Integrity Protection disabled.
+Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled:
+the keyboard shortcuts, and trackpad swipes in both directions with natural
+scrolling on.
+
 Not yet tested:
 
 - macOS 26, and any Mac with System Integrity Protection enabled.
+- Trackpad swipes with natural scrolling off, inside Mission Control and App
+  Exposé, and with Karabiner-Elements running.
 - Switching to full-screen Spaces.
 - More than one display.
-- Trackpad swipes: the direction on real hardware, with and without natural
-  scrolling, and Karabiner-Elements running.
 - Whether the Dock's own record of the current Space (used by Mission Control
-  and the trackpad swipe) stays correct after InstantSpaces switches.
+  and by macOS's swipe) stays correct after InstantSpaces switches.
+
+Known issue, not yet reproduced: once, after a long session of tests, the menu
+bar, set to hide automatically, no longer appeared when the pointer reached the
+top of the screen. Quitting InstantSpaces and restarting the Dock did not bring
+it back; logging out did. Whether InstantSpaces caused it is not known.
 
 ## Installation
 
-1. Build the app (see [Building from source](#building-from-source)) and move
-   `build/InstantSpaces.app` to the Applications folder.
-2. Open it. Its number appears in the menu bar.
-3. Turn off macOS's shortcuts that use the same keys (next section).
-4. To start InstantSpaces when you log in, turn on Open at Login in its Settings.
+1. Download [`InstantSpaces.zip`](https://github.com/alberti42/InstantSpaces/releases/latest/download/InstantSpaces.zip)
+   from the [latest release](https://github.com/alberti42/InstantSpaces/releases/latest).
+2. Unzip it and move `InstantSpaces.app` to the Applications folder.
+3. Open it. The number of the current desktop appears in the menu bar.
+4. macOS asks whether InstantSpaces may use Accessibility. Allow it for instant
+   trackpad swipes (System Settings → Privacy & Security → Accessibility); the
+   keyboard shortcuts work without it. See
+   [Permissions and privacy](#permissions-and-privacy).
+5. Turn off macOS's shortcuts that use the same keys (next section).
+6. To start InstantSpaces when you log in, turn on Open at Login in its Settings.
+
+The app is signed with a Developer ID and notarized by Apple. To check where a
+downloaded ZIP was built:
+
+```sh
+gh attestation verify InstantSpaces.zip --repo alberti42/InstantSpaces
+```
 
 ## Turn off the system shortcuts
 
@@ -165,6 +187,13 @@ make app     # build/InstantSpaces.app, signed ad hoc
 make run     # build and open it
 make test    # run the tests
 ```
+
+Open the app from the Finder or with `open build/InstantSpaces.app`. Started
+from a shell as `Contents/MacOS/InstantSpaces`, macOS attributes its
+Accessibility request to the shell. macOS also ties the Accessibility
+permission to the app's signature: an app signed ad hoc gets a new signature
+with every build, so the permission has to be granted again after each build.
+A build signed with a Developer ID keeps it.
 
 `ARCHS=universal make app` builds for Apple silicon and Intel; the default is
 this Mac's architecture. To sign with a Developer ID, set `SIGN_IDENTITY`:
