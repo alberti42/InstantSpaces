@@ -19,7 +19,7 @@
         
             <description><![CDATA[
 <p>InstantSpaces is now <strong>SpaceJumper</strong>, and it can slide too.</p>
-<p>Ever wished you could jump between your Mac's Spaces like a starship jumping to hyperspace? SpaceJumper switches Spaces instantly, without macOS's slide. And if you'd like to see the jump, you can set how long it takes.</p>
+<p>Ever wished you could jump between your Mac's Spaces like a Star Wars starship jumping to hyperspace? SpaceJumper switches Spaces instantly, without macOS's slide. And if you'd like to see the jump, you can set how long it takes.</p>
 <h3>New name</h3>
 <p>InstantSpaces was too close to the name of <a href="https://github.com/jurplel/InstantSpaceSwitcher">InstantSpaceSwitcher</a>, whose findings this app builds on. The app is now SpaceJumper, with a new bundle identifier, so macOS treats it as a new app:</p>
 <ul>
