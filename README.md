@@ -24,6 +24,7 @@ appears at once.
 - [Installation](#installation)
 - [Turn off the system shortcuts](#turn-off-the-system-shortcuts)
 - [Permissions and privacy](#permissions-and-privacy)
+- [Troubleshooting](#troubleshooting)
 - [How it works](#how-it-works)
 - [Building from source](#building-from-source)
 - [Credits](#credits)
@@ -75,7 +76,10 @@ Space, and Mission Control shows it.
 
 Not yet tested:
 
-- macOS 26, and any Mac with System Integrity Protection enabled.
+- macOS 26, and any Mac with System Integrity Protection enabled. InstantSpaces
+  declares macOS 26 as its minimum, but no one has run it there yet. If you
+  find a problem on macOS 26, please open an
+  [issue](https://github.com/alberti42/InstantSpaces/issues).
 - More than one display.
 
 Known issue, not yet reproduced: once, after a long session of tests, the menu
@@ -131,8 +135,9 @@ is not detected.
   instead; macOS allows that only to apps with Accessibility access. On first
   launch InstantSpaces asks for it; Settings shows whether it has it. Without
   it, or with "Switch instantly on trackpad swipes" off, swipes keep macOS's
-  animation. InstantSpaces only looks at the trackpad's Dock swipe events and
-  does not read the keyboard.
+  animation. InstantSpaces only looks at the trackpad's Dock swipe events and,
+  when a swipe begins, at the Dock's accessibility elements to tell whether
+  App Exposé is open. It does not read the keyboard.
 - InstantSpaces connects to the network only for updates: it downloads the
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
   you install an update, `InstantSpaces.zip` from GitHub Releases. Sparkle sends
@@ -143,6 +148,37 @@ is not detected.
 - InstantSpaces collects no data.
 - Its settings (modifier keys, shortcut groups, swipes, wrapping) are stored in
   `~/Library/Preferences/io.alberti42.InstantSpaces.plist`.
+
+## Troubleshooting
+
+- **Swipes switch with macOS's animation.** InstantSpaces lacks Accessibility
+  access, or "Switch instantly on trackpad swipes" is off. Settings →
+  Shortcuts shows both.
+- **Swipes do nothing.** Check how many fingers macOS uses: Settings →
+  Shortcuts shows "Swipe set in macOS" (Trackpad → More Gestures → Swipe
+  between full-screen applications). Choosing Dragging style Three Finger Drag
+  in Accessibility → Pointer Control → Trackpad Options moves this swipe to
+  four fingers.
+- **A swipe at the first or last desktop does nothing.** There is no Space
+  in that direction. Turn on "Wrap around from the last Space to the first"
+  to go to the other end.
+- **A shortcut switches with the animation, or twice.** A macOS shortcut on the
+  same keys is still on. Settings → Shortcuts lists it under Conflicts, with a
+  button to Keyboard Shortcuts; see
+  [Turn off the system shortcuts](#turn-off-the-system-shortcuts).
+- **Desktop numbers change by themselves.** macOS's "Automatically rearrange
+  Spaces based on most recent use" is on (Settings → General shows it). Turn
+  it off in Desktop & Dock → Mission Control to keep the order you set.
+
+If none of these applies, please open an
+[issue](https://github.com/alberti42/InstantSpaces/issues) with your macOS
+version and what you did. A log helps: run
+
+```sh
+/usr/bin/log stream --level debug --predicate 'subsystem == "io.alberti42.InstantSpaces"'
+```
+
+in Terminal, repeat the problem, and attach the output.
 
 ## How it works
 
