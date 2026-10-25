@@ -72,26 +72,6 @@ private struct ShortcutsPane: View {
             }
 
             Section {
-                LabeledContent {
-                    HStack {
-                        // No `step`: it draws a tick per step. The value is rounded
-                        // to 10 ms instead.
-                        Slider(value: Binding(
-                            get: { Double(model.animationMilliseconds) },
-                            set: { model.animationMilliseconds = Int(($0 / 10).rounded()) * 10 }),
-                               in: 0...500)
-                            .frame(width: 160)
-                        Text(model.animationMilliseconds == 0 ? "Off" : "\(model.animationMilliseconds) ms")
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
-                } label: {
-                    Text("Slide animation")
-                    Text("How long a switch slides, for the shortcuts and swipes. Off switches at once.")
-                }
-            }
-
-            Section {
                 Toggle("Wrap around from the last Space to the first", isOn: $model.wrapsAround)
             } footer: {
                 Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
@@ -134,6 +114,26 @@ private struct GeneralPane: View {
 
     var body: some View {
         Form {
+            Section {
+                LabeledContent {
+                    HStack {
+                        // No `step`: it draws a tick per step. The value is rounded
+                        // to 10 ms instead.
+                        Slider(value: Binding(
+                            get: { Double(model.animationMilliseconds) },
+                            set: { model.animationMilliseconds = Int(($0 / 10).rounded()) * 10 }),
+                               in: 0...500)
+                            .frame(width: 160)
+                        Text(model.animationMilliseconds == 0 ? "Off" : "\(model.animationMilliseconds) ms")
+                            .monospacedDigit()
+                            .frame(width: 56, alignment: .trailing)
+                    }
+                } label: {
+                    Text("Slide animation")
+                    Text("How long a switch slides, for the shortcuts and swipes. Off switches at once.")
+                }
+            }
+
             Section {
                 LabeledContent {
                     HStack {
