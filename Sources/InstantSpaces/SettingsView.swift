@@ -7,8 +7,8 @@ struct SettingsView: View {
 
     var body: some View {
         TabView {
-            Tab("Shortcuts", systemImage: "keyboard") { ShortcutsPane(model: model) }
             Tab("General", systemImage: "gearshape") { GeneralPane(model: model) }
+            Tab("Shortcuts", systemImage: "keyboard") { ShortcutsPane(model: model) }
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
