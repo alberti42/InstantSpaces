@@ -21,11 +21,13 @@ import Testing
         #expect(Command.parse(["--move", "right"]) == .command(.move(.right)))
         #expect(Command.parse(["--desktop", "2"]) == .command(.desktop(2)))
         #expect(Command.parse(["--space", "475"]) == .command(.space(475)))
+        #expect(Command.parse(["--app", "78024"]) == .command(.app(78024)))
     }
 
     @Test(arguments: [
         ["--move"], ["--move", "up"], ["--desktop"], ["--desktop", "two"], ["--desktop", "0"],
-        ["--space", "-1"], ["--space", "abc"], ["--frobnicate"],
+        ["--space", "-1"], ["--space", "abc"], ["--app"], ["--app", "0"], ["--app", "Xcode"],
+        ["--frobnicate"],
     ])
     func rejectsInvalidArguments(_ arguments: [String]) {
         #expect(Command.parse(arguments) == .invalid)

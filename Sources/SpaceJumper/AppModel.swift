@@ -12,6 +12,7 @@ final class AppModel: ObservableObject {
         static let desktopKeys = "desktopKeysEnabled"
         static let swipes = "swipesEnabled"
         static let wrapsAround = "wrapsAround"
+        static let switchesOnActivation = "switchesOnActivation"
         static let animationDuration = "animationDurationMilliseconds"
         static let menuBarFrame = "menuBarFrame"
         static let menuBarFrameShape = "menuBarFrameShape"
@@ -52,6 +53,12 @@ final class AppModel: ObservableObject {
         didSet { UserDefaults.standard.set(wrapsAround, forKey: Key.wrapsAround); switcher?.wrapsAround = wrapsAround }
     }
 
+    /// Switch to a Space with a window of an app when the app is activated
+    /// (⌘Tab, the Dock). Acts only while macOS's own option is off.
+    @Published var switchesOnActivation: Bool {
+        didSet { UserDefaults.standard.set(switchesOnActivation, forKey: Key.switchesOnActivation) }
+    }
+
     /// How long a switch slides, in milliseconds; 0 switches at once. For the
     /// shortcuts and swipes.
     @Published var animationMilliseconds: Int {
@@ -75,17 +82,22 @@ final class AppModel: ObservableObject {
     private var accessTimer: Timer?
     private var observers: [NSObjectProtocol] = []
     private var refreshTimer: Timer?
+    /// The app SpaceJumper switched to after its activation, until when it
+    /// is activated again if WindowServer makes another app frontmost.
+    private var followedApp: (app: NSRunningApplication, until: Date)?
 
     init() {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
-                                     Key.wrapsAround: false, Key.animationDuration: 0])
+                                     Key.wrapsAround: false, Key.switchesOnActivation: true,
+                                     Key.animationDuration: 0])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
         swipesEnabled = defaults.bool(forKey: Key.swipes)
         wrapsAround = defaults.bool(forKey: Key.wrapsAround)
+        switchesOnActivation = defaults.bool(forKey: Key.switchesOnActivation)
         animationMilliseconds = defaults.integer(forKey: Key.animationDuration)
         menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
         menuBarFrameShape = MenuBarFrameShape(rawValue: defaults.string(forKey: Key.menuBarFrameShape) ?? "") ?? .roundedRectangle
@@ -117,6 +129,12 @@ final class AppModel: ObservableObject {
             log.info("activeSpaceDidChange")
             MainActor.assumeIsolated { self?.refresh() }
         })
+        observers.append(NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
+        ) { [weak self] notification in
+            let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+            MainActor.assumeIsolated { self?.applicationDidActivate(app) }
+        })
         // macOS shortcuts can be switched on or off in System Settings at any time.
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
@@ -124,6 +142,41 @@ final class AppModel: ObservableObject {
                 self?.refreshMacOSSettings()
             }
         }
+    }
+
+    /// Whether SpaceJumper switches when an app is activated: the setting is
+    /// on and macOS's own switch is off, so that only one of them switches.
+    var switchesOnActivationEffectively: Bool {
+        switchesOnActivation && !macOSSettings.switchesOnActivateEffectively
+    }
+
+    /// Switches to a Space with a window of the activated app, as macOS does
+    /// with its option on. A hidden app is followed at once too: when macOS
+    /// unhides it, the Dock switches by itself, with the slide, even with the
+    /// option off (macOS 27.0.1).
+    private func applicationDidActivate(_ app: NSRunningApplication?) {
+        guard let app, app.processIdentifier != getpid(), let switcher else { return }
+        if let followed = followedApp {
+            followedApp = nil
+            // Setting the current Space makes an app of the new Space
+            // frontmost (WindowServer logs "Making … the front process"), not
+            // the app that was just activated (macOS 27.0.1).
+            if followed.app != app, Date() < followed.until {
+                log.info("activate \(app.localizedName ?? "?", privacy: .public) after the switch; activating \(followed.app.localizedName ?? "?", privacy: .public) again")
+                followed.app.activate()
+                return
+            }
+        }
+        refreshMacOSSettings()
+        guard switchesOnActivationEffectively else { return }
+        log.info("activate \(app.localizedName ?? "pid \(app.processIdentifier)", privacy: .public)\(app.isHidden ? " (hidden)" : "", privacy: .public)")
+        follow(app, switcher)
+    }
+
+    private func follow(_ app: NSRunningApplication, _ switcher: SpaceSwitcher) {
+        guard switcher.followActivation(ofProcess: app.processIdentifier) != nil else { return }
+        followedApp = (app, Date().addingTimeInterval(switcher.animationDuration + SpaceSwitcher.pendingInterval))
+        refresh()
     }
 
     /// The shortcuts in use, as the Settings window lists them.
@@ -169,7 +222,8 @@ final class AppModel: ObservableObject {
         let settings = MacOSSettings(
             threeFingerHorizontalSwipe: value("TrackpadThreeFingerHorizSwipeGesture", trackpad) as? Int,
             fourFingerHorizontalSwipe: value("TrackpadFourFingerHorizSwipeGesture", trackpad) as? Int,
-            rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool)
+            rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool,
+            switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool)
         if settings != macOSSettings { macOSSettings = settings }
     }
 

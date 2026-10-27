@@ -28,6 +28,13 @@ static int (*sGetSymbolicHotKeyValue)(int, uint16_t *, uint16_t *, uint64_t *);
 // Returns a pointer to a static buffer, overwritten by the next call.
 static const char *(*sSymbolicHotKeyName)(int);
 static bool (*sIsEventMatchingSymbolicHotKey)(CGSConnectionID, CGEventRef, int);
+static CFArrayRef (*sCopySpacesForWindows)(CGSConnectionID, int, CFArrayRef);
+static CFTypeRef (*sWindowQueryWindows)(CGSConnectionID, CFArrayRef, int);
+static CFTypeRef (*sWindowQueryResultCopyWindows)(CFTypeRef);
+static bool (*sWindowIteratorAdvance)(CFTypeRef);
+static uint32_t (*sWindowIteratorGetWindowID)(CFTypeRef);
+static uint64_t (*sWindowIteratorGetAttributes)(CFTypeRef);
+static uint64_t (*sWindowIteratorGetTags)(CFTypeRef);
 static void (*sPerform)(id);
 
 /// Finds a symbol, including a local one, in the symbol table of a loaded image.
@@ -88,6 +95,13 @@ BOOL SLBLoad(NSString **error)
     sGetSymbolicHotKeyValue = dlsym(skyLight, "SLSGetSymbolicHotKeyValue");
     sSymbolicHotKeyName = dlsym(skyLight, "SLSSymbolicHotKeyName");
     sIsEventMatchingSymbolicHotKey = dlsym(skyLight, "SLSIsEventMatchingSymbolicHotKey");
+    sCopySpacesForWindows = dlsym(skyLight, "SLSCopySpacesForWindows");
+    sWindowQueryWindows = dlsym(skyLight, "SLSWindowQueryWindows");
+    sWindowQueryResultCopyWindows = dlsym(skyLight, "SLSWindowQueryResultCopyWindows");
+    sWindowIteratorAdvance = dlsym(skyLight, "SLSWindowIteratorAdvance");
+    sWindowIteratorGetWindowID = dlsym(skyLight, "SLSWindowIteratorGetWindowID");
+    sWindowIteratorGetAttributes = dlsym(skyLight, "SLSWindowIteratorGetAttributes");
+    sWindowIteratorGetTags = dlsym(skyLight, "SLSWindowIteratorGetTags");
     sPerform = FindSymbol(kSkyLightPath, kPerformSymbol);
 
     NSMutableArray *missing = [NSMutableArray array];
@@ -99,6 +113,13 @@ BOOL SLBLoad(NSString **error)
     if (!sGetSymbolicHotKeyValue) [missing addObject:@"SLSGetSymbolicHotKeyValue"];
     if (!sSymbolicHotKeyName) [missing addObject:@"SLSSymbolicHotKeyName"];
     if (!sIsEventMatchingSymbolicHotKey) [missing addObject:@"SLSIsEventMatchingSymbolicHotKey"];
+    if (!sCopySpacesForWindows) [missing addObject:@"SLSCopySpacesForWindows"];
+    if (!sWindowQueryWindows) [missing addObject:@"SLSWindowQueryWindows"];
+    if (!sWindowQueryResultCopyWindows) [missing addObject:@"SLSWindowQueryResultCopyWindows"];
+    if (!sWindowIteratorAdvance) [missing addObject:@"SLSWindowIteratorAdvance"];
+    if (!sWindowIteratorGetWindowID) [missing addObject:@"SLSWindowIteratorGetWindowID"];
+    if (!sWindowIteratorGetAttributes) [missing addObject:@"SLSWindowIteratorGetAttributes"];
+    if (!sWindowIteratorGetTags) [missing addObject:@"SLSWindowIteratorGetTags"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation",
@@ -125,6 +146,35 @@ NSString *SLBActiveMenuBarDisplay(void)
 uint64_t SLBActiveSpace(void)
 {
     return sGetActiveSpace(sMainConnectionID());
+}
+
+// Mask 7 returns the Spaces of a window wherever they are; 5 returns only the
+// current Space, 6 only the others (checked on macOS 27.0.1).
+static const int kAllSpacesMask = 7;
+
+NSArray<NSNumber *> *SLBCopySpacesForWindow(uint32_t window)
+{
+    CFArrayRef spaces = sCopySpacesForWindows(sMainConnectionID(), kAllSpacesMask, (__bridge CFArrayRef)@[@(window)]);
+    return spaces ? CFBridgingRelease(spaces) : @[];
+}
+
+NSDictionary<NSNumber *, NSDictionary<NSString *, NSNumber *> *> *SLBCopyWindowStates(NSArray<NSNumber *> *windows)
+{
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    if (windows.count == 0) return result;
+    CFTypeRef query = sWindowQueryWindows(sMainConnectionID(), (__bridge CFArrayRef)windows, (int)windows.count);
+    if (!query) return result;
+    CFTypeRef iterator = sWindowQueryResultCopyWindows(query);
+    CFRelease(query);
+    if (!iterator) return result;
+    while (sWindowIteratorAdvance(iterator)) {
+        result[@(sWindowIteratorGetWindowID(iterator))] = @{
+            @"attributes": @(sWindowIteratorGetAttributes(iterator)),
+            @"tags": @(sWindowIteratorGetTags(iterator)),
+        };
+    }
+    CFRelease(iterator);
+    return result;
 }
 
 static BOOL PerformSpacesOperation(NSString *className, NSArray<NSNumber *> *spaces)

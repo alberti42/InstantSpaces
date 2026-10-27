@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Switch instantly when an app is activated (Settings → General → Mission Control, on by default): when ⌘Tab or the Dock activates an app with no window on the current Space, SpaceJumper switches to the Space of its frontmost window. It acts only while the macOS option "When switching to an application, switch to a Space with open windows for the application" is off; the Settings window shows that option with a Change… button. A minimized window does not count, as in macOS.
+- Command-line mode: `--app PID` switches to the Space of that process's windows.
+
 ## [0.2.0] - 2026-10-25
 
 ### Changed

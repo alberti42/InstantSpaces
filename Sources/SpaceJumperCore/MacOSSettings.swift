@@ -9,12 +9,17 @@ public struct MacOSSettings: Equatable, Sendable {
     /// `com.apple.dock mru-spaces`, "Automatically rearrange Spaces based on
     /// most recent use"; on by default.
     public var rearrangesSpaces: Bool?
+    /// `AppleSpacesSwitchOnActivate` in the global domain, "When switching to
+    /// an application, switch to a Space with open windows for the
+    /// application"; on by default.
+    public var switchesOnActivate: Bool?
 
     public init(threeFingerHorizontalSwipe: Int? = nil, fourFingerHorizontalSwipe: Int? = nil,
-                rearrangesSpaces: Bool? = nil) {
+                rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil) {
         self.threeFingerHorizontalSwipe = threeFingerHorizontalSwipe
         self.fourFingerHorizontalSwipe = fourFingerHorizontalSwipe
         self.rearrangesSpaces = rearrangesSpaces
+        self.switchesOnActivate = switchesOnActivate
     }
 
     private static let swipesBetweenSpaces = 2
@@ -44,5 +49,25 @@ public struct MacOSSettings: Equatable, Sendable {
         rearrangesSpacesEffectively
             ? "macOS moves Spaces as you use them, so desktop numbers can change. SpaceJumper follows the order macOS shows. To keep the order fixed, turn this off in Desktop & Dock → Mission Control."
             : "macOS keeps Spaces in the order you set (Desktop & Dock → Mission Control)."
+    }
+
+    /// Whether macOS switches Spaces when an app is activated. The key was
+    /// absent on macOS 27.0.1 with the option on.
+    public var switchesOnActivateEffectively: Bool { switchesOnActivate ?? true }
+
+    /// What the macOS option means for SpaceJumper's own switch on
+    /// activation, for the General tab. SpaceJumper switches only while the
+    /// option is off; with both on, macOS would slide first.
+    public func switchOnActivateExplanation(spaceJumperSwitches: Bool) -> String {
+        switch (switchesOnActivateEffectively, spaceJumperSwitches) {
+        case (true, true):
+            return "macOS switches with its slide. To have SpaceJumper switch instead, turn this off in Desktop & Dock → Mission Control."
+        case (true, false):
+            return "macOS switches with its slide."
+        case (false, true):
+            return "SpaceJumper switches instead of macOS."
+        case (false, false):
+            return "Activating an app does not change the Space. Turn on the switch above to have SpaceJumper do it."
+        }
     }
 }

@@ -83,6 +83,20 @@ public final class SpaceSwitcher {
         return target
     }
 
+    /// Switches to the Space of the frontmost window of process `pid` that
+    /// appears on activation (see `ActivationTarget.find`), for an app that
+    /// was just activated. Returns the Space switched to, or nil when such a
+    /// window is already on a current Space or there is none.
+    @discardableResult
+    public func followActivation(ofProcess pid: Int32) -> UInt64? {
+        let all = displays()
+        guard let target = ActivationTarget.find(windows: server.windows(ofProcess: pid), displays: all,
+                                                 currentSpaces: Set(all.map(currentSpace(of:))))
+        else { return nil }
+        switchTo(target.space, on: target.display)
+        return target.space
+    }
+
     /// Switches `display` to `space`. Every other Space of the display is
     /// hidden, not only the current one, so a wrong idea of the current Space
     /// cannot leave two Spaces on screen.

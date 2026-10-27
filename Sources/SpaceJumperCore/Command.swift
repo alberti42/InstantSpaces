@@ -4,8 +4,10 @@ public enum Command: Equatable, Sendable {
     case move(Direction)
     case desktop(Int)
     case space(UInt64)
+    /// Switch to the Space of a process's windows, as after its activation.
+    case app(Int32)
 
-    public static let usage = "usage: SpaceJumper [--list | --move left|right | --desktop N | --space ID]"
+    public static let usage = "usage: SpaceJumper [--list | --move left|right | --desktop N | --space ID | --app PID]"
 
     /// Flags for the menu-bar app itself rather than a command (debug builds:
     /// `--show-settings` opens the Settings window at launch).
@@ -36,6 +38,9 @@ public enum Command: Equatable, Sendable {
         case "--space":
             guard let value, let space = UInt64(value) else { return .invalid }
             return .command(.space(space))
+        case "--app":
+            guard let value, let pid = Int32(value), pid > 0 else { return .invalid }
+            return .command(.app(pid))
         default:
             return .invalid
         }

@@ -32,6 +32,12 @@ enum CommandLineMode {
             }
             switcher.switchTo(space, on: display)
             report(space, switcher)
+        case .app(let pid):
+            guard let target = switcher.followActivation(ofProcess: pid) else {
+                print("no switch: a window is on a current Space, or none is shown")
+                exit(0)
+            }
+            report(target, switcher)
         }
         exit(0)
     }

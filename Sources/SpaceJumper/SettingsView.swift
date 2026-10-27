@@ -135,6 +135,23 @@ private struct GeneralPane: View {
             }
 
             Section {
+                Toggle(isOn: $model.switchesOnActivation) {
+                    Text("Switch instantly when an app is activated")
+                    Text("When ⌘Tab or the Dock activates an app with no window on this Space, SpaceJumper switches to a Space where it has one. Only while the macOS option below is off.")
+                }
+                LabeledContent {
+                    HStack {
+                        Text(model.macOSSettings.switchesOnActivateEffectively ? "On" : "Off")
+                        Button("Change…") { model.openMissionControlSettings() }
+                    }
+                } label: {
+                    Label {
+                        Text("When switching to an application, switch to a Space with open windows for the application")
+                        Text(model.macOSSettings.switchOnActivateExplanation(spaceJumperSwitches: model.switchesOnActivation))
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                }
                 LabeledContent {
                     HStack {
                         Text(model.macOSSettings.rearrangesSpacesEffectively ? "On" : "Off")

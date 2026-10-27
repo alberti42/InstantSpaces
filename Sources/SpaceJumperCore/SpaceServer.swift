@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import SkyLightBridge
 
@@ -15,6 +16,9 @@ public protocol SpaceServer: AnyObject {
     func setSpaceOffset(_ space: UInt64, x: Double)
     /// The width in points of the display with this identifier.
     func displayWidth(_ display: String) -> Double
+    /// The normal windows (layer 0) of a process, front to back, with their
+    /// Spaces and whether they are shown or hidden with their app.
+    func windows(ofProcess pid: Int32) -> [AppWindow]
     /// The macOS keyboard shortcuts that are switched on, without names.
     func enabledSystemShortcuts() -> [SystemShortcut]
     /// SkyLight's internal name of a shortcut, e.g. "WindowTileLeftHalf".
@@ -64,6 +68,23 @@ public final class SkyLightServer: SpaceServer {
 
     public func displayWidth(_ display: String) -> Double {
         SLBDisplayWidth(display)
+    }
+
+    public func windows(ofProcess pid: Int32) -> [AppWindow] {
+        // In front-to-back order. IDs and owners need no Screen Recording permission.
+        let info = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID) as? [[String: Any]] ?? []
+        let ids = info.compactMap { window -> UInt32? in
+            guard (window[kCGWindowOwnerPID as String] as? Int32) == pid,
+                  (window[kCGWindowLayer as String] as? Int) == 0 else { return nil }
+            return (window[kCGWindowNumber as String] as? NSNumber)?.uint32Value
+        }
+        let states = SLBCopyWindowStates(ids.map { NSNumber(value: $0) })
+        return ids.map { id in
+            let state = states[NSNumber(value: id)]
+            return AppWindow(id: id, spaces: SLBCopySpacesForWindow(id).map(\.uint64Value),
+                             isShown: (state?["attributes"]?.uint64Value ?? 0) & 0x2 != 0,
+                             isHiddenWithApp: (state?["tags"]?.uint64Value ?? 0) & 0x80_0000_0000 != 0)
+        }
     }
 
     public func enabledSystemShortcuts() -> [SystemShortcut] {

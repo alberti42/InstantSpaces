@@ -15,6 +15,7 @@ private final class FakeServer: SpaceServer {
     var activeDisplay: String?
     var shortcuts: [SystemShortcut] = []
     var names: [Int32: String] = [:]
+    var appWindows: [Int32: [AppWindow]] = [:]
     /// (shortcut, key code, flags) that WindowServer would trigger.
     var triggers: Set<String> = []
     private(set) var matchQueries: [(id: Int32, keyCode: Int, flags: UInt64)] = []
@@ -32,6 +33,7 @@ private final class FakeServer: SpaceServer {
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
     func setSpaceOffset(_ space: UInt64, x: Double) { calls.append(.offset(space, x: x)) }
     func displayWidth(_ display: String) -> Double { 1000 }
+    func windows(ofProcess pid: Int32) -> [AppWindow] { appWindows[pid] ?? [] }
     func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
     func systemShortcutName(_ id: Int32) -> String? { names[id] }
     func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool {
@@ -288,5 +290,29 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         switcher.animationDuration = 0
         switcher.move(.right)
         #expect(server.calls == [.show([475]), .setCurrent(475, display: "A"), .hide([1, 600, 610])])
+    }
+
+    @Test func followActivationSwitchesToTheAppsWindow() {
+        let (switcher, server, _) = makeSwitcher()
+        server.appWindows[42] = [AppWindow(id: 7, spaces: [610], isShown: true)]
+        #expect(switcher.followActivation(ofProcess: 42) == 610)
+        #expect(server.calls == [.show([610]), .setCurrent(610, display: "A"), .hide([1, 475, 600])])
+    }
+
+    @Test func followActivationStaysWhenAWindowIsOnTheCurrentSpace() {
+        let (switcher, server, _) = makeSwitcher()
+        server.appWindows[42] = [AppWindow(id: 7, spaces: [610], isShown: true),
+                                 AppWindow(id: 8, spaces: [1], isShown: true)]
+        #expect(switcher.followActivation(ofProcess: 42) == nil)
+        #expect(server.calls.isEmpty)
+    }
+
+    /// Right after a switch WindowServer can still report the old Space; the
+    /// switcher counts from the Space it switched to.
+    @Test func followActivationCountsFromAPendingSwitch() {
+        let (switcher, server, _) = makeSwitcher()
+        switcher.move(.right)
+        server.appWindows[42] = [AppWindow(id: 7, spaces: [475], isShown: true)]
+        #expect(switcher.followActivation(ofProcess: 42) == nil)
     }
 }
