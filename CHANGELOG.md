@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - With "Switch instantly with ⌘Tab" on, a switch by shortcut or swipe could bounce back to the previous Space. On every Space change macOS makes an app of the new Space active, sometimes one with no window there, such as Finder; SpaceJumper took that for an activation by the user and switched to that app's Space. Activations during a Space change are no longer followed.
+- With "Switch instantly with ⌘Tab" on, hiding or quitting the active app switched to the Space of the app macOS activated next. macOS stays on the current Space; so does SpaceJumper now.
 - ⌘Tab to a hidden app with a slide length set: the Dock started its own slide during SpaceJumper's.
 
 ## [0.3.0] - 2026-10-27

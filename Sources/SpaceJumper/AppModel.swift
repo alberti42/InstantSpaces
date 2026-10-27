@@ -88,6 +88,8 @@ final class AppModel: ObservableObject {
     private var followedApp: NSRunningApplication?
     /// Tells activations that come with a Space change from the user's.
     private var spaceChanges = SpaceChangeTracker(current: [])
+    /// The app that was active before the latest activation.
+    private var frontApp = NSWorkspace.shared.frontmostApplication
 
     init() {
         let defaults = UserDefaults.standard
@@ -133,6 +135,15 @@ final class AppModel: ObservableObject {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 self.spaceChanges.spaceDidChange(to: self.windowServerCurrentSpaces(), at: Date())
+                // The followed app belongs to this Space change only; it must
+                // not be activated again during a later one.
+                if let followed = self.followedApp {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + SpaceChangeTracker.grace) {
+                        MainActor.assumeIsolated {
+                            if self.followedApp == followed { self.followedApp = nil }
+                        }
+                    }
+                }
                 self.refresh()
             }
         })
@@ -165,6 +176,8 @@ final class AppModel: ObservableObject {
     /// unhides it, the Dock switches by itself, with the slide, even with the
     /// option off (macOS 27.0.1).
     private func applicationDidActivate(_ app: NSRunningApplication?) {
+        let previous = frontApp
+        frontApp = app
         guard let app, app.processIdentifier != getpid(), let switcher else { return }
         let name = app.localizedName ?? "pid \(app.processIdentifier)"
         // WindowServer brings an app of the new Space to the front when the
@@ -182,6 +195,15 @@ final class AppModel: ObservableObject {
             return
         }
         followedApp = nil
+        // When the active app is hidden or quits, macOS activates another
+        // app and does not change the Space. The activation arrives 10–16 ms
+        // before the hide or quit is announced, but the previous app already
+        // reports itself hidden, or its process is gone (macOS 27.0.1).
+        if let previous, previous != app,
+           previous.isHidden || previous.isTerminated || kill(previous.processIdentifier, 0) != 0 {
+            log.info("activate \(name, privacy: .public) after \(previous.localizedName ?? "?", privacy: .public) was hidden or quit; not followed")
+            return
+        }
         refreshMacOSSettings()
         guard switchesOnActivationEffectively else { return }
         log.info("activate \(name, privacy: .public)\(app.isHidden ? " (hidden)" : "", privacy: .public)")
