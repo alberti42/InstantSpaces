@@ -36,6 +36,7 @@ SpaceJumper was called InstantSpaces up to version 0.1.1; see
 - [Status](#status)
 - [Installation](#installation)
 - [Turn off the system shortcuts](#turn-off-the-system-shortcuts)
+- [Switching with ⌘Tab](#switching-with-tab)
 - [Permissions and privacy](#permissions-and-privacy)
 - [Troubleshooting](#troubleshooting)
 - [How it works](#how-it-works)
@@ -55,6 +56,10 @@ SpaceJumper was called InstantSpaces up to version 0.1.1; see
 - **Trackpad swipes** between Spaces switch instantly too (on by default; can be
   switched off in Settings). This needs Accessibility access; see
   [Permissions and privacy](#permissions-and-privacy).
+- **⌘Tab** (off by default): when ⌘Tab or the Dock activates an app with no
+  window on the current Space, SpaceJumper switches to the Space of its
+  frontmost window, instantly or with your slide. A macOS option has to be off
+  for this; see [Switching with ⌘Tab](#switching-with-tab).
 - **Menu-bar item** showing the number of the current desktop, or "F" on a
   full-screen Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
@@ -63,8 +68,8 @@ SpaceJumper was called InstantSpaces up to version 0.1.1; see
   [above](#spacejumper). Besides the options in this list, it lists the
   shortcuts that macOS or another app already uses with the same keys, and
   shows the macOS settings that affect SpaceJumper: how swiping between Spaces
-  is set in Trackpad settings, and whether macOS rearranges Spaces by recent
-  use.
+  is set in Trackpad settings, whether macOS switches Spaces when an app is
+  activated, and whether macOS rearranges Spaces by recent use.
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces, as macOS does, and stop at the first and last Space.
@@ -87,8 +92,8 @@ SpaceJumper is early work. It relies on private macOS interfaces (see
 Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled,
 with Karabiner-Elements running: the keyboard shortcuts, trackpad swipes in
 both directions with natural scrolling on and off (the direction follows
-macOS's), trackpad swipes inside Mission Control and App Exposé, and switching
-to and from full-screen Spaces. After each switch the Dock records the new
+macOS's), trackpad swipes inside Mission Control and App Exposé, switching
+to and from full-screen Spaces, and ⌘Tab to apps that are shown or hidden. After each switch the Dock records the new
 Space, and Mission Control shows it.
 
 Not yet tested:
@@ -159,6 +164,32 @@ defines with plain arrows; the window-tiling shortcuts (fn⌃←, fn⌃→) do n
 react to ⌃← and ⌃→. A macOS shortcut that you rebind yourself to a plain arrow
 is not detected.
 
+## Switching with ⌘Tab
+
+When ⌘Tab or a click in the Dock activates an app that has no window on the
+current Space, macOS switches to a Space where the app has one, with the
+slide. The Dock does this when the macOS option "When switching to an
+application, switch to a Space with open windows for the application" is on
+(System Settings → Desktop & Dock → Mission Control); it is on by default.
+
+To have SpaceJumper make this switch instead:
+
+1. Turn on "Switch instantly with ⌘Tab" in SpaceJumper's Settings → General.
+2. Turn off the macOS option. The row below the switch shows it: press Turn
+   Off, and SpaceJumper turns it off for you, or press Change… to open Desktop
+   & Dock and untick it yourself. The Dock takes the change at once; no
+   restart is needed.
+
+With the macOS option on, SpaceJumper does nothing on ⌘Tab, so that only one
+of the two switches. To go back to macOS's switch, turn off SpaceJumper's
+setting and press Turn On in the same row: with both off, ⌘Tab would only
+activate the app and leave you on the current Space.
+
+SpaceJumper chooses the Space as macOS does: the Space of the app's frontmost
+window. A minimized window does not count; if all of the app's windows are
+minimized, the Space does not change. A hidden app's windows count, because
+activating the app shows them again.
+
 ## Permissions and privacy
 
 - The keyboard shortcuts need no permission: they are registered with
@@ -171,6 +202,12 @@ is not detected.
   animation. SpaceJumper only looks at the trackpad's Dock swipe events and,
   when a swipe begins, at the Dock's accessibility elements to tell whether
   App Exposé is open. It does not read the keyboard.
+- The switch on ⌘Tab needs no permission. SpaceJumper reads the window list
+  for window numbers and owners only (not titles or contents, which would
+  need Screen Recording access) and asks WindowServer which Space each window
+  is on. Turn Off and Turn On in Settings → General change the macOS
+  preference `AppleSpacesSwitchOnActivate`; SpaceJumper changes it only when
+  you press one of them.
 - SpaceJumper connects to the network only for updates: it downloads the
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
   you install an update, `SpaceJumper.zip` from GitHub Releases. Sparkle sends
@@ -179,7 +216,7 @@ is not detected.
   automatically" in Settings → General to check only when you choose Check for
   Updates.
 - SpaceJumper collects no data.
-- Its settings (modifier keys, shortcut groups, swipes, wrapping) are stored in
+- Its settings (modifier keys, shortcut groups, swipes, wrapping, ⌘Tab) are stored in
   `~/Library/Preferences/io.alberti42.SpaceJumper.plist`.
 
 ## Troubleshooting
@@ -199,6 +236,12 @@ is not detected.
   same keys is still on. Settings → Shortcuts lists it under Conflicts, with a
   button to Keyboard Shortcuts; see
   [Turn off the system shortcuts](#turn-off-the-system-shortcuts).
+- **⌘Tab to an app on another Space still slides.** The macOS option "When
+  switching to an application, switch to a Space with open windows for the
+  application" is on, or "Switch instantly with ⌘Tab" is off. Settings →
+  General shows both; see [Switching with ⌘Tab](#switching-with-tab).
+- **⌘Tab no longer changes the Space.** The macOS option is off and "Switch
+  instantly with ⌘Tab" is off too. Turn one of them on.
 - **Desktop numbers change by themselves.** macOS's "Automatically rearrange
   Spaces based on most recent use" is on (Settings → General shows it). Turn
   it off in Desktop & Dock → Mission Control to keep the order you set.
@@ -251,6 +294,20 @@ Dock needs it to finish the gesture. Swipes inside Mission Control are
 intercepted in the same way. Swipes inside App Exposé are left to the Dock,
 which does not switch Spaces there; SpaceJumper recognises App Exposé from
 the Dock's accessibility elements when a swipe begins.
+
+### ⌘Tab
+
+macOS sends a notification to every app when an app is activated, by ⌘Tab,
+the Dock or otherwise. SpaceJumper received it 33 ms before the Dock started
+its switch in a test on macOS 27.0.1. It lists the app's windows, front to back, asks
+WindowServer which Space each one is on (`SLSCopySpacesForWindows`) and
+whether it is shown, minimized or hidden with its app (window attributes and
+tags from SkyLight's window iterator), and switches to the Space of the
+frontmost window that is shown or hidden with the app.
+
+Making the new Space current also makes WindowServer bring an app of that
+Space to the front, which is not always the app you chose. When that happens
+right after the switch, SpaceJumper activates your app again.
 
 ## Building from source
 

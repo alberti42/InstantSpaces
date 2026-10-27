@@ -26,8 +26,16 @@ import Testing
     @Test func switchingOnActivateIsOnByDefault() {
         #expect(MacOSSettings().switchesOnActivateEffectively)
         #expect(!MacOSSettings(switchesOnActivate: false).switchesOnActivateEffectively)
-        #expect(MacOSSettings().switchOnActivateExplanation(spaceJumperSwitches: true).contains("turn this off"))
+        #expect(MacOSSettings().switchOnActivateExplanation(spaceJumperSwitches: true).contains("Turn this off"))
         #expect(MacOSSettings(switchesOnActivate: false).switchOnActivateExplanation(spaceJumperSwitches: true)
                 == "SpaceJumper switches instead of macOS.")
+    }
+
+    /// Exactly one of macOS and SpaceJumper should switch on activation.
+    @Test func switchOnActivateNeeded() {
+        #expect(MacOSSettings().switchOnActivateNeeded(spaceJumperSwitches: true) == false)
+        #expect(MacOSSettings().switchOnActivateNeeded(spaceJumperSwitches: false) == nil)
+        #expect(MacOSSettings(switchesOnActivate: false).switchOnActivateNeeded(spaceJumperSwitches: true) == nil)
+        #expect(MacOSSettings(switchesOnActivate: false).switchOnActivateNeeded(spaceJumperSwitches: false) == true)
     }
 }

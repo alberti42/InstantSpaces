@@ -54,7 +54,8 @@ final class AppModel: ObservableObject {
     }
 
     /// Switch to a Space with a window of an app when the app is activated
-    /// (⌘Tab, the Dock). Acts only while macOS's own option is off.
+    /// (⌘Tab, the Dock). Acts only while macOS's own option is off; off by
+    /// default.
     @Published var switchesOnActivation: Bool {
         didSet { UserDefaults.standard.set(switchesOnActivation, forKey: Key.switchesOnActivation) }
     }
@@ -90,7 +91,7 @@ final class AppModel: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
-                                     Key.wrapsAround: false, Key.switchesOnActivation: true,
+                                     Key.wrapsAround: false, Key.switchesOnActivation: false,
                                      Key.animationDuration: 0])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
@@ -188,6 +189,9 @@ final class AppModel: ObservableObject {
     var attentionMessage: String? {
         if swipesNeedAccess { return "Swipes need Accessibility access; see Settings." }
         if !clashes.isEmpty || !hotKeyFailures.isEmpty { return "Some shortcuts conflict; see Settings." }
+        if macOSSettings.switchOnActivateNeeded(spaceJumperSwitches: switchesOnActivation) == false {
+            return "⌘Tab needs a macOS option turned off; see Settings."
+        }
         return nil
     }
 
@@ -225,6 +229,17 @@ final class AppModel: ObservableObject {
             rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool,
             switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool)
         if settings != macOSSettings { macOSSettings = settings }
+    }
+
+    /// Sets macOS's "When switching to an application, switch to a Space with
+    /// open windows for the application". The Dock reads the new value at
+    /// the next activation, without a restart (macOS 27.0.1).
+    func setMacOSSwitchesOnActivate(_ on: Bool) {
+        CFPreferencesSetValue("AppleSpacesSwitchOnActivate" as CFString, on as CFBoolean,
+                              kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        CFPreferencesSynchronize(kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
+        log.info("AppleSpacesSwitchOnActivate set to \(on, privacy: .public)")
+        refreshMacOSSettings()
     }
 
     func openTrackpadSettings() {

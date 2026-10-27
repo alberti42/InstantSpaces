@@ -55,19 +55,26 @@ public struct MacOSSettings: Equatable, Sendable {
     /// absent on macOS 27.0.1 with the option on.
     public var switchesOnActivateEffectively: Bool { switchesOnActivate ?? true }
 
-    /// What the macOS option means for SpaceJumper's own switch on
-    /// activation, for the General tab. SpaceJumper switches only while the
-    /// option is off; with both on, macOS would slide first.
+    /// Whether the macOS option has to change for SpaceJumper's setting:
+    /// off when SpaceJumper switches on activation (with both on, macOS slides
+    /// first), on when it does not (with both off, activating an app never
+    /// changes the Space). Nil when the option already fits.
+    public func switchOnActivateNeeded(spaceJumperSwitches: Bool) -> Bool? {
+        switchesOnActivateEffectively == spaceJumperSwitches ? !spaceJumperSwitches : nil
+    }
+
+    /// What the macOS option means for SpaceJumper's switch on activation,
+    /// for the General tab.
     public func switchOnActivateExplanation(spaceJumperSwitches: Bool) -> String {
         switch (switchesOnActivateEffectively, spaceJumperSwitches) {
         case (true, true):
-            return "macOS switches with its slide. To have SpaceJumper switch instead, turn this off in Desktop & Dock → Mission Control."
+            return "macOS switches first, with its slide. Turn this off so that SpaceJumper switches instead."
         case (true, false):
             return "macOS switches with its slide."
         case (false, true):
             return "SpaceJumper switches instead of macOS."
         case (false, false):
-            return "Activating an app does not change the Space. Turn on the switch above to have SpaceJumper do it."
+            return "Activating an app does not change the Space. Turn this on so that macOS switches again."
         }
     }
 }
