@@ -236,16 +236,17 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         let (switcher, server, animator) = makeAnimatedSwitcher()
         #expect(switcher.move(.right) == 475)
         #expect(animator.duration == 0.3)
-        // The new Space waits one display width to the right, then is shown.
-        #expect(server.calls == [.offset(475, x: 1000), .show([475])])
+        // The new Space waits one display width to the right, is shown and
+        // made current.
+        #expect(server.calls == [.offset(475, x: 1000), .show([475]), .setCurrent(475, display: "A")])
 
         animator.step(to: 0.5)
         #expect(Array(server.calls.suffix(2)) == [.offset(1, x: -500), .offset(475, x: 500)])
 
         animator.finish()
-        #expect(Array(server.calls.suffix(6)) == [
+        #expect(Array(server.calls.suffix(5)) == [
             .offset(1, x: -1000), .offset(475, x: 0),
-            .setCurrent(475, display: "A"), .hide([1, 600, 610]),
+            .hide([1, 600, 610]),
             .offset(1, x: 0), .offset(475, x: 0),
         ])
     }
@@ -281,7 +282,8 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         #expect(switcher.move(.right) == 600)
         #expect(server.calls.contains(.setCurrent(475, display: "A")))
         #expect(animator.isRunning)
-        #expect(Array(server.calls.suffix(2)) == [.offset(600, x: 1000), .show([600])])
+        #expect(Array(server.calls.suffix(3)) == [.offset(600, x: 1000), .show([600]), .setCurrent(600, display: "A")])
+        #expect(server.calls.contains(.hide([1, 600, 610])))
         animator.finish()
     }
 

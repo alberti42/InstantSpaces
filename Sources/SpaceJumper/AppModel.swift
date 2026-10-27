@@ -83,9 +83,11 @@ final class AppModel: ObservableObject {
     private var accessTimer: Timer?
     private var observers: [NSObjectProtocol] = []
     private var refreshTimer: Timer?
-    /// The app SpaceJumper switched to after its activation, until when it
-    /// is activated again if WindowServer makes another app frontmost.
-    private var followedApp: (app: NSRunningApplication, until: Date)?
+    /// The app SpaceJumper switched to after its activation. It is activated
+    /// again if WindowServer makes another app frontmost during that switch.
+    private var followedApp: NSRunningApplication?
+    /// Tells activations that come with a Space change from the user's.
+    private var spaceChanges = SpaceChangeTracker(current: [])
 
     init() {
         let defaults = UserDefaults.standard
@@ -128,7 +130,11 @@ final class AppModel: ObservableObject {
             forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main
         ) { [weak self] _ in
             log.info("activeSpaceDidChange")
-            MainActor.assumeIsolated { self?.refresh() }
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.spaceChanges.spaceDidChange(to: self.windowServerCurrentSpaces(), at: Date())
+                self.refresh()
+            }
         })
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main
@@ -137,8 +143,11 @@ final class AppModel: ObservableObject {
             MainActor.assumeIsolated { self?.applicationDidActivate(app) }
         })
         // macOS shortcuts can be switched on or off in System Settings at any time.
+        spaceChanges = SpaceChangeTracker(current: windowServerCurrentSpaces())
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
+                // In case an announcement of a Space change was missed.
+                if let self { self.spaceChanges.resynchronize(self.windowServerCurrentSpaces()) }
                 self?.refreshClashes()
                 self?.refreshMacOSSettings()
             }
@@ -157,27 +166,38 @@ final class AppModel: ObservableObject {
     /// option off (macOS 27.0.1).
     private func applicationDidActivate(_ app: NSRunningApplication?) {
         guard let app, app.processIdentifier != getpid(), let switcher else { return }
-        if let followed = followedApp {
-            followedApp = nil
-            // Setting the current Space makes an app of the new Space
-            // frontmost (WindowServer logs "Making … the front process"), not
-            // the app that was just activated (macOS 27.0.1).
-            if followed.app != app, Date() < followed.until {
-                log.info("activate \(app.localizedName ?? "?", privacy: .public) after the switch; activating \(followed.app.localizedName ?? "?", privacy: .public) again")
-                followed.app.activate()
-                return
+        let name = app.localizedName ?? "pid \(app.processIdentifier)"
+        // WindowServer brings an app of the new Space to the front when the
+        // Space changes (see SpaceChangeTracker). Following it could switch
+        // away from the Space just reached; after a switch on activation it
+        // would also take the focus from the app the user chose.
+        if spaceChanges.isChanging(current: windowServerCurrentSpaces(), at: Date()) {
+            if let followed = followedApp, followed != app {
+                log.info("activate \(name, privacy: .public) during the Space change; activating \(followed.localizedName ?? "?", privacy: .public) again")
+                followedApp = nil
+                followed.activate()
+            } else {
+                log.info("activate \(name, privacy: .public) during the Space change; not followed")
             }
+            return
         }
+        followedApp = nil
         refreshMacOSSettings()
         guard switchesOnActivationEffectively else { return }
-        log.info("activate \(app.localizedName ?? "pid \(app.processIdentifier)", privacy: .public)\(app.isHidden ? " (hidden)" : "", privacy: .public)")
+        log.info("activate \(name, privacy: .public)\(app.isHidden ? " (hidden)" : "", privacy: .public)")
         follow(app, switcher)
     }
 
     private func follow(_ app: NSRunningApplication, _ switcher: SpaceSwitcher) {
         guard switcher.followActivation(ofProcess: app.processIdentifier) != nil else { return }
-        followedApp = (app, Date().addingTimeInterval(switcher.animationDuration + SpaceSwitcher.pendingInterval))
+        followedApp = app
         refresh()
+    }
+
+    /// The current Space of every display as WindowServer reports it, without
+    /// the switcher's record of a switch in progress.
+    private func windowServerCurrentSpaces() -> Set<UInt64> {
+        Set(switcher?.displays().map(\.current) ?? [])
     }
 
     /// The shortcuts in use, as the Settings window lists them.

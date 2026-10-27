@@ -1,3 +1,5 @@
+import Foundation
+
 /// One normal window (layer 0) of an app, as `SpaceServer.windows(ofProcess:)`
 /// reports it.
 public struct AppWindow: Equatable, Sendable {
@@ -46,5 +48,46 @@ public enum ActivationTarget {
             }
         }
         return nil
+    }
+}
+
+/// Tells whether a Space change is in progress, so that an app activation
+/// can be told apart from the user's: making a Space current also makes
+/// WindowServer bring an app of the new Space to the front (macOS 27.0.1),
+/// often one with no window there, such as Finder. That activation arrived
+/// 6–14 ms before `activeSpaceDidChangeNotification`, whatever started the
+/// change (SpaceJumper, the Dock, Mission Control).
+public struct SpaceChangeTracker: Sendable {
+    /// How long after the announcement an activation still counts as part of
+    /// the change, in case it arrives late.
+    public static let grace: TimeInterval = 0.1
+
+    /// The current Spaces of all displays as of the last announcement.
+    public private(set) var announced: Set<UInt64>
+    private var announcedAt: Date?
+
+    public init(current: Set<UInt64>) {
+        announced = current
+    }
+
+    /// Records `activeSpaceDidChangeNotification`.
+    public mutating func spaceDidChange(to current: Set<UInt64>, at time: Date) {
+        announced = current
+        announcedAt = time
+    }
+
+    /// Takes WindowServer's current Spaces without a grace period, for a
+    /// periodic check in case an announcement was missed.
+    public mutating func resynchronize(_ current: Set<UInt64>) {
+        announced = current
+    }
+
+    /// Whether a Space change is in progress: WindowServer reports other
+    /// current Spaces than the last announcement, or the announcement came
+    /// less than `grace` ago.
+    public func isChanging(current: Set<UInt64>, at time: Date) -> Bool {
+        if current != announced { return true }
+        guard let announcedAt else { return false }
+        return time.timeIntervalSince(announcedAt) < Self.grace
     }
 }

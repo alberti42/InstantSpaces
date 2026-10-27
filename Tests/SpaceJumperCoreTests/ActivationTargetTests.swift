@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import SpaceJumperCore
 
@@ -66,4 +67,40 @@ private func target(_ windows: [AppWindow], current: Set<UInt64> = [1, 10]) -> U
 
 @Test func goesToAFullScreenSpace() {
     #expect(target([AppWindow(id: 1, spaces: [600], isShown: true)]) == 600)
+}
+
+@Suite struct SpaceChangeTrackerTests {
+    private let start = Date(timeIntervalSinceReferenceDate: 0)
+
+    @Test func stillWhenWindowServerMatchesTheAnnouncement() {
+        let tracker = SpaceChangeTracker(current: [4])
+        #expect(!tracker.isChanging(current: [4], at: start))
+    }
+
+    /// WindowServer has made another Space current, and macOS has not
+    /// announced it yet: the activation belongs to the change.
+    @Test func changingBeforeTheAnnouncement() {
+        let tracker = SpaceChangeTracker(current: [4])
+        #expect(tracker.isChanging(current: [1], at: start))
+    }
+
+    @Test func changingForTheGracePeriodAfterTheAnnouncement() {
+        var tracker = SpaceChangeTracker(current: [4])
+        tracker.spaceDidChange(to: [1], at: start)
+        #expect(tracker.isChanging(current: [1], at: start.addingTimeInterval(0.05)))
+        #expect(!tracker.isChanging(current: [1], at: start.addingTimeInterval(SpaceChangeTracker.grace)))
+    }
+
+    @Test func resynchronizingHasNoGracePeriod() {
+        var tracker = SpaceChangeTracker(current: [4])
+        tracker.resynchronize([1])
+        #expect(!tracker.isChanging(current: [1], at: start))
+    }
+
+    /// With several displays, a change on either counts.
+    @Test func everyDisplayCounts() {
+        let tracker = SpaceChangeTracker(current: [4, 10])
+        #expect(tracker.isChanging(current: [4, 11], at: start))
+        #expect(!tracker.isChanging(current: [10, 4], at: start))
+    }
 }

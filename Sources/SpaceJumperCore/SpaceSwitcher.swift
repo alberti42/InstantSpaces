@@ -102,8 +102,12 @@ public final class SpaceSwitcher {
     /// cannot leave two Spaces on screen.
     ///
     /// With an `animationDuration` the new Space slides in from `direction`;
-    /// without one, from the side where it lies in Mission Control. A switch
-    /// during a slide first ends that slide at once.
+    /// without one, from the side where it lies in Mission Control. It is made
+    /// current when the slide starts and the others are hidden when it ends:
+    /// a window that appears on the new Space during the slide, such as a
+    /// hidden app's on activation, is then on the current Space, and the Dock
+    /// does not start its own switch to it. A switch during a slide first
+    /// ends that slide at once.
     public func switchTo(_ space: UInt64, on display: DisplaySpaces, direction: Direction? = nil) {
         animator.finish()
         let current = currentSpace(of: display)
@@ -126,12 +130,12 @@ public final class SpaceSwitcher {
         pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
         server.setSpaceOffset(space, x: slide.startOffset)
         server.showSpaces([space])
+        server.setCurrentSpace(space, display: display.identifier)
         animator.run(duration: animationDuration, step: { [server] progress in
             let offsets = slide.offsets(at: progress)
             server.setSpaceOffset(current, x: offsets.old)
             server.setSpaceOffset(space, x: offsets.new)
         }, completion: { [weak self, server] in
-            server.setCurrentSpace(space, display: display.identifier)
             server.hideSpaces(others)
             server.setSpaceOffset(current, x: 0)
             server.setSpaceOffset(space, x: 0)
