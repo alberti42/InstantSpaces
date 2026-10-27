@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-27
+
 ### Added
 
 - Switch instantly with ⌘Tab (Settings → General → Mission Control, off by default): when ⌘Tab or the Dock activates an app with no window on the current Space, SpaceJumper switches to the Space of its frontmost window. It acts only while the macOS option "When switching to an application, switch to a Space with open windows for the application" is off. Settings shows that option next to the switch, with Turn Off (or Turn On, when both are off) and Change… buttons, and the menu points to Settings while the option still has to be turned off. A minimized window does not count, as in macOS. See "Switching with ⌘Tab" in the README.
@@ -50,7 +52,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/alberti42/SpaceJumper/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/alberti42/SpaceJumper/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/alberti42/SpaceJumper/releases/tag/v0.1.0
