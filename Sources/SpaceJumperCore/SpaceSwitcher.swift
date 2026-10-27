@@ -104,9 +104,8 @@ public final class SpaceSwitcher {
     /// With an `animationDuration` the new Space slides in from `direction`;
     /// without one, from the side where it lies in Mission Control. It is made
     /// current when the slide starts and the others are hidden when it ends:
-    /// a window that appears on the new Space during the slide, such as a
-    /// hidden app's on activation, is then on the current Space, and the Dock
-    /// does not start its own switch to it. A switch during a slide first
+    /// a window that appears on the new Space during the slide is then on the
+    /// current Space, and the Dock does not start its own switch to it. A switch during a slide first
     /// ends that slide at once.
     public func switchTo(_ space: UInt64, on display: DisplaySpaces, direction: Direction? = nil) {
         animator.finish()

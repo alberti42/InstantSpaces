@@ -22,15 +22,12 @@ uint64_t SLBActiveSpace(void);
 /// its app keeps it ordered out; some ordered-out windows have none.
 NSArray<NSNumber *> *SLBCopySpacesForWindow(uint32_t window);
 
-/// The state of each window, by window ID, from SkyLight's window iterator:
-/// "attributes" (`SLSWindowIteratorGetAttributes`) and "tags"
-/// (`SLSWindowIteratorGetTags`). Inferred on macOS 27.0.1 from the cases
-/// tried: attribute bit 0x2 is set for a window that is ordered in, on the
-/// current Space or another, and clear for a minimized window, a window of a
-/// hidden app and an ordered-out window. Tag bit 0x8000000000 is set while
-/// the window's app is hidden, unless the window was minimized; tag bit
-/// 0x1000000000000000 is set while the window is minimized.
-NSDictionary<NSNumber *, NSDictionary<NSString *, NSNumber *> *> *SLBCopyWindowStates(NSArray<NSNumber *> *windows);
+/// The attributes of each window, by window ID, from SkyLight's window
+/// iterator (`SLSWindowIteratorGetAttributes`). Bit 0x2 is set for a window
+/// that is ordered in, on the current Space or another, and clear for a
+/// minimized window, a window of a hidden app and an ordered-out window
+/// (inferred from these cases on macOS 27.0.1).
+NSDictionary<NSNumber *, NSNumber *> *SLBCopyWindowAttributes(NSArray<NSNumber *> *windows);
 
 /// Bridged window-management operations. They are asynchronous; the return
 /// value only says whether the operation could be built and handed over.

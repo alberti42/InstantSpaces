@@ -172,9 +172,10 @@ final class AppModel: ObservableObject {
     }
 
     /// Switches to a Space with a window of the activated app, as macOS does
-    /// with its option on. A hidden app is followed at once too: when macOS
-    /// unhides it, the Dock switches by itself, with the slide, even with the
-    /// option off (macOS 27.0.1).
+    /// with its option on. A hidden app is left to the Dock: when the app is
+    /// unhidden on another Space, the Dock switches by itself, with its slide,
+    /// even with the option off, and its trigger (WindowServer notification
+    /// 1415) can come before the activation reaches SpaceJumper (macOS 27.0.1).
     private func applicationDidActivate(_ app: NSRunningApplication?) {
         let previous = frontApp
         frontApp = app
@@ -206,7 +207,11 @@ final class AppModel: ObservableObject {
         }
         refreshMacOSSettings()
         guard switchesOnActivationEffectively else { return }
-        log.info("activate \(name, privacy: .public)\(app.isHidden ? " (hidden)" : "", privacy: .public)")
+        if app.isHidden {
+            log.info("activate \(name, privacy: .public): hidden, left to the Dock")
+            return
+        }
+        log.info("activate \(name, privacy: .public)")
         follow(app, switcher)
     }
 

@@ -34,14 +34,6 @@ private func target(_ windows: [AppWindow], current: Set<UInt64> = [1, 10]) -> U
                     AppWindow(id: 2, spaces: [600], isShown: true)]) == 600)
 }
 
-/// A hidden app's windows are not shown yet when the activation arrives;
-/// macOS shows them with the activation.
-@Test func goesToAWindowHiddenWithItsApp() {
-    #expect(target([AppWindow(id: 1, spaces: [475], isShown: false, isHiddenWithApp: true)]) == 475)
-    #expect(target([AppWindow(id: 1, spaces: [475], isShown: false, isHiddenWithApp: true),
-                    AppWindow(id: 2, spaces: [1], isShown: false, isHiddenWithApp: true)]) == nil)
-}
-
 @Test func ignoresWindowsWithoutASpace() {
     #expect(target([AppWindow(id: 1, spaces: [], isShown: true)]) == nil)
     #expect(target([]) == nil)

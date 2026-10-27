@@ -93,7 +93,7 @@ Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled,
 with Karabiner-Elements running: the keyboard shortcuts, trackpad swipes in
 both directions with natural scrolling on and off (the direction follows
 macOS's), trackpad swipes inside Mission Control and App Exposé, switching
-to and from full-screen Spaces, and ⌘Tab to apps that are shown or hidden. After each switch the Dock records the new
+to and from full-screen Spaces, and ⌘Tab. After each switch the Dock records the new
 Space, and Mission Control shows it.
 
 Not yet tested:
@@ -187,8 +187,12 @@ activate the app and leave you on the current Space.
 
 SpaceJumper chooses the Space as macOS does: the Space of the app's frontmost
 window. A minimized window does not count; if all of the app's windows are
-minimized, the Space does not change. A hidden app's windows count, because
-activating the app shows them again.
+minimized, the Space does not change.
+
+A hidden app (⌘H) is the exception: when ⌘Tab shows it again on another
+Space, macOS switches there with its own slide, even with its option off.
+macOS can start that switch before SpaceJumper learns of the activation, so
+SpaceJumper leaves it to macOS.
 
 ## Permissions and privacy
 
@@ -301,9 +305,8 @@ macOS sends a notification to every app when an app is activated, by ⌘Tab,
 the Dock or otherwise. SpaceJumper received it 33 ms before the Dock started
 its switch in a test on macOS 27.0.1. It lists the app's windows, front to back, asks
 WindowServer which Space each one is on (`SLSCopySpacesForWindows`) and
-whether it is shown, minimized or hidden with its app (window attributes and
-tags from SkyLight's window iterator), and switches to the Space of the
-frontmost window that is shown or hidden with the app.
+whether it is shown (window attributes from SkyLight's window iterator), and
+switches to the Space of the frontmost shown window.
 
 Making the new Space current also makes WindowServer bring an app of that
 Space to the front, which is not always the app you chose. When that happens

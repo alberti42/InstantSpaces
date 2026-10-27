@@ -34,7 +34,6 @@ static CFTypeRef (*sWindowQueryResultCopyWindows)(CFTypeRef);
 static bool (*sWindowIteratorAdvance)(CFTypeRef);
 static uint32_t (*sWindowIteratorGetWindowID)(CFTypeRef);
 static uint64_t (*sWindowIteratorGetAttributes)(CFTypeRef);
-static uint64_t (*sWindowIteratorGetTags)(CFTypeRef);
 static void (*sPerform)(id);
 
 /// Finds a symbol, including a local one, in the symbol table of a loaded image.
@@ -101,7 +100,6 @@ BOOL SLBLoad(NSString **error)
     sWindowIteratorAdvance = dlsym(skyLight, "SLSWindowIteratorAdvance");
     sWindowIteratorGetWindowID = dlsym(skyLight, "SLSWindowIteratorGetWindowID");
     sWindowIteratorGetAttributes = dlsym(skyLight, "SLSWindowIteratorGetAttributes");
-    sWindowIteratorGetTags = dlsym(skyLight, "SLSWindowIteratorGetTags");
     sPerform = FindSymbol(kSkyLightPath, kPerformSymbol);
 
     NSMutableArray *missing = [NSMutableArray array];
@@ -119,7 +117,6 @@ BOOL SLBLoad(NSString **error)
     if (!sWindowIteratorAdvance) [missing addObject:@"SLSWindowIteratorAdvance"];
     if (!sWindowIteratorGetWindowID) [missing addObject:@"SLSWindowIteratorGetWindowID"];
     if (!sWindowIteratorGetAttributes) [missing addObject:@"SLSWindowIteratorGetAttributes"];
-    if (!sWindowIteratorGetTags) [missing addObject:@"SLSWindowIteratorGetTags"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation",
@@ -158,7 +155,7 @@ NSArray<NSNumber *> *SLBCopySpacesForWindow(uint32_t window)
     return spaces ? CFBridgingRelease(spaces) : @[];
 }
 
-NSDictionary<NSNumber *, NSDictionary<NSString *, NSNumber *> *> *SLBCopyWindowStates(NSArray<NSNumber *> *windows)
+NSDictionary<NSNumber *, NSNumber *> *SLBCopyWindowAttributes(NSArray<NSNumber *> *windows)
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     if (windows.count == 0) return result;
@@ -168,10 +165,7 @@ NSDictionary<NSNumber *, NSDictionary<NSString *, NSNumber *> *> *SLBCopyWindowS
     CFRelease(query);
     if (!iterator) return result;
     while (sWindowIteratorAdvance(iterator)) {
-        result[@(sWindowIteratorGetWindowID(iterator))] = @{
-            @"attributes": @(sWindowIteratorGetAttributes(iterator)),
-            @"tags": @(sWindowIteratorGetTags(iterator)),
-        };
+        result[@(sWindowIteratorGetWindowID(iterator))] = @(sWindowIteratorGetAttributes(iterator));
     }
     CFRelease(iterator);
     return result;
