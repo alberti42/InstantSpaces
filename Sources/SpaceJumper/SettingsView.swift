@@ -61,6 +61,10 @@ private struct SpacesPane: View {
                         Image(systemName: "info.circle")
                     }
                 }
+                Toggle(isOn: $model.wrapsAround) {
+                    Text("Wrap around from the last Space to the first")
+                    Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
+                }
             } header: {
                 Text("Transition")
             }
@@ -120,13 +124,6 @@ private struct SpacesPane: View {
                 Text("Trackpad")
             } footer: {
                 Text("Turn it off to keep macOS's swipe with its animation; SpaceJumper then needs no Accessibility access.")
-                    .foregroundStyle(.secondary)
-            }
-
-            Section {
-                Toggle("Wrap around from the last Space to the first", isOn: $model.wrapsAround)
-            } footer: {
-                Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
                     .foregroundStyle(.secondary)
             }
 
