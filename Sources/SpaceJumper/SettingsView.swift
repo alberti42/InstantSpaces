@@ -27,6 +27,45 @@ private struct SpacesPane: View {
     var body: some View {
         Form {
             Section {
+                LabeledContent {
+                    HStack {
+                        // No `step`: it draws a tick per step. The value is rounded
+                        // to 10 ms instead.
+                        Slider(value: Binding(
+                            get: { Double(model.animationMilliseconds) },
+                            set: { model.animationMilliseconds = Int(($0 / 10).rounded()) * 10 }),
+                               in: 0...500)
+                            .frame(width: 160)
+                        Text(model.animationMilliseconds == 0 ? "Off" : "\(model.animationMilliseconds) ms")
+                            .monospacedDigit()
+                            .frame(width: 56, alignment: .trailing)
+                    }
+                } label: {
+                    Text("Duration")
+                    Text("How long a switch takes, for the shortcuts, swipes and ⌘Tab. Off switches at once.")
+                }
+                Toggle(isOn: $model.followsReduceMotion) {
+                    Text("Cross-fade when Reduce motion is on")
+                    Text("Turn it off to keep the slide while Reduce motion stays on for the rest of macOS.")
+                }
+                LabeledContent {
+                    HStack {
+                        Text(model.macOSSettings.reducesMotion ? "On" : "Off")
+                        Button("Change…") { model.openReduceMotionSettings() }
+                    }
+                } label: {
+                    Label {
+                        Text("Reduce motion")
+                        Text(model.macOSSettings.reduceMotionExplanation(followingReduceMotion: model.followsReduceMotion))
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            } header: {
+                Text("Transition")
+            }
+
+            Section {
                 Picker("Modifier keys", selection: $model.modifierPrefix) {
                     ForEach(ModifierPrefix.allCases, id: \.self) { prefix in
                         Text(prefix.symbols).tag(prefix)
@@ -50,6 +89,8 @@ private struct SpacesPane: View {
                          ? "Every Space by its position in Mission Control, full-screen apps included. The menu bar shows the same number."
                          : "Only desktops, as macOS's \"Switch to Desktop N\" shortcuts count them. The menu bar shows F on a full-screen Space.")
                 }
+            } header: {
+                Text("Shortcuts")
             }
 
             Section {
@@ -87,45 +128,6 @@ private struct SpacesPane: View {
             } footer: {
                 Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
                     .foregroundStyle(.secondary)
-            }
-
-            Section {
-                LabeledContent {
-                    HStack {
-                        // No `step`: it draws a tick per step. The value is rounded
-                        // to 10 ms instead.
-                        Slider(value: Binding(
-                            get: { Double(model.animationMilliseconds) },
-                            set: { model.animationMilliseconds = Int(($0 / 10).rounded()) * 10 }),
-                               in: 0...500)
-                            .frame(width: 160)
-                        Text(model.animationMilliseconds == 0 ? "Off" : "\(model.animationMilliseconds) ms")
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
-                } label: {
-                    Text("Duration")
-                    Text("How long a switch takes, for the shortcuts, swipes and ⌘Tab. Off switches at once.")
-                }
-                Toggle(isOn: $model.followsReduceMotion) {
-                    Text("Cross-fade when Reduce motion is on")
-                    Text("Turn it off to keep the slide while Reduce motion stays on for the rest of macOS.")
-                }
-                LabeledContent {
-                    HStack {
-                        Text(model.macOSSettings.reducesMotion ? "On" : "Off")
-                        Button("Change…") { model.openReduceMotionSettings() }
-                    }
-                } label: {
-                    Label {
-                        Text("Reduce motion")
-                        Text(model.macOSSettings.reduceMotionExplanation(followingReduceMotion: model.followsReduceMotion))
-                    } icon: {
-                        Image(systemName: "info.circle")
-                    }
-                }
-            } header: {
-                Text("Transition")
             }
 
             if !model.clashes.isEmpty || !model.hotKeyFailures.isEmpty {
