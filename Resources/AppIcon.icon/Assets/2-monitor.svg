@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<defs>
+ <clipPath id="screen"><rect x="236" y="254" width="552" height="352" rx="18"/></clipPath>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151a46"/><stop offset="1" stop-color="#060818"/></linearGradient>
+ <radialGradient id="halo"><stop offset="0" stop-color="#cfe0ff" stop-opacity=".7"/><stop offset="1" stop-color="#cfe0ff" stop-opacity="0"/></radialGradient>
+ <radialGradient id="glow" cx="512" cy="430" r="300" gradientUnits="userSpaceOnUse">
+  <stop offset="0" stop-color="#ffffff"/><stop offset=".12" stop-color="#bcd7ff"/><stop offset=".45" stop-color="#3550c8"/><stop offset="1" stop-color="#0d1240"/></radialGradient>
+ <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2f4f8"/><stop offset="1" stop-color="#a9b0bd"/></linearGradient>
+</defs>
+<g transform="matrix(1.242718 0 0 1.242718 -124.2718 -124.2718)">
+<g transform="translate(0 40)">
+<path d="M462 620 L562 620 L578 712 L446 712 Z" fill="url(#metal)"/>
+<rect x="380" y="708" width="264" height="22" rx="11" fill="#c3c9d4"/>
+<rect x="216" y="234" width="592" height="392" rx="34" fill="url(#metal)"/>
+</g>
+</g>
+</svg>

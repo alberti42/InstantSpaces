@@ -42,7 +42,7 @@ app:
 	swift build -c release $(ARCH_FLAGS) --product SpaceJumper
 	swift build -c release $(ARCH_FLAGS) --product LoginHelper
 	rm -rf "$(APP)"
-	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Frameworks" "$(HELPER)/Contents/MacOS"
+	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Resources" "$(APP)/Contents/Frameworks" "$(HELPER)/Contents/MacOS"
 	# ditto keeps the symbolic links inside the framework.
 	BIN="$$(swift build -c release $(ARCH_FLAGS) --show-bin-path)"; \
 	cp "$$BIN/SpaceJumper" "$(APP)/Contents/MacOS/SpaceJumper"; \
@@ -50,6 +50,12 @@ app:
 	ditto "$$BIN/Sparkle.framework" "$(SPARKLE)"
 	cp Resources/Info.plist "$(APP)/Contents/Info.plist"
 	cp Resources/LoginHelper-Info.plist "$(HELPER)/Contents/Info.plist"
+	# Compile the Icon Composer file into Assets.car and AppIcon.icns. Info.plist
+	# names the icon in CFBundleIconName and CFBundleIconFile, so the partial plist
+	# that actool writes is not used.
+	xcrun actool Resources/AppIcon.icon --compile "$(APP)/Contents/Resources" \
+	    --platform macosx --minimum-deployment-target 26.0 --app-icon AppIcon \
+	    --output-partial-info-plist build/AppIcon-partial.plist >/dev/null
 	# Sign inside out: Sparkle's helpers, Sparkle, the login helper, then the app
 	# that contains them. The order and the flags follow Sparkle's documentation
 	# ("Code Signing", sparkle-project.org/documentation/sandboxing).

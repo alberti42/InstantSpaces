@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- An app icon: a desktop monitor whose screen shows a jump to hyperspace, in front of a night sky with stars. It follows macOS's light, dark, clear and tinted icon styles.
+
 ## [0.4.0] - 2026-10-28
 
 ### Added
