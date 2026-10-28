@@ -178,11 +178,15 @@ private struct AppsPane: View {
                 ForEach(model.appShortcuts) { shortcut in
                     LabeledContent {
                         HStack {
+                            // The menu items are the bare letters, so that typing a
+                            // letter selects it; with the prefix in every title,
+                            // type-to-select matched nothing.
+                            Text(prefix)
                             Picker("Letter", selection: Binding(
                                 get: { shortcut.letter },
                                 set: { model.setLetter($0, of: shortcut) })) {
                                 ForEach(AppShortcut.letters, id: \.self) { letter in
-                                    Text(prefix + String(letter)).tag(letter)
+                                    Text(String(letter)).tag(letter)
                                 }
                             }
                             .labelsHidden()
