@@ -244,6 +244,14 @@ SpaceJumper leaves it to macOS.
   switching to an application, switch to a Space with open windows for the
   application" is on, or "Switch instantly with ⌘Tab" is off. Settings →
   General shows both; see [Switching with ⌘Tab](#switching-with-tab).
+- **⌘Tab to a hidden app on another Space slides.** This is macOS's own
+  switch, and SpaceJumper leaves it to macOS. When ⌘Tab shows a hidden app
+  (⌘H) again on another Space, macOS switches there with its own slide, even
+  with its option "When switching to an application, switch to a Space with
+  open windows for the application" off. macOS can start that switch before
+  SpaceJumper learns of the activation, so SpaceJumper cannot replace it.
+  This is inconsistent in macOS: it ignores the option you turned off for
+  hidden apps, and only Apple can fix it.
 - **⌘Tab no longer changes the Space.** The macOS option is off and "Switch
   instantly with ⌘Tab" is off too. Turn one of them on.
 - **Desktop numbers change by themselves.** macOS's "Automatically rearrange
