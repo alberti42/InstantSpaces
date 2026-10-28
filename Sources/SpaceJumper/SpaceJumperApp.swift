@@ -65,6 +65,7 @@ private struct MenuContent: View {
             SettingsWindow.bringToFront()
         }
         .keyboardShortcut(",")
+        Button("About SpaceJumper") { AboutPanel.show() }
         UpdateItem(updater: Updater.shared)
         Divider()
 
@@ -101,5 +102,39 @@ enum SettingsWindow {
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
         }
+    }
+}
+
+/// macOS's standard About panel: name, version and build from Info.plist,
+/// the copyright line (`NSHumanReadableCopyright`), and a credit with the
+/// README's description and a link to the repository. Brought to the front
+/// like the Settings window (`SettingsWindow`).
+@MainActor
+enum AboutPanel {
+    private static let repository = URL(string: "https://github.com/alberti42/SpaceJumper")!
+
+    static func show() {
+        NSApp.activate()
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits()])
+        // The panel is a plain NSPanel (macOS 27.0.1); the app's other windows
+        // are status-bar windows and the SwiftUI Settings window.
+        DispatchQueue.main.async {
+            guard let panel = NSApp.windows.first(where: { type(of: $0) == NSPanel.self && $0.isVisible }) else { return }
+            panel.makeKeyAndOrderFront(nil)
+            panel.orderFrontRegardless()
+        }
+    }
+
+    private static func credits() -> NSAttributedString {
+        let centered = NSMutableParagraphStyle()
+        centered.alignment = .center
+        let font = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        let text = NSMutableAttributedString(
+            string: "A menu-bar app for macOS that switches between Spaces without the slide animation, or with a slide as long as you choose.\n\n",
+            attributes: [.font: font, .foregroundColor: NSColor.labelColor, .paragraphStyle: centered])
+        text.append(NSAttributedString(
+            string: "github.com/alberti42/SpaceJumper",
+            attributes: [.font: font, .link: repository, .paragraphStyle: centered]))
+        return text
     }
 }

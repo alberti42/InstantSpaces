@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- About SpaceJumper in the menu: macOS's About panel with the version, a short description, a link to the repository and the copyright line.
+
 ## [0.3.1] - 2026-10-28
 
 ### Changed
