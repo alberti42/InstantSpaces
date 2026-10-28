@@ -6,6 +6,51 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.6.0</title>
+            <pubDate>Wed, 28 Oct 2026 21:09:43 +0000</pubDate>
+            <sparkle:version>10</sparkle:version>
+            <sparkle:shortVersionString>0.6.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.6.0</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.6.0/SpaceJumper.zip" length="4069333" type="application/octet-stream" sparkle:edSignature="5mO7DYSGgKCOiimqXGoOhWV/OfaxXQzlXFgkZGWXKCk+eUqxb1ngYSSzjN4UoEV1nlm2Ac3gan1GtSOObVSRAQ=="/>
+        
+            <description><![CDATA[
+<h3>Added</h3>
+<ul>
+<li>Settings → General → Menu Bar → "Show the name of full-screen Spaces" (off by default): next to the number, the menu bar shows the name Mission Control shows for a full-screen Space, the app or both apps in split view. The first line of the menu names the app on a full-screen Space, whatever the setting.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Settings → Spaces: "Wrap around from the last Space to the first" is now in the Transition group, after Duration, with its explanation next to it.</li>
+</ul>
+<h3>Removed</h3>
+<ul>
+<li>The warning that another app had taken one of SpaceJumper's shortcuts (Settings → Spaces → Conflicts, the menu, Copy Diagnostics). macOS reports no error when two apps use the same keys, so the warning could not appear; Troubleshooting in the README explains what to do when an app shortcut does nothing.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Settings, About, Copy Diagnostics, Check for Updates and Add App could open dimmed, as windows of an inactive app, until clicked: macOS declined SpaceJumper's activation while another app was active. SpaceJumper now takes over the activation from the frontmost app.</li>
+</ul>
+<h2>Changes since v0.5.0</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/0eb1b08">0eb1b08</a> Version bump to v0.6.0 (build 10)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/dbd2c0e">dbd2c0e</a> Update the README screenshots of the three Settings tabs</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/1db3304">1db3304</a> Remove the warning for shortcuts taken by another app</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/3ef2798">3ef2798</a> Document that another app's global shortcut on the same keys goes unreported</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/73ccb47">73ccb47</a> Take over activation from the frontmost app before showing a window</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/15e38a9">15e38a9</a> Put wrap-around right after Duration in the Transition group</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/8f02cec">8f02cec</a> Move wrap-around into the Transition group</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/44d9d0d">44d9d0d</a> Show the name of a full-screen Space next to its number</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/39fbf0e">39fbf0e</a> Release v0.5.0 (automatic appcast update)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/8adc97a">8adc97a</a> Lay out the README screenshots in tables, as in SyncGlass</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.5.0...v0.6.0</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.5.0</title>
             <pubDate>Wed, 28 Oct 2026 12:38:31 +0000</pubDate>
             <sparkle:version>9</sparkle:version>
