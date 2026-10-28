@@ -66,6 +66,7 @@ private struct MenuContent: View {
         }
         .keyboardShortcut(",")
         Button("About SpaceJumper") { AboutPanel.show() }
+        Button("Copy Diagnostics…") { DiagnosticsCopier.run(model: model) }
         UpdateItem(updater: Updater.shared)
         Divider()
 

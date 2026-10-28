@@ -317,6 +317,40 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The values of Copy Diagnostics… that the model knows; the Mac's details
+    /// and the recent log are added by `DiagnosticsCopier`.
+    func diagnostics() -> Diagnostics {
+        var d = Diagnostics()
+        d.accessibilityGranted = GestureTap.hasAccessibilityPermission
+        d.skyLightError = loadError
+        d.swipeTapRunning = gestureTap.isRunning
+        d.displays = switcher?.displays() ?? []
+        d.activeDisplay = switcher?.activeDisplay()?.identifier
+        let duration = animationMilliseconds == 0 ? "off"
+            : "\(animationMilliseconds) ms, \(macOSSettings.reducesMotion ? "cross-fade (Reduce motion on)" : "slide")"
+        d.settings = [
+            .init("Modifier keys", modifierPrefix.symbols),
+            .init("Move between Spaces", arrowKeysEnabled ? "on" : "off"),
+            .init("Go to a desktop", desktopKeysEnabled ? "on" : "off"),
+            .init("Trackpad swipes", swipesEnabled ? "on" : "off"),
+            .init("Wrap around", wrapsAround ? "on" : "off"),
+            .init("Transition duration", duration),
+            .init("Switch instantly with ⌘Tab", switchesOnActivation ? "on" : "off"),
+            .init("Menu-bar frame", "\(menuBarFrame.title), \(menuBarFrameShape.title)"),
+            .init("Open at login", opensAtLogin ? "on" : "off"),
+        ]
+        d.macOSSettings = [
+            .init("Swipe between full-screen applications", macOSSettings.swipeSetting ?? "not set"),
+            .init("Reduce motion", macOSSettings.reducesMotion ? "on" : "off"),
+            .init("Switch to a Space with open windows (⌘Tab)", macOSSettings.switchesOnActivateEffectively ? "on" : "off"),
+            .init("Automatically rearrange Spaces", macOSSettings.rearrangesSpacesEffectively ? "on" : "off"),
+        ]
+        d.shortcuts = enabledBindings.map(\.name)
+        d.clashes = clashes.map(\.description)
+        d.hotKeyFailures = hotKeyFailures
+        return d
+    }
+
     func openKeyboardShortcutsSettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") {
             NSWorkspace.shared.open(url)

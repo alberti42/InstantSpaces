@@ -155,6 +155,17 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
 
 ## Troubleshooting
 
+When something does not work as expected, choose **Copy Diagnostics…** in
+SpaceJumper's menu. SpaceJumper copies a report to your clipboard: versions,
+permissions, your displays and Spaces, the settings of SpaceJumper and macOS,
+the apps that intercept swipes or key presses, and SpaceJumper's recent
+activity. Nothing is sent over the Internet: it is plain text you can read
+and edit. The report may show the cause, for example a missing permission or
+another app that takes the swipes away; if not, paste it into an
+[issue](https://github.com/alberti42/SpaceJumper/issues) and say what you did.
+
+Common cases:
+
 - **Swipes switch with macOS's animation.** SpaceJumper lacks Accessibility
   access, or "Switch instantly on trackpad swipes" is off. Settings →
   Shortcuts shows both.
@@ -193,9 +204,7 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
   Spaces based on most recent use" is on (Settings → General shows it). Turn
   it off in Desktop & Dock → Mission Control to keep the order you set.
 
-If none of these applies, please open an
-[issue](https://github.com/alberti42/SpaceJumper/issues) with your macOS
-version and what you did. A log helps: run
+For a detailed log to attach to an issue, run
 
 ```sh
 /usr/bin/log stream --level debug --predicate 'subsystem == "io.alberti42.SpaceJumper"'

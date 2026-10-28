@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - With Reduce motion on (System Settings → Accessibility → Motion) and a transition duration set, the Spaces cross-fade instead of sliding, as macOS does without SpaceJumper. Settings → General shows Reduce motion below the duration, with a Change… button.
+- Copy Diagnostics… in the menu: copies a plain-text report to the clipboard, for bug reports: versions, permissions, displays and Spaces, the settings of SpaceJumper and macOS, the shortcuts and their conflicts, the apps that intercept trackpad swipes or key presses, and SpaceJumper's recent activity. Nothing is sent over the Internet.
 - About SpaceJumper in the menu: macOS's About panel with the version, a short description, a link to the repository and the copyright line.
 
 ### Changed
