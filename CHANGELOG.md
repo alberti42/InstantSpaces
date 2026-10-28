@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-28
+
 ### Added
 
 - An app icon: a desktop monitor whose screen shows a jump to hyperspace, in front of a night sky with stars. It follows macOS's light, dark, clear and tinted icon styles.
@@ -81,7 +83,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/alberti42/SpaceJumper/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/alberti42/SpaceJumper/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/alberti42/SpaceJumper/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...v0.3.0
