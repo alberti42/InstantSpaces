@@ -55,7 +55,6 @@ public struct Diagnostics: Sendable {
     /// The names of the registered shortcuts, e.g. "⌃→".
     public var shortcuts: [String] = []
     public var clashes: [String] = []
-    public var hotKeyFailures: [String] = []
     /// Taps on trackpad gesture or Dock control events (types 29 and 30), in
     /// the order macOS lists them; nil if the list was not available. The
     /// report sorts them by delivery order (`deliveryOrder`).
@@ -101,11 +100,9 @@ public struct Diagnostics: Sendable {
         r += "\n## SpaceJumper settings\n" + Self.aligned(settings)
         r += "\n## macOS settings\n" + Self.aligned(macOSSettings)
         r += "\n## Shortcuts\n"
-        r += "Registered          : \(shortcuts.isEmpty ? "none" : shortcuts.joined(separator: "  "))\n"
-        r += "Clash with macOS    : \(clashes.isEmpty ? "none" : "")\n"
+        r += "Registered       : \(shortcuts.isEmpty ? "none" : shortcuts.joined(separator: "  "))\n"
+        r += "Clash with macOS : \(clashes.isEmpty ? "none" : "")\n"
         r += clashes.map { "  \($0)\n" }.joined()
-        r += "Taken by other apps : \(hotKeyFailures.isEmpty ? "none" : "")\n"
-        r += hotKeyFailures.map { "  \($0)\n" }.joined()
         r += """
 
         ## Apps that intercept trackpad swipes

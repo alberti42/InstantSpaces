@@ -4,11 +4,6 @@ import Carbon.HIToolbox
 /// Accessibility permission.
 @MainActor
 final class HotKeyCenter {
-    struct Failure {
-        let name: String
-        let status: OSStatus
-    }
-
     private static let signature: OSType = 0x496E_5370 // "InSp"
 
     private var references: [EventHotKeyRef] = []
@@ -29,19 +24,19 @@ final class HotKeyCenter {
         }, 1, &spec, Unmanaged.passUnretained(self).toOpaque(), nil)
     }
 
-    /// Registers a hotkey. Returns the failure if the system refuses it. A
+    /// Registers a hotkey and returns `RegisterEventHotKey`'s status. A
     /// combination another app holds is not refused (macOS 27.0.1): both apps
     /// register it, and only one of them receives the key press.
-    func register(name: String, keyCode: Int, modifiers: Int, action: @escaping () -> Void) -> Failure? {
+    func register(keyCode: Int, modifiers: Int, action: @escaping () -> Void) -> OSStatus {
         let id = nextID
         nextID += 1
         var reference: EventHotKeyRef?
         let status = RegisterEventHotKey(UInt32(keyCode), UInt32(modifiers), EventHotKeyID(signature: Self.signature, id: id),
                                          GetApplicationEventTarget(), 0, &reference)
-        guard status == noErr, let reference else { return Failure(name: name, status: status) }
+        guard status == noErr, let reference else { return status }
         references.append(reference)
         actions[id] = action
-        return nil
+        return noErr
     }
 
     func unregisterAll() {

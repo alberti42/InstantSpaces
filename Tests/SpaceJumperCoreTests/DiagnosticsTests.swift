@@ -12,7 +12,6 @@ import Testing
         d.activeDisplay = "A"
         d.settings = [.init("Modifier keys", "⌃"), .init("Transition duration", "440 ms")]
         d.shortcuts = ["⌃←", "⌃→"]
-        d.hotKeyFailures = ["⌃1 is taken by another app (error -9878)"]
         d.recentActivity = ["08:00:00.000 switch 1 -> 5"]
         return d
     }
@@ -34,9 +33,8 @@ import Testing
         let report = sample().report()
         #expect(report.contains("Accessibility (trackpad swipes) : granted\n"))
         #expect(report.contains("SkyLight                        : loaded\n"))
-        #expect(report.contains("Registered          : ⌃←  ⌃→\n"))
-        #expect(report.contains("Clash with macOS    : none\n"))
-        #expect(report.contains("Taken by other apps : \n  ⌃1 is taken by another app (error -9878)\n"))
+        #expect(report.contains("Registered       : ⌃←  ⌃→\n"))
+        #expect(report.contains("Clash with macOS : none\n"))
         #expect(report.contains("08:00:00.000 switch 1 -> 5\n"))
     }
 

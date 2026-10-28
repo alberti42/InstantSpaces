@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Settings → Spaces: "Wrap around from the last Space to the first" is now in the Transition group, after Duration, with its explanation next to it.
 
+### Removed
+
+- The warning that another app had taken one of SpaceJumper's shortcuts (Settings → Spaces → Conflicts, the menu, Copy Diagnostics). macOS reports no error when two apps use the same keys, so the warning could not appear; Troubleshooting in the README explains what to do when an app shortcut does nothing.
+
 ### Fixed
 
 - Settings, About, Copy Diagnostics, Check for Updates and Add App could open dimmed, as windows of an inactive app, until clicked: macOS declined SpaceJumper's activation while another app was active. SpaceJumper now takes over the activation from the frontmost app.

@@ -34,9 +34,6 @@ final class AppModel: ObservableObject {
     @Published private(set) var statusLine = ""
     /// Bindings that a switched-on macOS shortcut also uses.
     @Published private(set) var clashes: [ShortcutClash] = []
-    /// Bindings that `RegisterEventHotKey` refused. It does not refuse keys
-    /// another app holds: both apps register them, and only one receives them.
-    @Published private(set) var hotKeyFailures: [String] = []
     @Published private(set) var loadError: String?
     @Published private(set) var opensAtLogin = LoginItem.isEnabled
     /// Swipes are switched on but the app lacks Accessibility permission.
@@ -348,7 +345,7 @@ final class AppModel: ObservableObject {
     /// What the menu shows to point to the Settings window, if anything.
     var attentionMessage: String? {
         if swipesNeedAccess { return "Swipes need Accessibility access; see Settings." }
-        if !clashes.isEmpty || !hotKeyFailures.isEmpty { return "Some shortcuts conflict; see Settings." }
+        if !clashes.isEmpty { return "Some shortcuts conflict; see Settings." }
         if macOSSettings.switchOnActivateNeeded(spaceJumperSwitches: switchesOnActivation) == false {
             return "⌘Tab needs a macOS option turned off; see Settings."
         }
@@ -460,7 +457,6 @@ final class AppModel: ObservableObject {
         ]
         d.shortcuts = enabledBindings.map(\.name)
         d.clashes = clashes.map(\.description)
-        d.hotKeyFailures = hotKeyFailures
         return d
     }
 
@@ -508,10 +504,10 @@ final class AppModel: ObservableObject {
     private func registerHotKeys() {
         hotKeys.unregisterAll()
         guard let switcher else { return }
-        var failures: [HotKeyCenter.Failure] = []
-
         for binding in enabledBindings {
-            if let failure = hotKeys.register(name: binding.name, keyCode: binding.keyCode, modifiers: binding.modifiers, action: { [weak self] in
+            // A refused registration is only logged: `RegisterEventHotKey` does
+            // not refuse keys another app holds, the one clash users meet.
+            let status = hotKeys.register(keyCode: binding.keyCode, modifiers: binding.modifiers, action: { [weak self] in
                 log.info("hotkey \(binding.name, privacy: .public)")
                 switch binding.action {
                 case .move(let direction): switcher.move(direction)
@@ -519,9 +515,11 @@ final class AppModel: ObservableObject {
                 case .app(let bundleIdentifier): self?.jump(toApp: bundleIdentifier)
                 }
                 self?.refresh()
-            }) { failures.append(failure) }
+            })
+            if status != noErr {
+                log.error("hotkey \(binding.name, privacy: .public) not registered (error \(status))")
+            }
         }
-        hotKeyFailures = failures.map { "\($0.name) is taken by another app (error \($0.status))" }
         refreshClashes()
     }
 

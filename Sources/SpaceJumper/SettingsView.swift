@@ -127,21 +127,16 @@ private struct SpacesPane: View {
                     .foregroundStyle(.secondary)
             }
 
-            if !model.clashes.isEmpty || !model.hotKeyFailures.isEmpty {
+            if !model.clashes.isEmpty {
                 Section {
                     ForEach(model.clashes, id: \.description) { clash in
                         Label(clash.description, systemImage: "exclamationmark.triangle")
                     }
-                    ForEach(model.hotKeyFailures, id: \.self) { failure in
-                        Label(failure, systemImage: "exclamationmark.triangle")
-                    }
-                    if !model.clashes.isEmpty {
-                        LabeledContent {
-                            Button("Open Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
-                        } label: {
-                            Text("Turn the macOS shortcut off")
-                            Text("When macOS uses the same keys, both macOS and SpaceJumper react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
-                        }
+                    LabeledContent {
+                        Button("Open Keyboard Shortcuts…") { model.openKeyboardShortcutsSettings() }
+                    } label: {
+                        Text("Turn the macOS shortcut off")
+                        Text("When macOS uses the same keys, both macOS and SpaceJumper react. Turn the macOS shortcut off in System Settings → Keyboard → Keyboard Shortcuts, or choose other modifier keys.")
                     }
                 } header: {
                     Text("Conflicts")
