@@ -52,7 +52,8 @@ you set it.
   keys are ⌃ (the default, as in macOS's own Mission Control shortcuts), ⌃⌥,
   ⌃⌘, ⌥⌘ or ⌃⌥⌘, the same for both groups. Either group can be switched off.
 - **App shortcuts**: in Settings → Apps, give an app a letter; the modifier
-  keys and that letter (⌃⌘M for MailMate, for example) switch to the Space
+  keys chosen there (⌃⌘ by default, set apart from the Space shortcuts') and
+  that letter (⌃⌘M for MailMate, for example) switch to the Space
   with the app's frontmost window, full-screen or not, and bring the app
   forward. An app that is not open is opened.
 - **Trackpad swipes** between Spaces switch instantly too (on by default; can be

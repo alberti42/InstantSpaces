@@ -1,6 +1,7 @@
 import Carbon.HIToolbox
 
-/// The modifier keys shared by all shortcuts: the arrows and the digits 1–9.
+/// The modifier keys of a group of shortcuts: one choice for the arrows and
+/// the digits 1–9, another for the app shortcuts.
 public enum ModifierPrefix: String, CaseIterable, Sendable {
     case control
     case controlOption
@@ -10,6 +11,10 @@ public enum ModifierPrefix: String, CaseIterable, Sendable {
 
     /// ⌃, as in macOS's own Mission Control shortcuts (⌃← ⌃→, ⌃1 … ⌃9).
     public static let `default` = ModifierPrefix.control
+
+    /// ⌃⌘ for the app shortcuts: with ⌃ alone, ⌃ + letter would take keys that
+    /// text fields use (⌃A, ⌃E).
+    public static let appDefault = ModifierPrefix.controlCommand
 
     /// In the order macOS writes modifiers: ⌃ ⌥ ⇧ ⌘.
     public var symbols: String {

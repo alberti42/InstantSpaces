@@ -15,6 +15,7 @@ final class AppModel: ObservableObject {
         static let wrapsAround = "wrapsAround"
         static let spaceNumbering = "spaceNumbering"
         static let appShortcuts = "appShortcuts"
+        static let appModifierPrefix = "appModifierPrefix"
         static let switchesOnActivation = "switchesOnActivation"
         static let animationDuration = "animationDurationMilliseconds"
         static let menuBarFrame = "menuBarFrame"
@@ -66,6 +67,10 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The modifier keys of the app shortcuts.
+    @Published var appModifierPrefix: ModifierPrefix {
+        didSet { UserDefaults.standard.set(appModifierPrefix.rawValue, forKey: Key.appModifierPrefix); registerHotKeys() }
+    }
     /// Prefix-letter shortcuts that jump to an app, in the order they were added.
     @Published var appShortcuts: [AppShortcut] {
         didSet {
@@ -124,6 +129,7 @@ final class AppModel: ObservableObject {
         swipesEnabled = defaults.bool(forKey: Key.swipes)
         wrapsAround = defaults.bool(forKey: Key.wrapsAround)
         spaceNumbering = SpaceNumbering(rawValue: defaults.string(forKey: Key.spaceNumbering) ?? "") ?? .allSpaces
+        appModifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.appModifierPrefix) ?? "") ?? .appDefault
         appShortcuts = defaults.data(forKey: Key.appShortcuts)
             .flatMap { try? JSONDecoder().decode([AppShortcut].self, from: $0) } ?? []
         switchesOnActivation = defaults.bool(forKey: Key.switchesOnActivation)
@@ -316,7 +322,7 @@ final class AppModel: ObservableObject {
     /// The shortcuts in use, as the Settings window lists them.
     var enabledBindings: [HotKeyBinding] {
         HotKeyBinding.enabled(prefix: modifierPrefix, arrowKeys: arrowKeysEnabled, desktopKeys: desktopKeysEnabled)
-            + HotKeyBinding.appKeys(modifierPrefix, appShortcuts, keyCode: KeyboardLayout.keyCode(for:))
+            + HotKeyBinding.appKeys(appModifierPrefix, appShortcuts, keyCode: KeyboardLayout.keyCode(for:))
     }
 
     /// What the menu shows to point to the Settings window, if anything.
@@ -416,6 +422,7 @@ final class AppModel: ObservableObject {
             .init("Numbering", spaceNumbering.title),
             .init("Trackpad swipes", swipesEnabled ? "on" : "off"),
             .init("Wrap around", wrapsAround ? "on" : "off"),
+            .init("App modifier keys", appModifierPrefix.symbols),
             .init("App shortcuts", appShortcuts.isEmpty ? "none"
                   : appShortcuts.map { "\($0.letter) \($0.name)" }.joined(separator: ", ")),
             .init("Transition duration", duration),

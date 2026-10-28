@@ -122,10 +122,17 @@ private struct ShortcutsPane: View {
 private struct AppsPane: View {
     @ObservedObject var model: AppModel
 
-    private var prefix: String { model.modifierPrefix.symbols }
+    private var prefix: String { model.appModifierPrefix.symbols }
 
     var body: some View {
         Form {
+            Section {
+                Picker("Modifier keys", selection: $model.appModifierPrefix) {
+                    ForEach(ModifierPrefix.allCases, id: \.self) { prefix in
+                        Text(prefix.symbols).tag(prefix)
+                    }
+                }
+            }
             Section {
                 ForEach(model.appShortcuts) { shortcut in
                     LabeledContent {
@@ -163,11 +170,11 @@ private struct AppsPane: View {
             } header: {
                 Text("Jump to an app")
             } footer: {
-                Text("\(prefix) and the letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The modifier keys are those of the Shortcuts tab.")
+                Text("\(prefix) and the letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened.")
                     .foregroundStyle(.secondary)
             }
-            if model.modifierPrefix == .control && !model.appShortcuts.isEmpty {
-                Label("With ⌃ alone, these shortcuts take keys that text fields use, such as ⌃A and ⌃E (start and end of line). Choose other modifier keys in the Shortcuts tab.",
+            if model.appModifierPrefix == .control && !model.appShortcuts.isEmpty {
+                Label("With ⌃ alone, these shortcuts take keys that text fields use, such as ⌃A and ⌃E (start and end of line). Choose other modifier keys above.",
                       systemImage: "exclamationmark.triangle")
             }
         }
