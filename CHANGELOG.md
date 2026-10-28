@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- An app icon: a desktop monitor whose screen shows a jump to hyperspace, in front of a night sky with stars. It follows macOS's light, dark, clear and tinted icon styles.
 - Settings → Spaces → Transition → "Cross-fade when Reduce motion is on" (on by default): turn it off to keep a short slide while Reduce motion stays on for the rest of macOS.
 - App shortcuts (Settings → Apps): give an app a letter, and the modifier keys chosen there (⌃⌘ by default) with that letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The letter follows the keyboard layout (on a German keyboard ⌃⌘Z is the key labelled Z).
 
@@ -15,12 +16,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The menu-bar number and ⌃1 … ⌃9 count every Space by its position in Mission Control, full-screen apps included, so a full-screen app shows its number instead of "F". Settings → Spaces → Numbering → Desktops only keeps the previous numbering: only desktops, as macOS's "Switch to Desktop N" shortcuts count them.
 - Settings: the Shortcuts tab is now called Spaces, as the app shortcuts have their own tab, and the Transition group (Duration, Reduce motion) moved there from General.
-
-## [0.4.1] - 2026-10-28
-
-### Added
-
-- An app icon: a desktop monitor whose screen shows a jump to hyperspace, in front of a night sky with stars. It follows macOS's light, dark, clear and tinted icon styles.
 
 ## [0.4.0] - 2026-10-28
 
@@ -93,8 +88,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.4.1...HEAD
-[0.4.1]: https://github.com/alberti42/SpaceJumper/compare/v0.4.0...v0.4.1
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.4.0...HEAD
 [0.4.0]: https://github.com/alberti42/SpaceJumper/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/alberti42/SpaceJumper/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...v0.3.0
