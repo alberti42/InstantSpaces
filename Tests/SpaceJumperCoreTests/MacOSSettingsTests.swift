@@ -40,8 +40,15 @@ import Testing
     }
 
     @Test func reduceMotionChoosesTheCrossFade() {
-        #expect(MacOSSettings().transition == .slide)
-        #expect(MacOSSettings(reducesMotion: true).transition == .crossFade)
-        #expect(MacOSSettings(reducesMotion: true).reduceMotionExplanation.contains("cross-fade instead"))
+        #expect(MacOSSettings().transition(followingReduceMotion: true) == .slide)
+        #expect(MacOSSettings(reducesMotion: true).transition(followingReduceMotion: true) == .crossFade)
+        #expect(MacOSSettings(reducesMotion: true).reduceMotionExplanation(followingReduceMotion: true)
+                    .contains("cross-fade instead"))
+    }
+
+    @Test func notFollowingReduceMotionKeepsTheSlide() {
+        #expect(MacOSSettings(reducesMotion: true).transition(followingReduceMotion: false) == .slide)
+        #expect(MacOSSettings(reducesMotion: true).reduceMotionExplanation(followingReduceMotion: false)
+                    .contains("slide, whether"))
     }
 }

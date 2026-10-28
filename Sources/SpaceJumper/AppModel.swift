@@ -16,6 +16,7 @@ final class AppModel: ObservableObject {
         static let spaceNumbering = "spaceNumbering"
         static let appShortcuts = "appShortcuts"
         static let appModifierPrefix = "appModifierPrefix"
+        static let followsReduceMotion = "followsReduceMotion"
         static let switchesOnActivation = "switchesOnActivation"
         static let animationDuration = "animationDurationMilliseconds"
         static let menuBarFrame = "menuBarFrame"
@@ -95,6 +96,14 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Cross-fade instead of sliding while macOS's Reduce motion is on.
+    @Published var followsReduceMotion: Bool {
+        didSet {
+            UserDefaults.standard.set(followsReduceMotion, forKey: Key.followsReduceMotion)
+            switcher?.transition = macOSSettings.transition(followingReduceMotion: followsReduceMotion)
+        }
+    }
+
     /// The frame around the desktop number in the menu bar.
     @Published var menuBarFrame: MenuBarFrame {
         didSet { UserDefaults.standard.set(menuBarFrame.rawValue, forKey: Key.menuBarFrame) }
@@ -122,7 +131,7 @@ final class AppModel: ObservableObject {
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
                                      Key.wrapsAround: false, Key.switchesOnActivation: false,
-                                     Key.animationDuration: 0])
+                                     Key.animationDuration: 0, Key.followsReduceMotion: true])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
@@ -134,6 +143,7 @@ final class AppModel: ObservableObject {
             .flatMap { try? JSONDecoder().decode([AppShortcut].self, from: $0) } ?? []
         switchesOnActivation = defaults.bool(forKey: Key.switchesOnActivation)
         animationMilliseconds = defaults.integer(forKey: Key.animationDuration)
+        followsReduceMotion = defaults.bool(forKey: Key.followsReduceMotion)
         menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
         menuBarFrameShape = MenuBarFrameShape(rawValue: defaults.string(forKey: Key.menuBarFrameShape) ?? "") ?? .roundedRectangle
 
@@ -369,7 +379,7 @@ final class AppModel: ObservableObject {
             rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool,
             switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool,
             reducesMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
-        switcher?.transition = settings.transition
+        switcher?.transition = settings.transition(followingReduceMotion: followsReduceMotion)
         if settings != macOSSettings { macOSSettings = settings }
     }
 
@@ -414,7 +424,7 @@ final class AppModel: ObservableObject {
         d.displays = switcher?.displays() ?? []
         d.activeDisplay = switcher?.activeDisplay()?.identifier
         let duration = animationMilliseconds == 0 ? "off"
-            : "\(animationMilliseconds) ms, \(macOSSettings.reducesMotion ? "cross-fade (Reduce motion on)" : "slide")"
+            : "\(animationMilliseconds) ms, \(macOSSettings.transition(followingReduceMotion: followsReduceMotion) == .crossFade ? "cross-fade (Reduce motion on)" : "slide")"
         d.settings = [
             .init("Modifier keys", modifierPrefix.symbols),
             .init("Move between Spaces", arrowKeysEnabled ? "on" : "off"),
@@ -426,6 +436,7 @@ final class AppModel: ObservableObject {
             .init("App shortcuts", appShortcuts.isEmpty ? "none"
                   : appShortcuts.map { "\($0.letter) \($0.name)" }.joined(separator: ", ")),
             .init("Transition duration", duration),
+            .init("Follow Reduce motion", followsReduceMotion ? "on" : "off"),
             .init("Switch instantly with ⌘Tab", switchesOnActivation ? "on" : "off"),
             .init("Menu-bar frame", "\(menuBarFrame.title), \(menuBarFrameShape.title)"),
             .init("Open at login", opensAtLogin ? "on" : "off"),

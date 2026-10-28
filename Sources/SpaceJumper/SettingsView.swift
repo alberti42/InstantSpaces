@@ -229,10 +229,14 @@ private struct GeneralPane: View {
                 } label: {
                     Label {
                         Text("Reduce motion")
-                        Text(model.macOSSettings.reduceMotionExplanation)
+                        Text(model.macOSSettings.reduceMotionExplanation(followingReduceMotion: model.followsReduceMotion))
                     } icon: {
                         Image(systemName: "info.circle")
                     }
+                }
+                Toggle(isOn: $model.followsReduceMotion) {
+                    Text("Cross-fade when Reduce motion is on")
+                    Text("Turn it off to keep the slide while Reduce motion stays on for the rest of macOS.")
                 }
             } header: {
                 Text("Transition")

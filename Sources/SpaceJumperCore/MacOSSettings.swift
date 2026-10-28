@@ -26,13 +26,16 @@ public struct MacOSSettings: Equatable, Sendable {
         self.reducesMotion = reducesMotion
     }
 
-    /// How an animated switch looks: a cross-fade while Reduce motion is on,
-    /// as macOS switches Spaces then; otherwise the slide.
-    public var transition: Transition { reducesMotion ? .crossFade : .slide }
+    /// How an animated switch looks: a cross-fade while Reduce motion is on and
+    /// SpaceJumper follows it, as macOS switches Spaces then; otherwise the slide.
+    public func transition(followingReduceMotion follows: Bool) -> Transition {
+        follows && reducesMotion ? .crossFade : .slide
+    }
 
     /// What Reduce motion means for SpaceJumper's animation, for the General tab.
-    public var reduceMotionExplanation: String {
-        reducesMotion
+    public func reduceMotionExplanation(followingReduceMotion follows: Bool) -> String {
+        if !follows { return "The Spaces slide, whether Reduce motion is on or off." }
+        return reducesMotion
             ? "The Spaces cross-fade instead of sliding, as macOS does without SpaceJumper."
             : "The Spaces slide. With Reduce motion on, they cross-fade instead, as macOS does without SpaceJumper."
     }

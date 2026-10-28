@@ -83,7 +83,9 @@ you set it.
   500 ms in 10 ms steps, for the shortcuts, swipes and ⌘Tab. SpaceJumper draws
   it itself, so ⌃1 … ⌃9 slide straight to the Space. With Reduce motion on
   (System Settings → Accessibility → Motion), the Spaces cross-fade instead,
-  as macOS does without SpaceJumper.
+  as macOS does without SpaceJumper; to keep the slide while Reduce motion
+  stays on for the rest of macOS, turn off "Cross-fade when Reduce motion is
+  on" in Settings → General.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
