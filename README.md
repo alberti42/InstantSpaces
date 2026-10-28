@@ -1,3 +1,5 @@
+<p align="center"><img src="Images/AppIcon.png" width="160" alt="SpaceJumper's icon: a desktop monitor whose screen shows a jump to lightspeed, in front of a night sky with stars"></p>
+
 # SpaceJumper
 
 [![notarized download](https://img.shields.io/github/actions/workflow/status/alberti42/SpaceJumper/verify-release.yml?label=notarized%20download&logo=apple)](https://github.com/alberti42/SpaceJumper/actions/workflows/verify-release.yml)
