@@ -8,12 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Settings → General → "Cross-fade when Reduce motion is on" (on by default): turn it off to keep a short slide while Reduce motion stays on for the rest of macOS.
+- Settings → Spaces → Transition → "Cross-fade when Reduce motion is on" (on by default): turn it off to keep a short slide while Reduce motion stays on for the rest of macOS.
 - App shortcuts (Settings → Apps): give an app a letter, and the modifier keys chosen there (⌃⌘ by default) with that letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The letter follows the keyboard layout (on a German keyboard ⌃⌘Z is the key labelled Z).
 
 ### Changed
 
-- The menu-bar number and ⌃1 … ⌃9 count every Space by its position in Mission Control, full-screen apps included, so a full-screen app shows its number instead of "F". Settings → Shortcuts → Numbering → Desktops only keeps the previous numbering: only desktops, as macOS's "Switch to Desktop N" shortcuts count them.
+- The menu-bar number and ⌃1 … ⌃9 count every Space by its position in Mission Control, full-screen apps included, so a full-screen app shows its number instead of "F". Settings → Spaces → Numbering → Desktops only keeps the previous numbering: only desktops, as macOS's "Switch to Desktop N" shortcuts count them.
+- Settings: the Shortcuts tab is now called Spaces, as the app shortcuts have their own tab, and the Transition group (Duration, Reduce motion) moved there from General.
 
 ## [0.4.1] - 2026-10-28
 

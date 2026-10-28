@@ -85,7 +85,7 @@ you set it.
   (System Settings → Accessibility → Motion), the Spaces cross-fade instead,
   as macOS does without SpaceJumper; to keep the slide while Reduce motion
   stays on for the rest of macOS, turn off "Cross-fade when Reduce motion is
-  on" in Settings → General.
+  on" in Settings → Spaces.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.
@@ -121,7 +121,7 @@ Not yet tested:
    trackpad swipes (System Settings → Privacy & Security → Accessibility); the
    keyboard shortcuts work without it. See
    [Permissions and privacy](#permissions-and-privacy).
-5. If macOS's own shortcuts use the same keys, Settings → Shortcuts lists them
+5. If macOS's own shortcuts use the same keys, Settings → Spaces lists them
    under Conflicts, with a button that opens Keyboard Shortcuts, where you
    turn them off.
 6. To start SpaceJumper when you log in, turn on Open at Login in its Settings.
@@ -189,7 +189,7 @@ Common cases:
   in that direction. Turn on "Wrap around from the last Space to the first"
   to go to the other end.
 - **A shortcut switches with the animation, or twice.** A macOS shortcut on the
-  same keys is still on. Settings → Shortcuts lists it under Conflicts, with a
+  same keys is still on. Settings → Spaces lists it under Conflicts, with a
   button to Keyboard Shortcuts. Or choose other modifier keys.
 - **⌘Tab to an app on another Space still slides.** The macOS option "When
   switching to an application, switch to a Space with open windows for the

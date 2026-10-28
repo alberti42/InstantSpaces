@@ -32,7 +32,7 @@ public struct MacOSSettings: Equatable, Sendable {
         follows && reducesMotion ? .crossFade : .slide
     }
 
-    /// What Reduce motion means for SpaceJumper's animation, for the General tab.
+    /// What Reduce motion means for SpaceJumper's animation, for the Spaces tab.
     public func reduceMotionExplanation(followingReduceMotion follows: Bool) -> String {
         if !follows { return "The Spaces slide, whether Reduce motion is on or off." }
         return reducesMotion
