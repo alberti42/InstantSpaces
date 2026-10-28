@@ -33,8 +33,6 @@ you set it.
 - [Features](#features)
 - [Status](#status)
 - [Installation](#installation)
-- [Turn off the system shortcuts](#turn-off-the-system-shortcuts)
-- [Switching with ⌘Tab](#switching-with-tab)
 - [Permissions and privacy](#permissions-and-privacy)
 - [Troubleshooting](#troubleshooting)
 - [How it works](#how-it-works)
@@ -56,8 +54,8 @@ you set it.
   [Permissions and privacy](#permissions-and-privacy).
 - **⌘Tab** (off by default): when ⌘Tab or the Dock activates an app with no
   window on the current Space, SpaceJumper switches to the Space of its
-  frontmost window, instantly or with your slide. A macOS option has to be off
-  for this; see [Switching with ⌘Tab](#switching-with-tab).
+  frontmost window, instantly or with your slide. Turn it on in Settings →
+  General; a button there turns off macOS's own switch, which would slide.
 - **Menu-bar item** showing the number of the current desktop, or "F" on a
   full-screen Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
@@ -109,7 +107,9 @@ Not yet tested:
    trackpad swipes (System Settings → Privacy & Security → Accessibility); the
    keyboard shortcuts work without it. See
    [Permissions and privacy](#permissions-and-privacy).
-5. Turn off macOS's shortcuts that use the same keys (next section).
+5. If macOS's own shortcuts use the same keys, Settings → Shortcuts lists them
+   under Conflicts, with a button that opens Keyboard Shortcuts, where you
+   turn them off.
 6. To start SpaceJumper when you log in, turn on Open at Login in its Settings.
 
 The app is signed with a Developer ID and notarized by Apple. To check where a
@@ -120,55 +120,6 @@ gh attestation verify SpaceJumper.zip --repo alberti42/SpaceJumper
 ```
 
 To report a security problem privately, see [SECURITY.md](SECURITY.md).
-
-## Turn off the system shortcuts
-
-macOS binds ⌃← and ⌃→ to its own animated switch by default. If both
-SpaceJumper and macOS react to the same key, both switch. With the default
-modifier ⌃, turn them off in System Settings → Keyboard → Keyboard Shortcuts →
-Mission Control: untick "Move left a space" and "Move right a space", and
-"Switch to Desktop 1 … 9" if you have turned those on (they are off by default).
-
-The Settings window of SpaceJumper lists the switched-on macOS shortcuts
-that its keys would also trigger, with the name System Settings uses where
-SpaceJumper knows it, and has a button that opens Keyboard settings.
-Alternatively, choose other modifier keys.
-
-For arrow keys, macOS stores ⌃← and fn⌃← the same way, so SpaceJumper cannot
-tell them apart. It counts only the Mission Control shortcuts, which macOS
-defines with plain arrows; the window-tiling shortcuts (fn⌃←, fn⌃→) do not
-react to ⌃← and ⌃→. A macOS shortcut that you rebind yourself to a plain arrow
-is not detected.
-
-## Switching with ⌘Tab
-
-When ⌘Tab or a click in the Dock activates an app that has no window on the
-current Space, macOS switches to a Space where the app has one, with the
-slide. The Dock does this when the macOS option "When switching to an
-application, switch to a Space with open windows for the application" is on
-(System Settings → Desktop & Dock → Mission Control); it is on by default.
-
-To have SpaceJumper make this switch instead:
-
-1. Turn on "Switch instantly with ⌘Tab" in SpaceJumper's Settings → General.
-2. Turn off the macOS option. The row below the switch shows it: press Turn
-   Off, and SpaceJumper turns it off for you, or press Change… to open Desktop
-   & Dock and untick it yourself. The Dock takes the change at once; no
-   restart is needed.
-
-With the macOS option on, SpaceJumper does nothing on ⌘Tab, so that only one
-of the two switches. To go back to macOS's switch, turn off SpaceJumper's
-setting and press Turn On in the same row: with both off, ⌘Tab would only
-activate the app and leave you on the current Space.
-
-SpaceJumper chooses the Space as macOS does: the Space of the app's frontmost
-window. A minimized window does not count; if all of the app's windows are
-minimized, the Space does not change.
-
-A hidden app (⌘H) is the exception: when ⌘Tab shows it again on another
-Space, macOS switches there with its own slide, even with its option off.
-macOS can start that switch before SpaceJumper learns of the activation, so
-SpaceJumper leaves it to macOS.
 
 ## Permissions and privacy
 
@@ -214,12 +165,11 @@ SpaceJumper leaves it to macOS.
   to go to the other end.
 - **A shortcut switches with the animation, or twice.** A macOS shortcut on the
   same keys is still on. Settings → Shortcuts lists it under Conflicts, with a
-  button to Keyboard Shortcuts; see
-  [Turn off the system shortcuts](#turn-off-the-system-shortcuts).
+  button to Keyboard Shortcuts. Or choose other modifier keys.
 - **⌘Tab to an app on another Space still slides.** The macOS option "When
   switching to an application, switch to a Space with open windows for the
   application" is on, or "Switch instantly with ⌘Tab" is off. Settings →
-  General shows both; see [Switching with ⌘Tab](#switching-with-tab).
+  General shows both.
 - **⌘Tab to a hidden app on another Space slides.** This is macOS's own
   switch, and SpaceJumper leaves it to macOS. When ⌘Tab shows a hidden app
   (⌘H) again on another Space, macOS switches there with its own slide, even
@@ -248,9 +198,12 @@ in Terminal, repeat the problem, and attach the output.
 
 ### Keyboard shortcuts
 
-The animation is drawn by the Dock. When you switch Spaces, the Dock shows both
-Spaces, slides them across the screen, and then tells WindowServer to make the
-new Space current. WindowServer makes that change at once.
+The animation is drawn by the Dock: the macOS process that shows the Dock at
+the edge of the screen also manages Spaces, Mission Control and the slide
+between Spaces. When you switch Spaces, the Dock shows both Spaces, slides them
+across the screen, and then tells WindowServer, the macOS process that puts
+all windows on screen, to make the new Space current. WindowServer makes that
+change at once.
 
 SpaceJumper sends WindowServer the same three requests the Dock sends,
 without the slide: show the new Space, make it current, hide the other Spaces.
@@ -285,16 +238,28 @@ the Dock's accessibility elements when a swipe begins.
 
 ### ⌘Tab
 
-macOS sends a notification to every app when an app is activated, by ⌘Tab,
-the Dock or otherwise. SpaceJumper received it 33 ms before the Dock started
-its switch in a test on macOS 27.0.1. It lists the app's windows, front to back, asks
-WindowServer which Space each one is on (`SLSCopySpacesForWindows`) and
-whether it is shown (window attributes from SkyLight's window iterator), and
-switches to the Space of the frontmost shown window.
+With the macOS option "When switching to an application, switch to a Space
+with open windows for the application" on, an app that ⌘Tab activates brings
+its windows forward, even on another Space. WindowServer tells the Dock that a
+window appeared on a Space you are not on, and the Dock slides there. With the
+option off, the app becomes active but brings no window forward on another
+Space: the Dock has nothing to react to, and the Space stays.
+
+SpaceJumper takes over from there. macOS tells every app when another app
+becomes active. SpaceJumper then lists that app's windows, front to back, asks
+WindowServer which Space each one is on (`SLSCopySpacesForWindows`) and whether
+it is shown (window attributes from SkyLight's window iterator), and switches
+to the Space of the frontmost shown window. A minimized window is not shown,
+so an app whose windows are all minimized leaves the Space as it is, as in
+macOS.
 
 Making the new Space current also makes WindowServer bring an app of that
 Space to the front, which is not always the app you chose. When that happens
 right after the switch, SpaceJumper activates your app again.
+
+Showing a hidden app again brings its windows forward whatever the option
+says, so the Dock switches with its slide; see
+[Troubleshooting](#troubleshooting).
 
 ## Building from source
 
