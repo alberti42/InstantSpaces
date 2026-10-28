@@ -23,13 +23,18 @@ animation. SpaceJumper switches with no animation at all: the new Space
 appears at once. If you prefer a slide, SpaceJumper draws its own, as long as
 you set it.
 
-<p align="left">
-  <img src="Images/Settings-General.png" width="380" align="top" alt="SpaceJumper's Settings, General tab: Switch instantly with ⌘Tab with the two macOS options next to it, the menu-bar frame, startup and updates">
-  <img src="Images/Settings-Spaces.png" width="380" align="top" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration and Reduce motion, the shortcuts with modifier keys and numbering, trackpad swipes, and wrap-around">
-</p>
-<p align="left">
-  <img src="Images/Settings-Apps.png" width="380" align="top" alt="SpaceJumper's Settings, Apps tab: the modifier keys and a list of apps with their letters: Mail ⌃⌘M, BusyCal ⌃⌘B, Messages ⌃⌘E">
-</p>
+<table>
+  <tr>
+    <td valign="top" width="50%"><img src="Images/Settings-General.png" width="100%" alt="SpaceJumper's Settings, General tab: Switch instantly with ⌘Tab with the two macOS options next to it, the menu-bar frame, startup and updates"></td>
+    <td valign="top" width="50%"><img src="Images/Settings-Spaces.png" width="100%" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration and Reduce motion, the shortcuts with modifier keys and numbering, trackpad swipes, and wrap-around"></td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td valign="top" width="50%"><img src="Images/Settings-Apps.png" width="100%" alt="SpaceJumper's Settings, Apps tab: the modifier keys and a list of apps with their letters: Mail ⌃⌘M, BusyCal ⌃⌘B, Messages ⌃⌘E"></td>
+    <td valign="top" width="50%"></td>
+  </tr>
+</table>
 
 ---
 
