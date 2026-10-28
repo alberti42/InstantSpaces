@@ -181,8 +181,12 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
   the two switches would compete. SpaceJumper therefore leaves hidden apps to
   macOS. The cost is small: a hidden app on another Space is rare, and for it
   you get macOS's usual slide; everything else works as before.
-- **⌘Tab no longer changes the Space.** The macOS option is off and "Switch
-  instantly with ⌘Tab" is off too. Turn one of them on.
+- **⌘Tab no longer changes the Space.** SpaceJumper's "Switch instantly with
+  ⌘Tab" and macOS's own option "When switching to an application, switch to a
+  Space with open windows for the application" are both off, so neither
+  switches. Turn one of them on in Settings → General: SpaceJumper's for an
+  instant switch, or macOS's (the Turn On button next to it) for macOS's
+  slide.
 - **Desktop numbers change by themselves.** macOS's "Automatically rearrange
   Spaces based on most recent use" is on (Settings → General shows it). Turn
   it off in Desktop & Dock → Mission Control to keep the order you set.
