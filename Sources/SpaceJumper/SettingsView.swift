@@ -44,6 +44,10 @@ private struct SpacesPane: View {
                     Text("Duration")
                     Text("How long a switch takes, for the shortcuts, swipes and ⌘Tab. Off switches at once.")
                 }
+                Toggle(isOn: $model.wrapsAround) {
+                    Text("Wrap around from the last Space to the first")
+                    Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
+                }
                 Toggle(isOn: $model.followsReduceMotion) {
                     Text("Cross-fade when Reduce motion is on")
                     Text("Turn it off to keep the slide while Reduce motion stays on for the rest of macOS.")
@@ -60,10 +64,6 @@ private struct SpacesPane: View {
                     } icon: {
                         Image(systemName: "info.circle")
                     }
-                }
-                Toggle(isOn: $model.wrapsAround) {
-                    Text("Wrap around from the last Space to the first")
-                    Text("For \(prefix)← \(prefix)→ and trackpad swipes. macOS stops at the first and last Space.")
                 }
             } header: {
                 Text("Transition")

@@ -26,7 +26,7 @@ you set it.
 <table>
   <tr>
     <td valign="top" width="50%"><img src="Images/Settings-General.png" width="100%" alt="SpaceJumper's Settings, General tab: Switch instantly with ⌘Tab with the two macOS options next to it, the menu-bar frame, startup and updates"></td>
-    <td valign="top" width="50%"><img src="Images/Settings-Spaces.png" width="100%" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration, Reduce motion and wrap-around, the shortcuts with modifier keys and numbering, and trackpad swipes"></td>
+    <td valign="top" width="50%"><img src="Images/Settings-Spaces.png" width="100%" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration, wrap-around and Reduce motion, the shortcuts with modifier keys and numbering, and trackpad swipes"></td>
   </tr>
 </table>
 <table>

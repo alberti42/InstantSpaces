@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Settings → Spaces: "Wrap around from the last Space to the first" is now the last option of the Transition group, with its explanation next to it.
+- Settings → Spaces: "Wrap around from the last Space to the first" is now in the Transition group, after Duration, with its explanation next to it.
 
 ## [0.5.0] - 2026-10-28
 
