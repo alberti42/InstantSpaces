@@ -9,7 +9,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - ⌘Tab to a hidden app on another Space is left to macOS, which switches with its own slide. When the app is shown again, the Dock starts its switch by itself, even with the macOS option off, and sometimes before SpaceJumper learns of the activation; when SpaceJumper switched too, the two could mix.
-
 - With a slide length set, the new Space becomes current when the slide starts instead of when it ends; the menu bar changes at the start of the slide.
 - After a ⌘Tab switch, SpaceJumper makes the app active again only if macOS gives the focus to another app during the Space change (until 0.1 s after macOS announces it). A second ⌘Tab right after the first is no longer undone.
 
