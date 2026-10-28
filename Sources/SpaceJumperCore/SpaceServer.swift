@@ -14,8 +14,10 @@ public protocol SpaceServer: AnyObject {
     func hideSpaces(_ spaces: [UInt64])
     /// Draws `space` shifted `x` points to the right of its place; 0 puts it back.
     func setSpaceOffset(_ space: UInt64, x: Double)
-    /// Sets the opacity of `space`, 0 to 1; 1 is normal.
-    func setSpaceAlpha(_ space: UInt64, alpha: Double)
+    /// Freezes the screen for a cross-fade; nil if WindowServer refused.
+    func freezeScreen() -> Int32?
+    /// Dissolves the frozen screen into the current one over `duration`.
+    func dissolveScreen(_ freeze: Int32, duration: TimeInterval)
     /// The width in points of the display with this identifier.
     func displayWidth(_ display: String) -> Double
     /// The normal windows (layer 0) of a process, front to back, with their
@@ -68,8 +70,22 @@ public final class SkyLightServer: SpaceServer {
         SLBSetSpaceOffset(space, x)
     }
 
-    public func setSpaceAlpha(_ space: UInt64, alpha: Double) {
-        SLBSetSpaceAlpha(space, Float(alpha))
+    public func freezeScreen() -> Int32? {
+        let transition = SLBFreezeScreenForFade()
+        return transition == 0 ? nil : transition
+    }
+
+    /// How long the frozen screen waits before it dissolves, so that the
+    /// asynchronous bridged operations have completed the switch underneath.
+    static let dissolveDelay: TimeInterval = 0.15
+
+    public func dissolveScreen(_ freeze: Int32, duration: TimeInterval) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.dissolveDelay) {
+            SLBDissolveScreen(freeze, duration)
+            DispatchQueue.main.asyncAfter(deadline: .now() + duration + 0.1) {
+                SLBReleaseTransition(freeze)
+            }
+        }
     }
 
     public func displayWidth(_ display: String) -> Double {

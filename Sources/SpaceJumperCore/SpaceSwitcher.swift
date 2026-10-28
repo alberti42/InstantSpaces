@@ -125,13 +125,14 @@ public final class SpaceSwitcher {
         }
 
         if transition == .crossFade {
-            crossFade(from: current, to: space, on: display, hiding: others)
+            crossFade(to: space, on: display, hiding: others)
             return
         }
 
         let ids = display.spaces.map(\.id)
         let side = direction
             ?? ((ids.firstIndex(of: space) ?? 0) > (ids.firstIndex(of: current) ?? 0) ? .right : .left)
+
         let slide = Slide(direction: side, width: server.displayWidth(display.identifier))
         // Until the slide ends and WindowServer catches up, count from the new Space.
         pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
@@ -150,24 +151,17 @@ public final class SpaceSwitcher {
         })
     }
 
-    /// The animated switch with `transition` `.crossFade`, in the order of the
-    /// slide: the new Space is shown transparent and made current, both
-    /// opacities change, then the others are hidden and both are opaque again.
-    private func crossFade(from current: UInt64, to space: UInt64, on display: DisplaySpaces, hiding others: [UInt64]) {
-        pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
-        server.setSpaceAlpha(space, alpha: 0)
+    /// The animated switch with `transition` `.crossFade`: the screen is
+    /// frozen, the switch happens at once underneath, and the frozen image
+    /// dissolves into the new Space over `animationDuration`. Without a
+    /// frozen screen (WindowServer refused) the switch is instant.
+    private func crossFade(to space: UInt64, on display: DisplaySpaces, hiding others: [UInt64]) {
+        let freeze = server.freezeScreen()
         server.showSpaces([space])
         server.setCurrentSpace(space, display: display.identifier)
-        animator.run(duration: animationDuration, step: { [server] progress in
-            let alphas = CrossFade.alphas(at: progress)
-            server.setSpaceAlpha(current, alpha: alphas.old)
-            server.setSpaceAlpha(space, alpha: alphas.new)
-        }, completion: { [weak self, server] in
-            server.hideSpaces(others)
-            server.setSpaceAlpha(current, alpha: 1)
-            server.setSpaceAlpha(space, alpha: 1)
-            if let self { self.pending = (display.identifier, space, self.now()) }
-        })
+        server.hideSpaces(others)
+        pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
+        if let freeze { server.dissolveScreen(freeze, duration: animationDuration) }
     }
 
     /// The bindings among `bindings` that would also trigger a switched-on

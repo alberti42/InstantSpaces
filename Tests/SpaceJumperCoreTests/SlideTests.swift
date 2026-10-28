@@ -24,11 +24,4 @@ import Testing
         #expect(Slide.easeInOut(-1) == 0)
         #expect(Slide.easeInOut(2) == 1)
     }
-
-    @Test func crossFadeGoesFromOldToNew() {
-        #expect(CrossFade.alphas(at: 0) == (old: 1, new: 0))
-        #expect(CrossFade.alphas(at: 0.5) == (old: 0.5, new: 0.5))
-        #expect(CrossFade.alphas(at: 0.25) == (old: 0.875, new: 0.125))
-        #expect(CrossFade.alphas(at: 1) == (old: 0, new: 1))
-    }
 }

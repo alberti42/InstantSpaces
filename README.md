@@ -226,11 +226,17 @@ Dock, `SLSManagedDisplaySetCurrentSpace` changes the Space, but
 `SLSShowSpaces` and `SLSHideSpaces` are refused, so the windows of both Spaces
 stay on screen. The bridged operations are accepted.
 
-With a slide animation set, SpaceJumper draws the slide itself, as the Dock
-does: it shows the new Space shifted one screen width to the side, moves both
-Spaces across the screen about 120 times a second
+With a transition duration set, SpaceJumper draws the slide itself, as the
+Dock does: it shows the new Space shifted one screen width to the side, moves
+both Spaces across the screen about 120 times a second
 (`SLSBridgedSpaceSetTransformOperation`), and then sends the same three
 requests and puts both Spaces back in place.
+
+With Reduce motion on, SpaceJumper asks WindowServer to freeze the screen
+(`SLSNewTransition`, a fade), switches at once underneath, and lets
+WindowServer dissolve the frozen picture into the new Space
+(`SLSInvokeTransition`). The whole picture fades, so the windows keep their
+order throughout.
 
 ### Trackpad swipes
 

@@ -9,7 +9,8 @@ private final class FakeServer: SpaceServer {
         case setCurrent(UInt64, display: String)
         case hide([UInt64])
         case offset(UInt64, x: Double)
-        case alpha(UInt64, Double)
+        case freeze
+        case dissolve(Int32, duration: Double)
     }
 
     var displays: [[String: Any]]
@@ -33,7 +34,10 @@ private final class FakeServer: SpaceServer {
     func setCurrentSpace(_ space: UInt64, display: String) { calls.append(.setCurrent(space, display: display)) }
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
     func setSpaceOffset(_ space: UInt64, x: Double) { calls.append(.offset(space, x: x)) }
-    func setSpaceAlpha(_ space: UInt64, alpha: Double) { calls.append(.alpha(space, alpha)) }
+    /// The freeze handle `freezeScreen` returns; nil as if WindowServer refused.
+    var freezeHandle: Int32? = 7
+    func freezeScreen() -> Int32? { calls.append(.freeze); return freezeHandle }
+    func dissolveScreen(_ freeze: Int32, duration: TimeInterval) { calls.append(.dissolve(freeze, duration: duration)) }
     func displayWidth(_ display: String) -> Double { 1000 }
     func windows(ofProcess pid: Int32) -> [AppWindow] { appWindows[pid] ?? [] }
     func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
@@ -320,23 +324,25 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         #expect(switcher.followActivation(ofProcess: 42) == nil)
     }
 
-    @Test func crossFadeFadesBothSpacesThenSwitches() {
+    /// The screen is frozen, the switch happens at once underneath, and the
+    /// frozen image dissolves over the duration; nothing slides.
+    @Test func crossFadeFreezesSwitchesAndDissolves() {
         let (switcher, server, animator) = makeAnimatedSwitcher()
         switcher.transition = .crossFade
         #expect(switcher.move(.right) == 475)
-        // The new Space is shown transparent and made current; no offsets.
-        #expect(server.calls == [.alpha(475, 0), .show([475]), .setCurrent(475, display: "A")])
-
-        animator.step(to: 0.5)
-        #expect(Array(server.calls.suffix(2)) == [.alpha(1, 0.5), .alpha(475, 0.5)])
-
-        animator.finish()
-        #expect(Array(server.calls.suffix(5)) == [
-            .alpha(1, 0), .alpha(475, 1),
-            .hide([1, 600, 610]),
-            .alpha(1, 1), .alpha(475, 1),
+        #expect(server.calls == [
+            .freeze, .show([475]), .setCurrent(475, display: "A"), .hide([1, 600, 610]),
+            .dissolve(7, duration: 0.3),
         ])
-        #expect(!server.calls.contains { if case .offset = $0 { return true } else { return false } })
+        #expect(!animator.isRunning)
+    }
+
+    @Test func crossFadeWithoutFreezeSwitchesAtOnce() {
+        let (switcher, server, _) = makeAnimatedSwitcher()
+        switcher.transition = .crossFade
+        server.freezeHandle = nil
+        switcher.move(.right)
+        #expect(server.calls == [.freeze, .show([475]), .setCurrent(475, display: "A"), .hide([1, 600, 610])])
     }
 
     @Test func crossFadeWithoutDurationSwitchesAtOnce() {

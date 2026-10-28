@@ -34,6 +34,9 @@ static CFTypeRef (*sWindowQueryResultCopyWindows)(CFTypeRef);
 static bool (*sWindowIteratorAdvance)(CFTypeRef);
 static uint32_t (*sWindowIteratorGetWindowID)(CFTypeRef);
 static uint64_t (*sWindowIteratorGetAttributes)(CFTypeRef);
+static int (*sNewTransition)(CGSConnectionID, const void *, int *);
+static int (*sInvokeTransition)(CGSConnectionID, int, float);
+static int (*sReleaseTransition)(CGSConnectionID, int);
 static void (*sPerform)(id);
 
 /// Finds a symbol, including a local one, in the symbol table of a loaded image.
@@ -100,6 +103,9 @@ BOOL SLBLoad(NSString **error)
     sWindowIteratorAdvance = dlsym(skyLight, "SLSWindowIteratorAdvance");
     sWindowIteratorGetWindowID = dlsym(skyLight, "SLSWindowIteratorGetWindowID");
     sWindowIteratorGetAttributes = dlsym(skyLight, "SLSWindowIteratorGetAttributes");
+    sNewTransition = dlsym(skyLight, "SLSNewTransition");
+    sInvokeTransition = dlsym(skyLight, "SLSInvokeTransition");
+    sReleaseTransition = dlsym(skyLight, "SLSReleaseTransition");
     sPerform = FindSymbol(kSkyLightPath, kPerformSymbol);
 
     NSMutableArray *missing = [NSMutableArray array];
@@ -117,10 +123,13 @@ BOOL SLBLoad(NSString **error)
     if (!sWindowIteratorAdvance) [missing addObject:@"SLSWindowIteratorAdvance"];
     if (!sWindowIteratorGetWindowID) [missing addObject:@"SLSWindowIteratorGetWindowID"];
     if (!sWindowIteratorGetAttributes) [missing addObject:@"SLSWindowIteratorGetAttributes"];
+    if (!sNewTransition) [missing addObject:@"SLSNewTransition"];
+    if (!sInvokeTransition) [missing addObject:@"SLSInvokeTransition"];
+    if (!sReleaseTransition) [missing addObject:@"SLSReleaseTransition"];
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation",
-                             @"SLSBridgedSpaceSetTransformOperation", @"SLSBridgedSpaceSetAlphaOperation"]) {
+                             @"SLSBridgedSpaceSetTransformOperation"]) {
         if (!NSClassFromString(name)) [missing addObject:name];
     }
     if (missing.count > 0) {
@@ -214,15 +223,32 @@ BOOL SLBSetSpaceOffset(uint64_t space, double x)
     return YES;
 }
 
-BOOL SLBSetSpaceAlpha(uint64_t space, float alpha)
+// The transition spec of SLSNewTransition: type 1 is a fade; window 0 and
+// no background colour cover the whole screen.
+typedef struct {
+    uint32_t unknown;
+    uint32_t type;
+    uint32_t option;
+    uint32_t window;
+    float *backgroundColor;
+} SLBTransitionSpec;
+
+int SLBFreezeScreenForFade(void)
 {
-    Class cls = NSClassFromString(@"SLSBridgedSpaceSetAlphaOperation");
-    if (!cls) return NO;
-    id operation = ((id (*)(id, SEL, uint64_t, float))objc_msgSend)(
-        [cls alloc], sel_registerName("initWithSpaceID:alpha:"), space, alpha);
-    if (!operation) return NO;
-    sPerform(operation);
-    return YES;
+    SLBTransitionSpec spec = {0, 1, 0, 0, NULL};
+    int transition = 0;
+    if (sNewTransition(sMainConnectionID(), &spec, &transition) != 0) return 0;
+    return transition;
+}
+
+BOOL SLBDissolveScreen(int transition, double seconds)
+{
+    return sInvokeTransition(sMainConnectionID(), transition, (float)seconds) == 0;
+}
+
+void SLBReleaseTransition(int transition)
+{
+    sReleaseTransition(sMainConnectionID(), transition);
 }
 
 double SLBDisplayWidth(NSString *display)

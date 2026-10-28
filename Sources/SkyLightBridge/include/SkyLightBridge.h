@@ -41,10 +41,18 @@ BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
 /// 0 puts the Space back. Asynchronous, like the operations above.
 BOOL SLBSetSpaceOffset(uint64_t space, double x);
 
-/// Sets the opacity of `space`, 0 to 1, through
-/// `SLSBridgedSpaceSetAlphaOperation` (`initWithSpaceID:alpha:`). 1 is normal.
-/// Asynchronous, like the operations above.
-BOOL SLBSetSpaceAlpha(uint64_t space, float alpha);
+/// Freezes the screen for a fade transition (`SLSNewTransition`, type 1):
+/// changes made afterwards stay invisible until `SLBDissolveScreen`. Returns
+/// the transition's handle, or 0 if WindowServer refused it.
+int SLBFreezeScreenForFade(void);
+
+/// Dissolves the frozen screen image into the current screen over `seconds`
+/// (`SLSInvokeTransition`). WindowServer fades the whole picture, so the
+/// windows keep their order throughout.
+BOOL SLBDissolveScreen(int transition, double seconds);
+
+/// Releases a transition after its dissolve (`SLSReleaseTransition`).
+void SLBReleaseTransition(int transition);
 
 /// The width in points of the display with this identifier (a UUID), or of
 /// the main display when no display has it, as for "Main" when displays

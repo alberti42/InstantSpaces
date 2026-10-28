@@ -33,20 +33,12 @@ public struct Slide: Equatable, Sendable {
 }
 
 /// How an animated switch looks: the slide, or a cross-fade, which macOS
-/// uses instead of its slide when Reduce motion is on.
+/// uses instead of its slide when Reduce motion is on. The cross-fade is
+/// WindowServer's screen transition: the screen is frozen, the switch happens
+/// underneath, and the frozen image dissolves into the new one.
 public enum Transition: Sendable {
     case slide
     case crossFade
-}
-
-/// The opacity of the two Spaces of a cross-fade.
-public enum CrossFade {
-    /// Opacities of the old and the new Space at `progress` from 0 to 1,
-    /// eased in and out like the slide.
-    public static func alphas(at progress: Double) -> (old: Double, new: Double) {
-        let eased = Slide.easeInOut(progress)
-        return (1 - eased, eased)
-    }
 }
 
 /// Runs a slide: calls `step` with the progress from 0 to 1 over `duration`,
