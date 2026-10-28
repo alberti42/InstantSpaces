@@ -6,6 +6,42 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.3.1</title>
+            <pubDate>Wed, 28 Oct 2026 00:08:26 +0000</pubDate>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.3.1</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.3.1/SpaceJumper.zip" length="1517883" type="application/octet-stream" sparkle:edSignature="stm8ja5ybvSkGvbHcrb5AA5bCtXu4oF3yPvIyzuxvNLQRFnuphxo3xs0qAnExf2eJYEfT95+dPLC7Sisfi1jAA=="/>
+        
+            <description><![CDATA[
+<h3>Changed</h3>
+<ul>
+<li>⌘Tab to a hidden app on another Space is left to macOS, which switches with its own slide. When the app is shown again, the Dock starts its switch by itself, even with the macOS option off, and sometimes before SpaceJumper learns of the activation; when SpaceJumper switched too, the two could mix.</li>
+<li>With a slide length set, the new Space becomes current when the slide starts instead of when it ends; the menu bar changes at the start of the slide.</li>
+<li>After a ⌘Tab switch, SpaceJumper makes the app active again only if macOS gives the focus to another app during the Space change (until 0.1 s after macOS announces it). A second ⌘Tab right after the first is no longer undone.</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>With "Switch instantly with ⌘Tab" on, a switch by shortcut or swipe could bounce back to the previous Space. On every Space change macOS makes an app of the new Space active, sometimes one with no window there, such as Finder; SpaceJumper took that for an activation by the user and switched to that app's Space. Activations during a Space change are no longer followed.</li>
+<li>With "Switch instantly with ⌘Tab" on, hiding or quitting the active app switched to the Space of the app macOS activated next. macOS stays on the current Space; so does SpaceJumper now.</li>
+</ul>
+<h2>Changes since v0.3.0</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/c65605b">c65605b</a> Version bump to v0.3.1 (build 6)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/c4eab93">c4eab93</a> Remove a blank line inside the Unreleased Changed list</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/cd2f109">cd2f109</a> Leave ⌘Tab to a hidden app to macOS</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/808d328">808d328</a> Do not follow activations after the active app hides or quits</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/8d0e60b">8d0e60b</a> Stop following activations that come with a Space change</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/f86522f">f86522f</a> Release v0.3.0 (automatic appcast update)</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.3.0...v0.3.1</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.3.0</title>
             <pubDate>Tue, 27 Oct 2026 22:46:21 +0000</pubDate>
             <sparkle:version>5</sparkle:version>
