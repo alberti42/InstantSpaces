@@ -120,7 +120,7 @@ BOOL SLBLoad(NSString **error)
     if (!sPerform) [missing addObject:@"SLSPerformAsynchronousBridgedWindowManagementOperation"];
     for (NSString *name in @[@"SLSBridgedShowSpacesOperation", @"SLSBridgedHideSpacesOperation",
                              @"SLSBridgedManagedDisplaySetCurrentSpaceOperation",
-                             @"SLSBridgedSpaceSetTransformOperation"]) {
+                             @"SLSBridgedSpaceSetTransformOperation", @"SLSBridgedSpaceSetAlphaOperation"]) {
         if (!NSClassFromString(name)) [missing addObject:name];
     }
     if (missing.count > 0) {
@@ -209,6 +209,17 @@ BOOL SLBSetSpaceOffset(uint64_t space, double x)
     id operation = ((id (*)(id, SEL, uint64_t, CGAffineTransform, unsigned))objc_msgSend)(
         [cls alloc], sel_registerName("initWithSpaceID:transform:options:"), space,
         CGAffineTransformMakeTranslation(-x, 0), 0);
+    if (!operation) return NO;
+    sPerform(operation);
+    return YES;
+}
+
+BOOL SLBSetSpaceAlpha(uint64_t space, float alpha)
+{
+    Class cls = NSClassFromString(@"SLSBridgedSpaceSetAlphaOperation");
+    if (!cls) return NO;
+    id operation = ((id (*)(id, SEL, uint64_t, float))objc_msgSend)(
+        [cls alloc], sel_registerName("initWithSpaceID:alpha:"), space, alpha);
     if (!operation) return NO;
     sPerform(operation);
     return YES;

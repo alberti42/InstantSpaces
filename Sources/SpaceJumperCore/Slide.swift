@@ -32,6 +32,23 @@ public struct Slide: Equatable, Sendable {
     }
 }
 
+/// How an animated switch looks: the slide, or a cross-fade, which macOS
+/// uses instead of its slide when Reduce motion is on.
+public enum Transition: Sendable {
+    case slide
+    case crossFade
+}
+
+/// The opacity of the two Spaces of a cross-fade.
+public enum CrossFade {
+    /// Opacities of the old and the new Space at `progress` from 0 to 1,
+    /// eased in and out like the slide.
+    public static func alphas(at progress: Double) -> (old: Double, new: Double) {
+        let eased = Slide.easeInOut(progress)
+        return (1 - eased, eased)
+    }
+}
+
 /// Runs a slide: calls `step` with the progress from 0 to 1 over `duration`,
 /// then `completion`. `finish` ends a running slide at once (step 1, then
 /// completion). Tests use their own, which steps when the test says so.

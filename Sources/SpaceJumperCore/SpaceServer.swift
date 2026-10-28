@@ -14,6 +14,8 @@ public protocol SpaceServer: AnyObject {
     func hideSpaces(_ spaces: [UInt64])
     /// Draws `space` shifted `x` points to the right of its place; 0 puts it back.
     func setSpaceOffset(_ space: UInt64, x: Double)
+    /// Sets the opacity of `space`, 0 to 1; 1 is normal.
+    func setSpaceAlpha(_ space: UInt64, alpha: Double)
     /// The width in points of the display with this identifier.
     func displayWidth(_ display: String) -> Double
     /// The normal windows (layer 0) of a process, front to back, with their
@@ -64,6 +66,10 @@ public final class SkyLightServer: SpaceServer {
 
     public func setSpaceOffset(_ space: UInt64, x: Double) {
         SLBSetSpaceOffset(space, x)
+    }
+
+    public func setSpaceAlpha(_ space: UInt64, alpha: Double) {
+        SLBSetSpaceAlpha(space, Float(alpha))
     }
 
     public func displayWidth(_ display: String) -> Double {

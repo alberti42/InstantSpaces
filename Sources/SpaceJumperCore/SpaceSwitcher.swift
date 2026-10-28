@@ -21,6 +21,9 @@ public final class SpaceSwitcher {
     /// How long a switch slides; 0 switches at once.
     public var animationDuration: TimeInterval = 0
 
+    /// Whether an animated switch slides or cross-fades.
+    public var transition: Transition = .slide
+
     private let server: SpaceServer
     private let now: () -> Date
     private let animator: SlideAnimator
@@ -121,6 +124,11 @@ public final class SpaceSwitcher {
             return
         }
 
+        if transition == .crossFade {
+            crossFade(from: current, to: space, on: display, hiding: others)
+            return
+        }
+
         let ids = display.spaces.map(\.id)
         let side = direction
             ?? ((ids.firstIndex(of: space) ?? 0) > (ids.firstIndex(of: current) ?? 0) ? .right : .left)
@@ -138,6 +146,26 @@ public final class SpaceSwitcher {
             server.hideSpaces(others)
             server.setSpaceOffset(current, x: 0)
             server.setSpaceOffset(space, x: 0)
+            if let self { self.pending = (display.identifier, space, self.now()) }
+        })
+    }
+
+    /// The animated switch with `transition` `.crossFade`, in the order of the
+    /// slide: the new Space is shown transparent and made current, both
+    /// opacities change, then the others are hidden and both are opaque again.
+    private func crossFade(from current: UInt64, to space: UInt64, on display: DisplaySpaces, hiding others: [UInt64]) {
+        pending = (display.identifier, space, now().addingTimeInterval(animationDuration))
+        server.setSpaceAlpha(space, alpha: 0)
+        server.showSpaces([space])
+        server.setCurrentSpace(space, display: display.identifier)
+        animator.run(duration: animationDuration, step: { [server] progress in
+            let alphas = CrossFade.alphas(at: progress)
+            server.setSpaceAlpha(current, alpha: alphas.old)
+            server.setSpaceAlpha(space, alpha: alphas.new)
+        }, completion: { [weak self, server] in
+            server.hideSpaces(others)
+            server.setSpaceAlpha(current, alpha: 1)
+            server.setSpaceAlpha(space, alpha: 1)
             if let self { self.pending = (display.identifier, space, self.now()) }
         })
     }

@@ -9,6 +9,7 @@ private final class FakeServer: SpaceServer {
         case setCurrent(UInt64, display: String)
         case hide([UInt64])
         case offset(UInt64, x: Double)
+        case alpha(UInt64, Double)
     }
 
     var displays: [[String: Any]]
@@ -32,6 +33,7 @@ private final class FakeServer: SpaceServer {
     func setCurrentSpace(_ space: UInt64, display: String) { calls.append(.setCurrent(space, display: display)) }
     func hideSpaces(_ spaces: [UInt64]) { calls.append(.hide(spaces)) }
     func setSpaceOffset(_ space: UInt64, x: Double) { calls.append(.offset(space, x: x)) }
+    func setSpaceAlpha(_ space: UInt64, alpha: Double) { calls.append(.alpha(space, alpha)) }
     func displayWidth(_ display: String) -> Double { 1000 }
     func windows(ofProcess pid: Int32) -> [AppWindow] { appWindows[pid] ?? [] }
     func enabledSystemShortcuts() -> [SystemShortcut] { shortcuts }
@@ -316,5 +318,32 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         switcher.move(.right)
         server.appWindows[42] = [AppWindow(id: 7, spaces: [475], isShown: true)]
         #expect(switcher.followActivation(ofProcess: 42) == nil)
+    }
+
+    @Test func crossFadeFadesBothSpacesThenSwitches() {
+        let (switcher, server, animator) = makeAnimatedSwitcher()
+        switcher.transition = .crossFade
+        #expect(switcher.move(.right) == 475)
+        // The new Space is shown transparent and made current; no offsets.
+        #expect(server.calls == [.alpha(475, 0), .show([475]), .setCurrent(475, display: "A")])
+
+        animator.step(to: 0.5)
+        #expect(Array(server.calls.suffix(2)) == [.alpha(1, 0.5), .alpha(475, 0.5)])
+
+        animator.finish()
+        #expect(Array(server.calls.suffix(5)) == [
+            .alpha(1, 0), .alpha(475, 1),
+            .hide([1, 600, 610]),
+            .alpha(1, 1), .alpha(475, 1),
+        ])
+        #expect(!server.calls.contains { if case .offset = $0 { return true } else { return false } })
+    }
+
+    @Test func crossFadeWithoutDurationSwitchesAtOnce() {
+        let (switcher, server, _) = makeAnimatedSwitcher()
+        switcher.transition = .crossFade
+        switcher.animationDuration = 0
+        switcher.move(.right)
+        #expect(server.calls == [.show([475]), .setCurrent(475, display: "A"), .hide([1, 600, 610])])
     }
 }

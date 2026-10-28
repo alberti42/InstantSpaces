@@ -129,9 +129,24 @@ private struct GeneralPane: View {
                             .frame(width: 56, alignment: .trailing)
                     }
                 } label: {
-                    Text("Slide animation")
-                    Text("How long a switch slides, for the shortcuts and swipes. Off switches at once.")
+                    Text("Duration")
+                    Text("How long a switch takes, for the shortcuts, swipes and ⌘Tab. Off switches at once.")
                 }
+                LabeledContent {
+                    HStack {
+                        Text(model.macOSSettings.reducesMotion ? "On" : "Off")
+                        Button("Change…") { model.openReduceMotionSettings() }
+                    }
+                } label: {
+                    Label {
+                        Text("Reduce motion")
+                        Text(model.macOSSettings.reduceMotionExplanation)
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            } header: {
+                Text("Transition")
             }
 
             Section {

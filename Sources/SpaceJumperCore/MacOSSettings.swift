@@ -13,13 +13,28 @@ public struct MacOSSettings: Equatable, Sendable {
     /// an application, switch to a Space with open windows for the
     /// application"; on by default.
     public var switchesOnActivate: Bool?
+    /// Reduce motion (System Settings → Accessibility → Motion), as
+    /// `NSWorkspace.accessibilityDisplayShouldReduceMotion` reports it.
+    public var reducesMotion: Bool
 
     public init(threeFingerHorizontalSwipe: Int? = nil, fourFingerHorizontalSwipe: Int? = nil,
-                rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil) {
+                rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil, reducesMotion: Bool = false) {
         self.threeFingerHorizontalSwipe = threeFingerHorizontalSwipe
         self.fourFingerHorizontalSwipe = fourFingerHorizontalSwipe
         self.rearrangesSpaces = rearrangesSpaces
         self.switchesOnActivate = switchesOnActivate
+        self.reducesMotion = reducesMotion
+    }
+
+    /// How an animated switch looks: a cross-fade while Reduce motion is on,
+    /// as macOS switches Spaces then; otherwise the slide.
+    public var transition: Transition { reducesMotion ? .crossFade : .slide }
+
+    /// What Reduce motion means for SpaceJumper's animation, for the General tab.
+    public var reduceMotionExplanation: String {
+        reducesMotion
+            ? "The Spaces cross-fade instead of sliding, as macOS does without SpaceJumper."
+            : "The Spaces slide. With Reduce motion on, they cross-fade instead, as macOS does without SpaceJumper."
     }
 
     private static let swipesBetweenSpaces = 2

@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- With Reduce motion on (System Settings → Accessibility → Motion) and a transition duration set, the Spaces cross-fade instead of sliding, as macOS does without SpaceJumper. Settings → General shows Reduce motion below the duration, with a Change… button.
 - About SpaceJumper in the menu: macOS's About panel with the version, a short description, a link to the repository and the copyright line.
+
+### Changed
+
+- Settings → General: the slider "Slide animation" is now "Duration", in a group headed "Transition".
 
 ## [0.3.1] - 2026-10-28
 

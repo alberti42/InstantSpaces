@@ -38,4 +38,10 @@ import Testing
         #expect(MacOSSettings(switchesOnActivate: false).switchOnActivateNeeded(spaceJumperSwitches: true) == nil)
         #expect(MacOSSettings(switchesOnActivate: false).switchOnActivateNeeded(spaceJumperSwitches: false) == true)
     }
+
+    @Test func reduceMotionChoosesTheCrossFade() {
+        #expect(MacOSSettings().transition == .slide)
+        #expect(MacOSSettings(reducesMotion: true).transition == .crossFade)
+        #expect(MacOSSettings(reducesMotion: true).reduceMotionExplanation.contains("cross-fade instead"))
+    }
 }

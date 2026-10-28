@@ -70,9 +70,11 @@ you set it.
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
   full-screen Spaces and stop at the first and last Space, as macOS does
   without SpaceJumper.
-- **Slide animation** (off by default): a slide of your chosen length, 0 to
-  500 ms in 10 ms steps, for the shortcuts and swipes. SpaceJumper draws it
-  itself, so ⌃1 … ⌃9 slide straight to the desktop.
+- **Transition** (off by default): a slide of the duration you choose, 0 to
+  500 ms in 10 ms steps, for the shortcuts, swipes and ⌘Tab. SpaceJumper draws
+  it itself, so ⌃1 … ⌃9 slide straight to the desktop. With Reduce motion on
+  (System Settings → Accessibility → Motion), the Spaces cross-fade instead,
+  as macOS does without SpaceJumper.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Several displays**: the shortcuts act on the display with the active menu bar.

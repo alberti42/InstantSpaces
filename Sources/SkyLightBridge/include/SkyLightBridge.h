@@ -41,6 +41,11 @@ BOOL SLBSetCurrentSpace(NSString *display, uint64_t space);
 /// 0 puts the Space back. Asynchronous, like the operations above.
 BOOL SLBSetSpaceOffset(uint64_t space, double x);
 
+/// Sets the opacity of `space`, 0 to 1, through
+/// `SLSBridgedSpaceSetAlphaOperation` (`initWithSpaceID:alpha:`). 1 is normal.
+/// Asynchronous, like the operations above.
+BOOL SLBSetSpaceAlpha(uint64_t space, float alpha);
+
 /// The width in points of the display with this identifier (a UUID), or of
 /// the main display when no display has it, as for "Main" when displays
 /// share Spaces.

@@ -153,6 +153,12 @@ final class AppModel: ObservableObject {
             let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             MainActor.assumeIsolated { self?.applicationDidActivate(app) }
         })
+        // Reduce motion can be switched on or off in System Settings at any time.
+        observers.append(NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.accessibilityDisplayOptionsDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refreshMacOSSettings() }
+        })
         // macOS shortcuts can be switched on or off in System Settings at any time.
         spaceChanges = SpaceChangeTracker(current: windowServerCurrentSpaces())
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
@@ -274,7 +280,9 @@ final class AppModel: ObservableObject {
             threeFingerHorizontalSwipe: value("TrackpadThreeFingerHorizSwipeGesture", trackpad) as? Int,
             fourFingerHorizontalSwipe: value("TrackpadFourFingerHorizSwipeGesture", trackpad) as? Int,
             rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool,
-            switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool)
+            switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool,
+            reducesMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
+        switcher?.transition = settings.transition
         if settings != macOSSettings { macOSSettings = settings }
     }
 
@@ -291,6 +299,12 @@ final class AppModel: ObservableObject {
 
     func openTrackpadSettings() {
         openSystemSettings("com.apple.Trackpad-Settings.extension")
+    }
+
+    /// Accessibility → Motion, where Reduce motion is on macOS 27.0.1 (checked:
+    /// `?Motion` opens it; `?Display` opens Display, which no longer has it).
+    func openReduceMotionSettings() {
+        openSystemSettings("com.apple.Accessibility-Settings.extension?Motion")
     }
 
     func openMissionControlSettings() {
