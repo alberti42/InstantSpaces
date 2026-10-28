@@ -6,6 +6,47 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.4.0</title>
+            <pubDate>Wed, 28 Oct 2026 09:14:56 +0000</pubDate>
+            <sparkle:version>7</sparkle:version>
+            <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.4.0</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.4.0/SpaceJumper.zip" length="1599119" type="application/octet-stream" sparkle:edSignature="VJ8YsSW+5Sbo4a6T4PCLkGHJEcUGIcaXQ5aPSo11aH1z3KDKsKUJlr4MSBWyQVgAfX9BrslDP5/UA4fQgw2yCw=="/>
+        
+            <description><![CDATA[
+<h3>Added</h3>
+<ul>
+<li>With Reduce motion on (System Settings → Accessibility → Motion) and a transition duration set, the Spaces cross-fade instead of sliding, as macOS does without SpaceJumper. Settings → General shows Reduce motion below the duration, with a Change… button.</li>
+<li>Copy Diagnostics… in the menu: copies a plain-text report to the clipboard, for bug reports: versions, permissions, displays and Spaces, the settings of SpaceJumper and macOS, the shortcuts and their conflicts, the apps that intercept trackpad swipes or key presses, and SpaceJumper's recent activity. Nothing is sent over the Internet.</li>
+<li>About SpaceJumper in the menu: macOS's About panel with the version, a short description, a link to the repository and the copyright line.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Settings → General: the slider "Slide animation" is now "Duration", in a group headed "Transition".</li>
+</ul>
+<h2>Changes since v0.3.1</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/3b88b7b">3b88b7b</a> Version bump to v0.4.0 (build 7)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/5017a96">5017a96</a> Add Copy Diagnostics to the menu</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/f5779a9">f5779a9</a> Cross-fade with WindowServer's screen transition</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/db8b492">db8b492</a> Cross-fade between Spaces when Reduce motion is on</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/c5a1906">c5a1906</a> Name both options in the README's "⌘Tab no longer changes the Space"</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/21442ef">21442ef</a> Simplify how the README explains ⌘Tab and hidden apps</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/4270c9c">4270c9c</a> Shorten the README and correct how ⌘Tab works</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/6df5ede">6df5ede</a> Shorten the Status section of the README</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/3c64b88">3c64b88</a> State in the README that SpaceJumper works with SIP enabled</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/482a32b">482a32b</a> Explain the slide on ⌘Tab to a hidden app in Troubleshooting</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/fa2ad28">fa2ad28</a> Add an About window</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/73723d0">73723d0</a> Release v0.3.1 (automatic appcast update)</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.3.1...v0.4.0</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.3.1</title>
             <pubDate>Wed, 28 Oct 2026 00:08:26 +0000</pubDate>
             <sparkle:version>6</sparkle:version>
