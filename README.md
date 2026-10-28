@@ -24,8 +24,11 @@ appears at once. If you prefer a slide, SpaceJumper draws its own, as long as
 you set it.
 
 <p align="left">
-  <img src="Images/Settings-General.png" width="380" align="top" alt="SpaceJumper's Settings, General tab: slide animation, the macOS option to rearrange Spaces, the menu-bar frame, startup and updates">
-  <img src="Images/Settings-Shortcuts.png" width="380" align="top" alt="SpaceJumper's Settings, Shortcuts tab: modifier keys, the two shortcut groups, trackpad swipes with the swipe set in macOS, and wrap-around">
+  <img src="Images/Settings-General.png" width="380" align="top" alt="SpaceJumper's Settings, General tab: Switch instantly with ⌘Tab with the two macOS options next to it, the menu-bar frame, startup and updates">
+  <img src="Images/Settings-Spaces.png" width="380" align="top" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration and Reduce motion, the shortcuts with modifier keys and numbering, trackpad swipes, and wrap-around">
+</p>
+<p align="left">
+  <img src="Images/Settings-Apps.png" width="380" align="top" alt="SpaceJumper's Settings, Apps tab: the modifier keys and a list of apps with their letters: Mail ⌃⌘M, BusyCal ⌃⌘B, Messages ⌃⌘E">
 </p>
 
 ---

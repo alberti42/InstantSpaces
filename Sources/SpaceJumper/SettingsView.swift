@@ -293,7 +293,7 @@ private struct GeneralPane: View {
             } header: {
                 Text("Menu Bar")
             } footer: {
-                Text("A frame tells the desktop number apart from other numbers in the menu bar. Filled cuts the number out of the shape; a capsule around one digit is a circle.")
+                Text("A frame tells the Space's number apart from other numbers in the menu bar. Filled cuts the number out of the shape; a capsule around one digit is a circle.")
                     .foregroundStyle(.secondary)
             }
             Section("Startup") {
