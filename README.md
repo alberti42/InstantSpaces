@@ -87,17 +87,10 @@ you set it.
 
 ## Status
 
-SpaceJumper is early work. It relies on private macOS interfaces (see
+SpaceJumper relies on private macOS interfaces (see
 [How it works](#how-it-works)), which Apple can change in any update.
 
-Tested on one Mac with macOS 27.0.1 and Karabiner-Elements running: the
-keyboard shortcuts, trackpad swipes in both directions with natural scrolling
-on and off (the direction follows macOS's), trackpad swipes inside Mission
-Control and App Exposé, switching to and from full-screen Spaces, and ⌘Tab.
-After each switch the Dock records the new Space, and Mission Control shows
-it. These tests ran with System Integrity Protection disabled; since 28
-October 2026 SpaceJumper runs on that Mac with System Integrity Protection
-enabled.
+Tested on one Mac with macOS 27.0.1.
 
 Not yet tested:
 
@@ -105,11 +98,6 @@ Not yet tested:
   it there yet. If you find a problem on macOS 26, please open an
   [issue](https://github.com/alberti42/SpaceJumper/issues).
 - More than one display.
-
-Known issue, not yet reproduced: once, after a long session of tests, the menu
-bar, set to hide automatically, no longer appeared when the pointer reached the
-top of the screen. Quitting SpaceJumper and restarting the Dock did not bring
-it back; logging out did. Whether SpaceJumper caused it is not known.
 
 ## Installation
 
