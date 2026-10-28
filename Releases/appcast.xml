@@ -6,6 +6,49 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.5.0</title>
+            <pubDate>Wed, 28 Oct 2026 12:38:31 +0000</pubDate>
+            <sparkle:version>9</sparkle:version>
+            <sparkle:shortVersionString>0.5.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.5.0</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.5.0/SpaceJumper.zip" length="4064358" type="application/octet-stream" sparkle:edSignature="/9T3QhX6yiYuTW5dAsDZ3ZDHl8Cc1Ef5TNoI23BSyjS42I6sLbxWy7rS/ChFqT4alOAnfo1u2OazqjI9nZXWDg=="/>
+        
+            <description><![CDATA[
+<h3>Added</h3>
+<ul>
+<li>An app icon: a desktop monitor whose screen shows a jump to hyperspace, in front of a night sky with stars. It follows macOS's light, dark, clear and tinted icon styles.</li>
+<li>Settings → Spaces → Transition → "Cross-fade when Reduce motion is on" (on by default): turn it off to keep a short slide while Reduce motion stays on for the rest of macOS.</li>
+<li>App shortcuts (Settings → Apps): give an app a letter, and the modifier keys chosen there (⌃⌘ by default) with that letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The letter follows the keyboard layout (on a German keyboard ⌃⌘Z is the key labelled Z).</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>The menu-bar number and ⌃1 … ⌃9 count every Space by its position in Mission Control, full-screen apps included, so a full-screen app shows its number instead of "F". Settings → Spaces → Numbering → Desktops only keeps the previous numbering: only desktops, as macOS's "Switch to Desktop N" shortcuts count them.</li>
+<li>Settings: the Shortcuts tab is now called Spaces, as the app shortcuts have their own tab, and the Transition group (Duration, Reduce motion) moved there from General.</li>
+</ul>
+<h2>Changes since v0.4.0</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/6c14b23">6c14b23</a> Let typing a letter select it in an app's letter menu</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/ae72475">ae72475</a> Version bump to v0.5.0 (build 9)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/71ff8e3">71ff8e3</a> Fold the unpublished v0.4.1 into the next release</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/5abd350">5abd350</a> Show the three Settings tabs in the README</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/4e915c8">4e915c8</a> Put Transition first in the Spaces tab and head the shortcuts "Shortcuts"</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/0bb7d57">0bb7d57</a> Rename the Shortcuts tab to Spaces and move Transition there</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/53f9bd6">53f9bd6</a> Let the slide stay when Reduce motion is on</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/5cbc0b9">5cbc0b9</a> Give app shortcuts their own modifier keys</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/e1db56a">e1db56a</a> Number every Space, and add app shortcuts</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/c2e6512">c2e6512</a> Version bump to v0.4.1 (build 8)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/b6359eb">b6359eb</a> Show the app icon at the top of the README</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/7e41618">7e41618</a> Add the app icon</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/4b940de">4b940de</a> Release v0.4.0 (automatic appcast update)</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.4.0...v0.5.0</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.4.0</title>
             <pubDate>Wed, 28 Oct 2026 09:14:56 +0000</pubDate>
             <sparkle:version>7</sparkle:version>
