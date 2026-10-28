@@ -73,7 +73,9 @@ you set it.
   General; a button there turns off macOS's own switch, which would slide.
 - **Menu-bar item** showing the number of the current Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
-  rounded rectangle or a capsule.
+  rounded rectangle or a capsule. On a full-screen Space it can also show the
+  name Mission Control shows: the app, or both apps in split view (off by
+  default; Settings → General → Menu Bar).
 - **Settings window** (Settings… in the menu, ⌘,), shown
   [above](#spacejumper). Besides the options in this list, it lists the
   shortcuts that macOS or another app already uses with the same keys, and
@@ -219,6 +221,17 @@ Common cases:
   switches. Turn one of them on in Settings → General: SpaceJumper's for an
   instant switch, or macOS's (the Turn On button next to it) for macOS's
   slide.
+- **Desktops show no name in the menu bar.** macOS gives desktops no names:
+  Mission Control calls them "Desktop 1", "Desktop 2", …, and with Numbering
+  set to Every Space that name can differ from the number in the menu bar
+  (Desktop 2 is Space 3 when a full-screen app comes before it). SpaceJumper
+  therefore shows the name of full-screen Spaces only. Naming desktops
+  yourself, in Mission Control too, takes code loaded into the Dock, which
+  requires System Integrity Protection (SIP) to be disabled. SpaceJumper is
+  made to work with SIP enabled and loads no code into other processes. If
+  you accept disabling SIP,
+  [spaces-renamer](https://github.com/dado3212/spaces-renamer) names your
+  Spaces.
 - **Space numbers change by themselves.** macOS's "Automatically rearrange
   Spaces based on most recent use" is on (Settings → General shows it). Turn
   it off in Desktop & Dock → Mission Control to keep the order you set.

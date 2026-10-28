@@ -21,13 +21,15 @@ struct SpaceJumperApp: App {
     }
 }
 
-/// The desktop number in the menu bar.
+/// The desktop number in the menu bar, and the name of a full-screen Space
+/// when that setting is on.
 private struct MenuBarLabel: View {
     @ObservedObject var model: AppModel
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        Image(nsImage: MenuBarTitleImage.make(model.menuBarTitle, frame: model.menuBarFrame, shape: model.menuBarFrameShape))
+        Image(nsImage: MenuBarTitleImage.make(model.menuBarTitle, name: model.menuBarShowsSpaceName ? model.spaceName : nil,
+                                              frame: model.menuBarFrame, shape: model.menuBarFrameShape))
             .accessibilityLabel(model.statusLine)
             #if DEBUG
             // `--show-settings` opens the Settings window at launch, for

@@ -6,13 +6,28 @@ public struct Space: Equatable, Sendable {
     public let id: UInt64
     /// `type`: 0 for a user desktop, 4 for a full-screen Space.
     public let type: Int
+    /// The processes of a full-screen Space's windows, left to right: one, or
+    /// two in split view (`TileLayoutManager` → `TileSpaces` → `pid`). Empty
+    /// for a desktop.
+    public let appPIDs: [Int32]
 
-    public init(id: UInt64, type: Int) {
+    public init(id: UInt64, type: Int, appPIDs: [Int32] = []) {
         self.id = id
         self.type = type
+        self.appPIDs = appPIDs
     }
 
     public var isDesktop: Bool { type == 0 }
+
+    /// The name Mission Control shows for a full-screen Space: its app's
+    /// name, or "A & B" in split view (the Dock's `2_APP_TILED_SPACE`,
+    /// "%@ & %@"). Nil for a desktop, whose name ("Desktop N") is its desktop
+    /// number, and when no app name is found.
+    public func missionControlName(appName: (Int32) -> String?) -> String? {
+        guard !isDesktop else { return nil }
+        let names = appPIDs.compactMap(appName)
+        return names.isEmpty ? nil : names.joined(separator: " & ")
+    }
 }
 
 /// The Spaces of one display, in Mission Control order.
@@ -39,10 +54,19 @@ public struct DisplaySpaces: Equatable, Sendable {
             else { return nil }
             let spaces = list.compactMap { entry -> Space? in
                 guard let id = spaceID(entry) else { return nil }
-                return Space(id: id, type: (entry["type"] as? NSNumber)?.intValue ?? 0)
+                return Space(id: id, type: (entry["type"] as? NSNumber)?.intValue ?? 0, appPIDs: appPIDs(entry))
             }
             return DisplaySpaces(identifier: identifier, current: current, spaces: spaces)
         }
+    }
+
+    /// The `pid` of each tile of a full-screen Space, or the Space's own `pid`
+    /// when it lists no tiles.
+    private static func appPIDs(_ entry: [String: Any]) -> [Int32] {
+        let tiles = (entry["TileLayoutManager"] as? [String: Any])?["TileSpaces"] as? [[String: Any]] ?? []
+        let pids = tiles.compactMap { ($0["pid"] as? NSNumber)?.int32Value }
+        if !pids.isEmpty { return pids }
+        return ((entry["pid"] as? NSNumber)?.int32Value).map { [$0] } ?? []
     }
 
     private static func spaceID(_ entry: [String: Any]) -> UInt64? {

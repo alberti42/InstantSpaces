@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Settings → General → Menu Bar → "Show the name of full-screen Spaces" (off by default): next to the number, the menu bar shows the name Mission Control shows for a full-screen Space, the app or both apps in split view. The first line of the menu names the app on a full-screen Space, whatever the setting.
+
 ## [0.5.0] - 2026-10-28
 
 ### Added

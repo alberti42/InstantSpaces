@@ -73,7 +73,40 @@ enum MenuBarTitleImage {
         return image
     }
 
-    static func make(_ title: String, frame: MenuBarFrame = .none, shape: MenuBarFrameShape = .roundedRectangle) -> NSImage {
+    /// The number, followed by `name` (a full-screen Space's app) when given.
+    static func make(_ title: String, name: String? = nil, frame: MenuBarFrame = .none,
+                     shape: MenuBarFrameShape = .roundedRectangle) -> NSImage {
+        let number = makeNumber(title, frame: frame, shape: shape)
+        guard let name, !name.isEmpty else { return number }
+        return appendingName(name, to: number)
+    }
+
+    /// Space between the number and the name.
+    private static let nameGap: CGFloat = 4
+
+    /// `number` and `name` side by side, both centred vertically. The name is
+    /// in the menu bar's own font and stands as high as an unframed number.
+    private static func appendingName(_ name: String, to number: NSImage) -> NSImage {
+        let nameFont = NSFont.menuBarFont(ofSize: 0)
+        let attributes: [NSAttributedString.Key: Any] = [.font: nameFont, .foregroundColor: NSColor.black]
+        let text = name as NSString
+        let textSize = text.size(withAttributes: attributes)
+        let lineHeight = ceil(nameFont.ascender - nameFont.descender)
+        let size = NSSize(width: number.size.width + nameGap + ceil(textSize.width),
+                          height: max(number.size.height, lineHeight))
+        let image = NSImage(size: size, flipped: false) { rect in
+            number.draw(at: NSPoint(x: 0, y: (rect.height - number.size.height) / 2),
+                        from: .zero, operation: .sourceOver, fraction: 1)
+            let lineBottom = (rect.height - lineHeight) / 2
+            text.draw(at: NSPoint(x: number.size.width + nameGap, y: lineBottom - nameFont.descender - baselineDrop),
+                      withAttributes: attributes)
+            return true
+        }
+        image.isTemplate = true
+        return image
+    }
+
+    private static func makeNumber(_ title: String, frame: MenuBarFrame, shape: MenuBarFrameShape) -> NSImage {
         if frame != .none { return makeFramed(title, frame: frame, shape: shape) }
         let image = NSImage(size: size(for: title), flipped: false) { rect in
             let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: NSColor.black]

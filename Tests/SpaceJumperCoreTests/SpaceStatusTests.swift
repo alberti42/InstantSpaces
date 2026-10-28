@@ -21,6 +21,17 @@ private let spaces = [Space(id: 1, type: 0), Space(id: 475, type: 0), Space(id: 
                 == SpaceStatus(title: "F", line: "Full-screen Space"))
     }
 
+    @Test func fullScreenSpaceCarriesItsAppName() {
+        let named = [Space(id: 1, type: 0), Space(id: 600, type: 4, appPIDs: [42])]
+        let appName: (Int32) -> String? = { $0 == 42 ? "Acrobat" : nil }
+        #expect(SpaceStatus.make(current: 600, spaces: named, numbering: .allSpaces, appName: appName)
+                == SpaceStatus(title: "2", line: "Space 2 of 2, full screen: Acrobat", name: "Acrobat"))
+        #expect(SpaceStatus.make(current: 600, spaces: named, numbering: .desktopsOnly, appName: appName)
+                == SpaceStatus(title: "F", line: "Full-screen Space: Acrobat", name: "Acrobat"))
+        #expect(SpaceStatus.make(current: 1, spaces: named, numbering: .allSpaces, appName: appName)
+                == SpaceStatus(title: "1", line: "Space 1 of 2"))
+    }
+
     @Test func unknownSpaceIsUnavailable() {
         for numbering in SpaceNumbering.allCases {
             #expect(SpaceStatus.make(current: 999, spaces: spaces, numbering: numbering)

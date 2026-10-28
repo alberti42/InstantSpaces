@@ -21,6 +21,7 @@ final class AppModel: ObservableObject {
         static let animationDuration = "animationDurationMilliseconds"
         static let menuBarFrame = "menuBarFrame"
         static let menuBarFrameShape = "menuBarFrameShape"
+        static let menuBarShowsSpaceName = "menuBarShowsSpaceName"
         /// Set once SpaceJumper has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -28,6 +29,8 @@ final class AppModel: ObservableObject {
     /// Menu-bar text: the Space's number, or "F" on a full-screen Space when
     /// only desktops are numbered.
     @Published private(set) var menuBarTitle = "–"
+    /// Mission Control's name of the current full-screen Space; nil on a desktop.
+    @Published private(set) var spaceName: String?
     @Published private(set) var statusLine = ""
     /// Bindings that a switched-on macOS shortcut also uses.
     @Published private(set) var clashes: [ShortcutClash] = []
@@ -111,6 +114,10 @@ final class AppModel: ObservableObject {
     @Published var menuBarFrameShape: MenuBarFrameShape {
         didSet { UserDefaults.standard.set(menuBarFrameShape.rawValue, forKey: Key.menuBarFrameShape) }
     }
+    /// Shows Mission Control's name of a full-screen Space next to its number.
+    @Published var menuBarShowsSpaceName: Bool {
+        didSet { UserDefaults.standard.set(menuBarShowsSpaceName, forKey: Key.menuBarShowsSpaceName) }
+    }
 
     private let switcher: SpaceSwitcher?
     private let hotKeys = HotKeyCenter()
@@ -131,7 +138,8 @@ final class AppModel: ObservableObject {
         defaults.register(defaults: [Key.modifierPrefix: ModifierPrefix.default.rawValue,
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
                                      Key.wrapsAround: false, Key.switchesOnActivation: false,
-                                     Key.animationDuration: 0, Key.followsReduceMotion: true])
+                                     Key.animationDuration: 0, Key.followsReduceMotion: true,
+                                     Key.menuBarShowsSpaceName: false])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
@@ -146,6 +154,7 @@ final class AppModel: ObservableObject {
         followsReduceMotion = defaults.bool(forKey: Key.followsReduceMotion)
         menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
         menuBarFrameShape = MenuBarFrameShape(rawValue: defaults.string(forKey: Key.menuBarFrameShape) ?? "") ?? .roundedRectangle
+        menuBarShowsSpaceName = defaults.bool(forKey: Key.menuBarShowsSpaceName)
 
         do {
             switcher = try SpaceSwitcher()
@@ -439,6 +448,7 @@ final class AppModel: ObservableObject {
             .init("Follow Reduce motion", followsReduceMotion ? "on" : "off"),
             .init("Switch instantly with ⌘Tab", switchesOnActivation ? "on" : "off"),
             .init("Menu-bar frame", "\(menuBarFrame.title), \(menuBarFrameShape.title)"),
+            .init("Menu-bar Space name", menuBarShowsSpaceName ? "on" : "off"),
             .init("Open at login", opensAtLogin ? "on" : "off"),
         ]
         d.macOSSettings = [
@@ -520,11 +530,13 @@ final class AppModel: ObservableObject {
         refreshClashes()
         let status: SpaceStatus
         if let switcher, let display = switcher.activeDisplay() {
-            status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces, numbering: spaceNumbering)
+            status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces, numbering: spaceNumbering,
+                           appName: { NSRunningApplication(processIdentifier: $0)?.localizedName })
         } else {
             status = .unavailable(loadError ?? "No Spaces found.")
         }
         menuBarTitle = status.title
+        spaceName = status.name
         statusLine = status.line
     }
 

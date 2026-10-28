@@ -294,6 +294,10 @@ private struct GeneralPane: View {
                     ForEach(MenuBarFrameShape.allCases, id: \.self) { Text($0.title).tag($0) }
                 }
                 .disabled(model.menuBarFrame == .none)
+                Toggle(isOn: $model.menuBarShowsSpaceName) {
+                    Text("Show the name of full-screen Spaces")
+                    Text("The name Mission Control shows: the app, or both apps in split view. Desktops show their number alone.")
+                }
             } header: {
                 Text("Menu Bar")
             } footer: {
