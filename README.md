@@ -78,7 +78,7 @@ you set it.
   default; Settings → General → Menu Bar).
 - **Settings window** (Settings… in the menu, ⌘,), shown
   [above](#spacejumper). Besides the options in this list, it lists the
-  shortcuts that macOS or another app already uses with the same keys, and
+  macOS shortcuts that use the same keys, and
   shows the macOS settings that affect SpaceJumper: how swiping between Spaces
   is set in Trackpad settings, whether macOS switches Spaces when an app is
   activated, and whether macOS rearranges Spaces by recent use.
@@ -201,6 +201,11 @@ Common cases:
 - **A shortcut switches with the animation, or twice.** A macOS shortcut on the
   same keys is still on. Settings → Spaces lists it under Conflicts, with a
   button to Keyboard Shortcuts. Or choose other modifier keys.
+- **An app shortcut does nothing.** Another app uses the same keys as a global
+  shortcut. macOS lets two apps register the same keys without an error and
+  gives the key press to only one of them, so SpaceJumper cannot show this
+  under Conflicts. Choose another letter in Settings → Apps, or change the
+  other app's shortcut.
 - **⌘Tab to an app on another Space still slides.** The macOS option "When
   switching to an application, switch to a Space with open windows for the
   application" is on, or "Switch instantly with ⌘Tab" is off. Settings →

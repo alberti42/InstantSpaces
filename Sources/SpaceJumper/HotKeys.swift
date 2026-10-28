@@ -29,8 +29,9 @@ final class HotKeyCenter {
         }, 1, &spec, Unmanaged.passUnretained(self).toOpaque(), nil)
     }
 
-    /// Registers a hotkey. Returns the failure if the system refuses it, for
-    /// example because another app holds the same combination.
+    /// Registers a hotkey. Returns the failure if the system refuses it. A
+    /// combination another app holds is not refused (macOS 27.0.1): both apps
+    /// register it, and only one of them receives the key press.
     func register(name: String, keyCode: Int, modifiers: Int, action: @escaping () -> Void) -> Failure? {
         let id = nextID
         nextID += 1

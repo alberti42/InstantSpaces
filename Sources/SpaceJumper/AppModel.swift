@@ -34,7 +34,8 @@ final class AppModel: ObservableObject {
     @Published private(set) var statusLine = ""
     /// Bindings that a switched-on macOS shortcut also uses.
     @Published private(set) var clashes: [ShortcutClash] = []
-    /// Bindings that `RegisterEventHotKey` refused, usually because another app holds them.
+    /// Bindings that `RegisterEventHotKey` refused. It does not refuse keys
+    /// another app holds: both apps register them, and only one receives them.
     @Published private(set) var hotKeyFailures: [String] = []
     @Published private(set) var loadError: String?
     @Published private(set) var opensAtLogin = LoginItem.isEnabled
