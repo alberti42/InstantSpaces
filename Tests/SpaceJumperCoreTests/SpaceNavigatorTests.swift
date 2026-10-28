@@ -51,6 +51,17 @@ private let spaces = [
     #expect(SpaceNavigator.desktopNumber(of: 600, in: spaces) == nil)
 }
 
+@Test func numberingCountsEverySpaceOrOnlyDesktops() {
+    #expect(SpaceNavigator.space(3, in: spaces, numbering: .allSpaces) == 600)
+    #expect(SpaceNavigator.space(5, in: spaces, numbering: .allSpaces) == nil)
+    #expect(SpaceNavigator.space(0, in: spaces, numbering: .allSpaces) == nil)
+    #expect(SpaceNavigator.space(3, in: spaces, numbering: .desktopsOnly) == 610)
+    #expect(SpaceNavigator.number(of: 600, in: spaces, numbering: .allSpaces) == 3)
+    #expect(SpaceNavigator.number(of: 610, in: spaces, numbering: .allSpaces) == 4)
+    #expect(SpaceNavigator.number(of: 600, in: spaces, numbering: .desktopsOnly) == nil)
+    #expect(SpaceNavigator.number(of: 610, in: spaces, numbering: .desktopsOnly) == 3)
+}
+
 @Test func parsesManagedDisplaySpaces() {
     // Shape of SLSCopyManagedDisplaySpaces on macOS 27.0.1, reduced.
     let raw: [[String: Any]] = [[

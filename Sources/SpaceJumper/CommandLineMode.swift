@@ -25,7 +25,7 @@ enum CommandLineMode {
         case .move(let direction):
             report(switcher.move(direction), switcher)
         case .desktop(let number):
-            report(switcher.goToDesktop(number), switcher)
+            report(switcher.goToSpace(numbered: number), switcher)
         case .space(let space):
             guard let display = switcher.displays().first(where: { $0.spaces.contains { $0.id == space } }) else {
                 fail("No display has Space \(space).")

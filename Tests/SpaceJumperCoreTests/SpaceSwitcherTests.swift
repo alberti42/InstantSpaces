@@ -152,11 +152,19 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         #expect(switcher.move(.right) == 600)
     }
 
-    @Test func goToDesktopSkipsFullScreenSpaces() {
+    @Test func goToSpaceCountsEverySpace() {
         let (switcher, server, _) = makeSwitcher()
-        #expect(switcher.goToDesktop(3) == 610)
+        #expect(switcher.goToSpace(numbered: 3) == 600)
+        #expect(server.calls.first == .show([600]))
+        #expect(switcher.goToSpace(numbered: 5) == nil)
+    }
+
+    @Test func goToSpaceCanSkipFullScreenSpaces() {
+        let (switcher, server, _) = makeSwitcher()
+        switcher.numbering = .desktopsOnly
+        #expect(switcher.goToSpace(numbered: 3) == 610)
         #expect(server.calls.first == .show([610]))
-        #expect(switcher.goToDesktop(4) == nil)
+        #expect(switcher.goToSpace(numbered: 4) == nil)
     }
 
     /// WindowServer still reports Space 1 right after the first switch; the
@@ -216,7 +224,7 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         let server = FakeServer(displays: [], activeDisplay: nil)
         let switcher = SpaceSwitcher(server: server)
         #expect(switcher.move(.right) == nil)
-        #expect(switcher.goToDesktop(1) == nil)
+        #expect(switcher.goToSpace(numbered: 1) == nil)
         #expect(server.calls.isEmpty)
     }
 
@@ -273,9 +281,9 @@ private func makeAnimatedSwitcher(current: UInt64 = 1) -> (SpaceSwitcher, FakeSe
         animator.finish()
     }
 
-    @Test func goToDesktopSlidesFromWhereTheDesktopLies() {
+    @Test func goToSpaceSlidesFromWhereTheSpaceLies() {
         let (switcher, server, animator) = makeAnimatedSwitcher(current: 610)
-        #expect(switcher.goToDesktop(1) == 1)
+        #expect(switcher.goToSpace(numbered: 1) == 1)
         #expect(server.calls.first == .offset(1, x: -1000))
         animator.finish()
     }

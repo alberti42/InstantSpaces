@@ -9,6 +9,7 @@ struct SettingsView: View {
         TabView {
             Tab("General", systemImage: "gearshape") { GeneralPane(model: model) }
             Tab("Shortcuts", systemImage: "keyboard") { ShortcutsPane(model: model) }
+            Tab("Apps", systemImage: "square.grid.2x2") { AppsPane(model: model) }
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
@@ -36,8 +37,18 @@ private struct ShortcutsPane: View {
                     Text("\(prefix)←  \(prefix)→")
                 }
                 Toggle(isOn: $model.desktopKeysEnabled) {
-                    Text("Go to a desktop")
+                    Text("Go to a Space by number")
                     Text("\(prefix)1 … \(prefix)9")
+                }
+                Picker(selection: $model.spaceNumbering) {
+                    ForEach(SpaceNumbering.allCases, id: \.self) { numbering in
+                        Text(numbering.title).tag(numbering)
+                    }
+                } label: {
+                    Text("Numbering")
+                    Text(model.spaceNumbering == .allSpaces
+                         ? "Every Space by its position in Mission Control, full-screen apps included. The menu bar shows the same number."
+                         : "Only desktops, as macOS's \"Switch to Desktop N\" shortcuts count them. The menu bar shows F on a full-screen Space.")
                 }
             }
 
@@ -103,6 +114,77 @@ private struct ShortcutsPane: View {
         // The window grows to fit the pane instead of scrolling it.
         .scrollDisabled(true)
         .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+// MARK: Apps
+
+private struct AppsPane: View {
+    @ObservedObject var model: AppModel
+
+    private var prefix: String { model.modifierPrefix.symbols }
+
+    var body: some View {
+        Form {
+            Section {
+                ForEach(model.appShortcuts) { shortcut in
+                    LabeledContent {
+                        HStack {
+                            Picker("Letter", selection: Binding(
+                                get: { shortcut.letter },
+                                set: { model.setLetter($0, of: shortcut) })) {
+                                ForEach(AppShortcut.letters, id: \.self) { letter in
+                                    Text(prefix + String(letter)).tag(letter)
+                                }
+                            }
+                            .labelsHidden()
+                            .fixedSize()
+                            Button {
+                                model.removeAppShortcut(shortcut)
+                            } label: {
+                                Image(systemName: "minus.circle")
+                            }
+                            .buttonStyle(.borderless)
+                            .help("Remove the shortcut for \(shortcut.name)")
+                        }
+                    } label: {
+                        Label {
+                            Text(shortcut.name)
+                        } icon: {
+                            Image(nsImage: AppIcon.of(shortcut.bundleIdentifier))
+                        }
+                    }
+                }
+                HStack {
+                    Spacer()
+                    Button("Add App…") { model.addAppShortcut() }
+                        .disabled(model.appShortcuts.count == AppShortcut.letters.count)
+                }
+            } header: {
+                Text("Jump to an app")
+            } footer: {
+                Text("\(prefix) and the letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The modifier keys are those of the Shortcuts tab.")
+                    .foregroundStyle(.secondary)
+            }
+            if model.modifierPrefix == .control && !model.appShortcuts.isEmpty {
+                Label("With ⌃ alone, these shortcuts take keys that text fields use, such as ⌃A and ⌃E (start and end of line). Choose other modifier keys in the Shortcuts tab.",
+                      systemImage: "exclamationmark.triangle")
+            }
+        }
+        .formStyle(.grouped)
+        .scrollDisabled(true)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// The icon of an installed app, 16 points; a generic app icon when it is not found.
+private enum AppIcon {
+    static func of(_ bundleIdentifier: String) -> NSImage {
+        let image = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier)
+            .map { NSWorkspace.shared.icon(forFile: $0.path) }
+            ?? NSWorkspace.shared.icon(for: .application)
+        image.size = NSSize(width: 16, height: 16)
+        return image
     }
 }
 

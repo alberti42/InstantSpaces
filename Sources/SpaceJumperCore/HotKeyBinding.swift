@@ -6,6 +6,8 @@ public struct HotKeyBinding: Equatable, Sendable {
     public enum Action: Equatable, Sendable {
         case move(Direction)
         case desktop(Int)
+        /// Jump to the app with this bundle identifier.
+        case app(String)
     }
 
     /// As shown in the menu and the log, e.g. "⌃←" or "⌃3".
@@ -38,6 +40,18 @@ public struct HotKeyBinding: Equatable, Sendable {
     public static func desktopKeys(_ prefix: ModifierPrefix) -> [HotKeyBinding] {
         digitKeyCodes.enumerated().map { index, keyCode in
             HotKeyBinding(name: "\(prefix.symbols)\(index + 1)", keyCode: keyCode, prefix: prefix, action: .desktop(index + 1))
+        }
+    }
+
+    /// Prefix-letter for each app shortcut. `keyCode` gives the key that types
+    /// a letter on the current keyboard layout; a letter without a key is left out.
+    public static func appKeys(_ prefix: ModifierPrefix, _ shortcuts: [AppShortcut],
+                               keyCode: (Character) -> Int?) -> [HotKeyBinding] {
+        shortcuts.compactMap { shortcut in
+            keyCode(shortcut.letter).map {
+                HotKeyBinding(name: "\(prefix.symbols)\(shortcut.letter)", keyCode: $0, prefix: prefix,
+                              action: .app(shortcut.bundleIdentifier))
+            }
         }
     }
 

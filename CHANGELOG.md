@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- App shortcuts (Settings → Apps): give an app a letter, and the modifier keys with that letter switch to the Space with the app's frontmost window, full-screen or not, and bring the app forward. An app that is not open is opened. The letter follows the keyboard layout (on a German keyboard ⌃⌘Z is the key labelled Z).
+
+### Changed
+
+- The menu-bar number and ⌃1 … ⌃9 count every Space by its position in Mission Control, full-screen apps included, so a full-screen app shows its number instead of "F". Settings → Shortcuts → Numbering → Desktops only keeps the previous numbering: only desktops, as macOS's "Switch to Desktop N" shortcuts count them.
+
 ## [0.4.1] - 2026-10-28
 
 ### Added

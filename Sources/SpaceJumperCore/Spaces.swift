@@ -54,6 +54,22 @@ public enum Direction: String, Sendable {
     case left, right
 }
 
+/// How the menu-bar number and the shortcuts 1 … 9 count Spaces.
+public enum SpaceNumbering: String, CaseIterable, Sendable {
+    /// Every Space by its position in Mission Control, full-screen Spaces included.
+    case allSpaces
+    /// Only desktops, as Mission Control's "Desktop N" names and macOS's
+    /// "Switch to Desktop N" shortcuts count them; full-screen Spaces have no number.
+    case desktopsOnly
+
+    public var title: String {
+        switch self {
+        case .allSpaces: "Every Space"
+        case .desktopsOnly: "Desktops only"
+        }
+    }
+}
+
 /// Which Space a shortcut leads to. Pure functions, so they can be tested.
 public enum SpaceNavigator {
     /// The neighbour of `current` in `spaces`, counting full-screen Spaces as
@@ -78,5 +94,22 @@ public enum SpaceNavigator {
     /// The 1-based desktop number of `space`, or nil for a full-screen Space.
     public static func desktopNumber(of space: UInt64, in spaces: [Space]) -> Int? {
         spaces.filter(\.isDesktop).firstIndex(where: { $0.id == space }).map { $0 + 1 }
+    }
+
+    /// The Space with `number` (1-based), counted as `numbering` says.
+    public static func space(_ number: Int, in spaces: [Space], numbering: SpaceNumbering) -> UInt64? {
+        switch numbering {
+        case .allSpaces: spaces.indices.contains(number - 1) ? spaces[number - 1].id : nil
+        case .desktopsOnly: desktop(number, in: spaces)
+        }
+    }
+
+    /// The 1-based number of `space`, counted as `numbering` says; nil for a
+    /// full-screen Space when only desktops are counted.
+    public static func number(of space: UInt64, in spaces: [Space], numbering: SpaceNumbering) -> Int? {
+        switch numbering {
+        case .allSpaces: spaces.firstIndex(where: { $0.id == space }).map { $0 + 1 }
+        case .desktopsOnly: desktopNumber(of: space, in: spaces)
+        }
     }
 }

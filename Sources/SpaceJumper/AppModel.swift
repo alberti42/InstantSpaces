@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 import Combine
 import SpaceJumperCore
 
@@ -12,6 +13,8 @@ final class AppModel: ObservableObject {
         static let desktopKeys = "desktopKeysEnabled"
         static let swipes = "swipesEnabled"
         static let wrapsAround = "wrapsAround"
+        static let spaceNumbering = "spaceNumbering"
+        static let appShortcuts = "appShortcuts"
         static let switchesOnActivation = "switchesOnActivation"
         static let animationDuration = "animationDurationMilliseconds"
         static let menuBarFrame = "menuBarFrame"
@@ -20,7 +23,8 @@ final class AppModel: ObservableObject {
         static let accessibilityRequested = "accessibilityRequested"
     }
 
-    /// Menu-bar text: the desktop number, or "F" on a full-screen Space.
+    /// Menu-bar text: the Space's number, or "F" on a full-screen Space when
+    /// only desktops are numbered.
     @Published private(set) var menuBarTitle = "–"
     @Published private(set) var statusLine = ""
     /// Bindings that a switched-on macOS shortcut also uses.
@@ -51,6 +55,23 @@ final class AppModel: ObservableObject {
     /// keys and swipes.
     @Published var wrapsAround: Bool {
         didSet { UserDefaults.standard.set(wrapsAround, forKey: Key.wrapsAround); switcher?.wrapsAround = wrapsAround }
+    }
+
+    /// How the menu-bar number and the shortcuts 1 … 9 count Spaces.
+    @Published var spaceNumbering: SpaceNumbering {
+        didSet {
+            UserDefaults.standard.set(spaceNumbering.rawValue, forKey: Key.spaceNumbering)
+            switcher?.numbering = spaceNumbering
+            refresh()
+        }
+    }
+
+    /// Prefix-letter shortcuts that jump to an app, in the order they were added.
+    @Published var appShortcuts: [AppShortcut] {
+        didSet {
+            UserDefaults.standard.set(try? JSONEncoder().encode(appShortcuts), forKey: Key.appShortcuts)
+            registerHotKeys()
+        }
     }
 
     /// Switch to a Space with a window of an app when the app is activated
@@ -102,6 +123,9 @@ final class AppModel: ObservableObject {
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
         swipesEnabled = defaults.bool(forKey: Key.swipes)
         wrapsAround = defaults.bool(forKey: Key.wrapsAround)
+        spaceNumbering = SpaceNumbering(rawValue: defaults.string(forKey: Key.spaceNumbering) ?? "") ?? .allSpaces
+        appShortcuts = defaults.data(forKey: Key.appShortcuts)
+            .flatMap { try? JSONDecoder().decode([AppShortcut].self, from: $0) } ?? []
         switchesOnActivation = defaults.bool(forKey: Key.switchesOnActivation)
         animationMilliseconds = defaults.integer(forKey: Key.animationDuration)
         menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
@@ -110,6 +134,7 @@ final class AppModel: ObservableObject {
         do {
             switcher = try SpaceSwitcher()
             switcher?.wrapsAround = wrapsAround
+            switcher?.numbering = spaceNumbering
             switcher?.animationDuration = Double(animationMilliseconds) / 1000
         } catch {
             switcher = nil
@@ -152,6 +177,12 @@ final class AppModel: ObservableObject {
         ) { [weak self] notification in
             let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             MainActor.assumeIsolated { self?.applicationDidActivate(app) }
+        })
+        // A letter's key depends on the keyboard layout (see KeyboardLayout).
+        observers.append(DistributedNotificationCenter.default().addObserver(
+            forName: NSNotification.Name(kTISNotifySelectedKeyboardInputSourceChanged as String), object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.registerHotKeys() }
         })
         // Reduce motion can be switched on or off in System Settings at any time.
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(
@@ -221,6 +252,55 @@ final class AppModel: ObservableObject {
         follow(app, switcher)
     }
 
+    /// An app shortcut: switches to the Space of the app's frontmost window,
+    /// then activates the app, whose window is then on the current Space, so
+    /// the Dock does not switch as well. An app that is not open is opened; a
+    /// hidden app is shown and left to the Dock, as with ⌘Tab.
+    private func jump(toApp bundleIdentifier: String) {
+        guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier).first else {
+            guard let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) else {
+                log.error("app \(bundleIdentifier, privacy: .public) not found")
+                NSSound.beep()
+                return
+            }
+            log.info("open \(bundleIdentifier, privacy: .public)")
+            NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+            return
+        }
+        guard !app.isActive else { return }
+        if !app.isHidden, let switcher { follow(app, switcher) }
+        if !app.activate(), let url = app.bundleURL {
+            // macOS can decline an activation from a background app; opening
+            // the running app through Launch Services activates it.
+            log.info("activate \(bundleIdentifier, privacy: .public) declined; opening it")
+            NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+        }
+    }
+
+    /// Asks for an app and adds a shortcut for it with a free letter.
+    func addAppShortcut() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+        panel.prompt = "Add"
+        NSApp.activate()
+        guard panel.runModal() == .OK, let url = panel.url, let bundle = Bundle(url: url),
+              let identifier = bundle.bundleIdentifier,
+              !appShortcuts.contains(where: { $0.bundleIdentifier == identifier })
+        else { return }
+        let name = FileManager.default.displayName(atPath: url.path).replacingOccurrences(of: ".app", with: "")
+        guard let letter = AppShortcut.suggestedLetter(for: name, taken: appShortcuts) else { return }
+        appShortcuts.append(AppShortcut(letter: letter, bundleIdentifier: identifier, name: name))
+    }
+
+    func removeAppShortcut(_ shortcut: AppShortcut) {
+        appShortcuts.removeAll { $0.bundleIdentifier == shortcut.bundleIdentifier }
+    }
+
+    func setLetter(_ letter: Character, of shortcut: AppShortcut) {
+        appShortcuts = AppShortcut.assign(letter, to: shortcut.bundleIdentifier, in: appShortcuts)
+    }
+
     private func follow(_ app: NSRunningApplication, _ switcher: SpaceSwitcher) {
         guard switcher.followActivation(ofProcess: app.processIdentifier) != nil else { return }
         followedApp = app
@@ -236,6 +316,7 @@ final class AppModel: ObservableObject {
     /// The shortcuts in use, as the Settings window lists them.
     var enabledBindings: [HotKeyBinding] {
         HotKeyBinding.enabled(prefix: modifierPrefix, arrowKeys: arrowKeysEnabled, desktopKeys: desktopKeysEnabled)
+            + HotKeyBinding.appKeys(modifierPrefix, appShortcuts, keyCode: KeyboardLayout.keyCode(for:))
     }
 
     /// What the menu shows to point to the Settings window, if anything.
@@ -331,9 +412,12 @@ final class AppModel: ObservableObject {
         d.settings = [
             .init("Modifier keys", modifierPrefix.symbols),
             .init("Move between Spaces", arrowKeysEnabled ? "on" : "off"),
-            .init("Go to a desktop", desktopKeysEnabled ? "on" : "off"),
+            .init("Go to a Space by number", desktopKeysEnabled ? "on" : "off"),
+            .init("Numbering", spaceNumbering.title),
             .init("Trackpad swipes", swipesEnabled ? "on" : "off"),
             .init("Wrap around", wrapsAround ? "on" : "off"),
+            .init("App shortcuts", appShortcuts.isEmpty ? "none"
+                  : appShortcuts.map { "\($0.letter) \($0.name)" }.joined(separator: ", ")),
             .init("Transition duration", duration),
             .init("Switch instantly with ⌘Tab", switchesOnActivation ? "on" : "off"),
             .init("Menu-bar frame", "\(menuBarFrame.title), \(menuBarFrameShape.title)"),
@@ -402,7 +486,8 @@ final class AppModel: ObservableObject {
                 log.info("hotkey \(binding.name, privacy: .public)")
                 switch binding.action {
                 case .move(let direction): switcher.move(direction)
-                case .desktop(let number): switcher.goToDesktop(number)
+                case .desktop(let number): switcher.goToSpace(numbered: number)
+                case .app(let bundleIdentifier): self?.jump(toApp: bundleIdentifier)
                 }
                 self?.refresh()
             }) { failures.append(failure) }
@@ -417,7 +502,7 @@ final class AppModel: ObservableObject {
         refreshClashes()
         let status: SpaceStatus
         if let switcher, let display = switcher.activeDisplay() {
-            status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces)
+            status = .make(current: switcher.currentSpace(of: display), spaces: display.spaces, numbering: spaceNumbering)
         } else {
             status = .unavailable(loadError ?? "No Spaces found.")
         }

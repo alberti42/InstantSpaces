@@ -1,6 +1,7 @@
 /// The text of the menu-bar item and of the first line of the menu.
 public struct SpaceStatus: Equatable, Sendable {
-    /// The desktop number, "F" on a full-screen Space, "–" without Spaces.
+    /// The Space's number, "F" on a full-screen Space when only desktops are
+    /// numbered, "–" without Spaces.
     public let title: String
     public let line: String
 
@@ -9,7 +10,11 @@ public struct SpaceStatus: Equatable, Sendable {
         self.line = line
     }
 
-    public static func make(current: UInt64, spaces: [Space]) -> SpaceStatus {
+    public static func make(current: UInt64, spaces: [Space], numbering: SpaceNumbering) -> SpaceStatus {
+        if numbering == .allSpaces, let number = SpaceNavigator.number(of: current, in: spaces, numbering: numbering) {
+            let kind = spaces[number - 1].isDesktop ? "" : ", full screen"
+            return SpaceStatus(title: "\(number)", line: "Space \(number) of \(spaces.count)\(kind)")
+        }
         if let number = SpaceNavigator.desktopNumber(of: current, in: spaces) {
             let desktops = spaces.filter(\.isDesktop).count
             return SpaceStatus(title: "\(number)", line: "Desktop \(number) of \(desktops)")

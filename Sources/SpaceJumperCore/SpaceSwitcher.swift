@@ -18,6 +18,9 @@ public final class SpaceSwitcher {
     /// of stopping at the ends as macOS does.
     public var wrapsAround = false
 
+    /// How `goToSpace(numbered:)` counts Spaces.
+    public var numbering: SpaceNumbering = .allSpaces
+
     /// How long a switch slides; 0 switches at once.
     public var animationDuration: TimeInterval = 0
 
@@ -76,11 +79,12 @@ public final class SpaceSwitcher {
         return target
     }
 
-    /// Goes to user desktop `number` (1-based) on the active display.
+    /// Goes to the Space with `number` (1-based) on the active display,
+    /// counted as `numbering` says.
     @discardableResult
-    public func goToDesktop(_ number: Int) -> UInt64? {
+    public func goToSpace(numbered number: Int) -> UInt64? {
         guard let display = activeDisplay(),
-              let target = SpaceNavigator.desktop(number, in: display.spaces)
+              let target = SpaceNavigator.space(number, in: display.spaces, numbering: numbering)
         else { return nil }
         switchTo(target, on: display)
         return target

@@ -48,9 +48,13 @@ you set it.
 ## Features
 
 - **Keyboard shortcuts**: the modifier keys you choose in Settings, followed by
-  ← or → to move one Space, or by 1 … 9 to go to that desktop. The modifier
+  ← or → to move one Space, or by 1 … 9 to go to the Space with that number. The modifier
   keys are ⌃ (the default, as in macOS's own Mission Control shortcuts), ⌃⌥,
   ⌃⌘, ⌥⌘ or ⌃⌥⌘, the same for both groups. Either group can be switched off.
+- **App shortcuts**: in Settings → Apps, give an app a letter; the modifier
+  keys and that letter (⌃⌘M for MailMate, for example) switch to the Space
+  with the app's frontmost window, full-screen or not, and bring the app
+  forward. An app that is not open is opened.
 - **Trackpad swipes** between Spaces switch instantly too (on by default; can be
   switched off in Settings). This needs Accessibility access; see
   [Permissions and privacy](#permissions-and-privacy).
@@ -58,8 +62,7 @@ you set it.
   window on the current Space, SpaceJumper switches to the Space of its
   frontmost window, instantly or with your slide. Turn it on in Settings →
   General; a button there turns off macOS's own switch, which would slide.
-- **Menu-bar item** showing the number of the current desktop, or "F" on a
-  full-screen Space. It can have a frame, to tell it apart from other numbers
+- **Menu-bar item** showing the number of the current Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
   rounded rectangle or a capsule.
 - **Settings window** (Settings… in the menu, ⌘,), shown
@@ -68,13 +71,16 @@ you set it.
   shows the macOS settings that affect SpaceJumper: how swiping between Spaces
   is set in Trackpad settings, whether macOS switches Spaces when an app is
   activated, and whether macOS rearranges Spaces by recent use.
-- **Desktop numbers** count desktops as Mission Control names them ("Desktop
-  1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
-  full-screen Spaces and stop at the first and last Space, as macOS does
-  without SpaceJumper.
+- **Numbering**, for the menu bar and ⌃1 … ⌃9, chosen in Settings →
+  Shortcuts. Every Space (the default): each Space by its position in Mission
+  Control, full-screen apps included. Desktops only: only desktops, as Mission
+  Control names them ("Desktop 1", "Desktop 2", …) and macOS's "Switch to
+  Desktop N" shortcuts count them; the menu bar shows "F" on a full-screen
+  Space. ⌃← and ⌃→ include full-screen Spaces and stop at the first and last
+  Space, as macOS does without SpaceJumper.
 - **Transition** (off by default): a slide of the duration you choose, 0 to
   500 ms in 10 ms steps, for the shortcuts, swipes and ⌘Tab. SpaceJumper draws
-  it itself, so ⌃1 … ⌃9 slide straight to the desktop. With Reduce motion on
+  it itself, so ⌃1 … ⌃9 slide straight to the Space. With Reduce motion on
   (System Settings → Accessibility → Motion), the Spaces cross-fade instead,
   as macOS does without SpaceJumper.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
@@ -107,7 +113,7 @@ Not yet tested:
 1. Download [`SpaceJumper.zip`](https://github.com/alberti42/SpaceJumper/releases/latest/download/SpaceJumper.zip)
    from the [latest release](https://github.com/alberti42/SpaceJumper/releases/latest).
 2. Unzip it and move `SpaceJumper.app` to the Applications folder.
-3. Open it. The number of the current desktop appears in the menu bar.
+3. Open it. The number of the current Space appears in the menu bar.
 4. macOS asks whether SpaceJumper may use Accessibility. Allow it for instant
    trackpad swipes (System Settings → Privacy & Security → Accessibility); the
    keyboard shortcuts work without it. See
@@ -202,7 +208,7 @@ Common cases:
   switches. Turn one of them on in Settings → General: SpaceJumper's for an
   instant switch, or macOS's (the Turn On button next to it) for macOS's
   slide.
-- **Desktop numbers change by themselves.** macOS's "Automatically rearrange
+- **Space numbers change by themselves.** macOS's "Automatically rearrange
   Spaces based on most recent use" is on (Settings → General shows it). Turn
   it off in Desktop & Dock → Mission Control to keep the order you set.
 
