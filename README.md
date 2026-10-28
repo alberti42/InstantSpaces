@@ -12,16 +12,14 @@ if you'd like to see the jump, you can set how long it takes.
 **[Download SpaceJumper.zip](https://github.com/alberti42/SpaceJumper/releases/latest/download/SpaceJumper.zip)** (latest release, signed and notarized). See [Installation](#installation).
 
 Free and open source (GPL-3.0). Requires macOS 26 or later; runs natively on
-Apple silicon and Intel Macs.
+Apple silicon and Intel Macs. Works with System Integrity Protection (SIP)
+enabled, as it is on every Mac by default: you do not need to turn it off.
 
 macOS has no setting to turn off the animation that plays when you switch
 Spaces. "Reduce motion" replaces the slide with a cross-fade, which is still an
 animation. SpaceJumper switches with no animation at all: the new Space
 appears at once. If you prefer a slide, SpaceJumper draws its own, as long as
 you set it.
-
-SpaceJumper was called InstantSpaces up to version 0.1.1; see
-[Moving from InstantSpaces](#moving-from-instantspaces).
 
 <p align="left">
   <img src="Images/Settings-General.png" width="380" align="top" alt="SpaceJumper's Settings, General tab: slide animation, the macOS option to rearrange Spaces, the menu-bar frame, startup and updates">
@@ -83,24 +81,28 @@ SpaceJumper was called InstantSpaces up to version 0.1.1; see
 - **Updates** through [Sparkle](https://sparkle-project.org): SpaceJumper
   checks for a new version once a week, or when you choose Check for Updates in
   its menu.
+- **Works with System Integrity Protection (SIP) enabled**, as it is on every
+  Mac by default: you do not need to turn it off. SpaceJumper loads no code
+  into other processes.
 
 ## Status
 
 SpaceJumper is early work. It relies on private macOS interfaces (see
 [How it works](#how-it-works)), which Apple can change in any update.
 
-Tested on one Mac with macOS 27.0.1 and System Integrity Protection disabled,
-with Karabiner-Elements running: the keyboard shortcuts, trackpad swipes in
-both directions with natural scrolling on and off (the direction follows
-macOS's), trackpad swipes inside Mission Control and App Exposé, switching
-to and from full-screen Spaces, and ⌘Tab. After each switch the Dock records the new
-Space, and Mission Control shows it.
+Tested on one Mac with macOS 27.0.1 and Karabiner-Elements running: the
+keyboard shortcuts, trackpad swipes in both directions with natural scrolling
+on and off (the direction follows macOS's), trackpad swipes inside Mission
+Control and App Exposé, switching to and from full-screen Spaces, and ⌘Tab.
+After each switch the Dock records the new Space, and Mission Control shows
+it. These tests ran with System Integrity Protection disabled; since 28
+October 2026 SpaceJumper runs on that Mac with System Integrity Protection
+enabled.
 
 Not yet tested:
 
-- macOS 26, and any Mac with System Integrity Protection enabled. SpaceJumper
-  declares macOS 26 as its minimum, but no one has run it there yet. If you
-  find a problem on macOS 26, please open an
+- macOS 26. SpaceJumper declares macOS 26 as its minimum, but no one has run
+  it there yet. If you find a problem on macOS 26, please open an
   [issue](https://github.com/alberti42/SpaceJumper/issues).
 - More than one display.
 
@@ -130,20 +132,6 @@ gh attestation verify SpaceJumper.zip --repo alberti42/SpaceJumper
 ```
 
 To report a security problem privately, see [SECURITY.md](SECURITY.md).
-
-### Moving from InstantSpaces
-
-SpaceJumper was called InstantSpaces up to version 0.1.1. The two apps have
-different bundle identifiers, so InstantSpaces cannot update itself to
-SpaceJumper; it shows the new release with a link to this page instead.
-
-1. Quit InstantSpaces and move `InstantSpaces.app` to the Trash. This also
-   removes its login item.
-2. Install SpaceJumper as above. On first launch it copies the InstantSpaces
-   settings: modifier keys, shortcut groups, swipes, wrap-around and updates.
-3. Allow Accessibility access for SpaceJumper, and turn on Open at Login again
-   if you used it. You can remove InstantSpaces from System Settings → Privacy &
-   Security → Accessibility.
 
 ## Turn off the system shortcuts
 
@@ -370,8 +358,9 @@ build/SpaceJumper.app/Contents/MacOS/SpaceJumper --desktop 2
   and it adds its own slide, the menu-bar number, ⌃1 … ⌃9 and wrap-around.
 - [yabai](https://github.com/asmvik/yabai) is a tiling window manager that
   also moves windows between Spaces and switches Spaces, partly through code it
-  loads into the Dock. SpaceJumper manages no windows and loads no code into
-  the Dock; it only switches Spaces.
+  loads into the Dock, which requires System Integrity Protection to be partly
+  disabled. SpaceJumper manages no windows and loads no code into the Dock; it
+  only switches Spaces.
 - [SpaceHopper](https://github.com/Mor-Li/SpaceHopper) switches desktops through
   yabai, or in its "lite" version through macOS's own "Switch to Desktop N"
   shortcuts, which keep macOS's animation.
