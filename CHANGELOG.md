@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-28
+
 ### Changed
 
 - ⌘Tab to a hidden app on another Space is left to macOS, which switches with its own slide. When the app is shown again, the Dock starts its switch by itself, even with the macOS option off, and sometimes before SpaceJumper learns of the activation; when SpaceJumper switched too, the two could mix.
@@ -63,7 +65,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/alberti42/SpaceJumper/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/alberti42/SpaceJumper/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/alberti42/SpaceJumper/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/alberti42/SpaceJumper/compare/v0.1.0...v0.1.1
