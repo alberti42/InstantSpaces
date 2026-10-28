@@ -68,7 +68,8 @@ you set it.
   activated, and whether macOS rearranges Spaces by recent use.
 - **Desktop numbers** count desktops as Mission Control names them ("Desktop
   1", "Desktop 2", …); full-screen Spaces are skipped. ⌃← and ⌃→ include
-  full-screen Spaces, as macOS does, and stop at the first and last Space.
+  full-screen Spaces and stop at the first and last Space, as macOS does
+  without SpaceJumper.
 - **Slide animation** (off by default): a slide of your chosen length, 0 to
   500 ms in 10 ms steps, for the shortcuts and swipes. SpaceJumper draws it
   itself, so ⌃1 … ⌃9 slide straight to the desktop.
@@ -171,13 +172,15 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
   application" is on, or "Switch instantly with ⌘Tab" is off. Settings →
   General shows both.
 - **⌘Tab to a hidden app on another Space slides.** This is macOS's own
-  switch, and SpaceJumper leaves it to macOS. When ⌘Tab shows a hidden app
-  (⌘H) again on another Space, macOS switches there with its own slide, even
-  with its option "When switching to an application, switch to a Space with
-  open windows for the application" off. macOS can start that switch before
-  SpaceJumper learns of the activation, so SpaceJumper cannot replace it.
-  This is inconsistent in macOS: it ignores the option you turned off for
-  hidden apps, and only Apple can fix it.
+  switch. When ⌘Tab shows a hidden app (⌘H) again on another Space, macOS
+  switches there with its own slide, even with its option "When switching to
+  an application, switch to a Space with open windows for the application"
+  off. This is inconsistent in macOS: it ignores the option you turned off for
+  hidden apps, and only Apple can fix it. macOS can start this switch before
+  SpaceJumper learns that the app was activated; if SpaceJumper switched too,
+  the two switches would compete. SpaceJumper therefore leaves hidden apps to
+  macOS. The cost is small: a hidden app on another Space is rare, and for it
+  you get macOS's usual slide; everything else works as before.
 - **⌘Tab no longer changes the Space.** The macOS option is off and "Switch
   instantly with ⌘Tab" is off too. Turn one of them on.
 - **Desktop numbers change by themselves.** macOS's "Automatically rearrange
@@ -242,24 +245,20 @@ With the macOS option "When switching to an application, switch to a Space
 with open windows for the application" on, an app that ⌘Tab activates brings
 its windows forward, even on another Space. WindowServer tells the Dock that a
 window appeared on a Space you are not on, and the Dock slides there. With the
-option off, the app becomes active but brings no window forward on another
-Space: the Dock has nothing to react to, and the Space stays.
+option off, macOS honors your choice: the app becomes active, but no window
+comes forward on another Space, and the Dock does not switch.
 
 SpaceJumper takes over from there. macOS tells every app when another app
 becomes active. SpaceJumper then lists that app's windows, front to back, asks
 WindowServer which Space each one is on (`SLSCopySpacesForWindows`) and whether
 it is shown (window attributes from SkyLight's window iterator), and switches
 to the Space of the frontmost shown window. A minimized window is not shown,
-so an app whose windows are all minimized leaves the Space as it is, as in
-macOS.
+so an app whose windows are all minimized leaves the Space as it is, as macOS
+does without SpaceJumper.
 
-Making the new Space current also makes WindowServer bring an app of that
-Space to the front, which is not always the app you chose. When that happens
-right after the switch, SpaceJumper activates your app again.
-
-Showing a hidden app again brings its windows forward whatever the option
-says, so the Dock switches with its slide; see
-[Troubleshooting](#troubleshooting).
+SpaceJumper does not handle ⌘Tab to a hidden app (⌘H) on another Space, by
+design: macOS switches there with its own slide.
+[Troubleshooting](#troubleshooting) explains why.
 
 ## Building from source
 
