@@ -36,7 +36,7 @@ private struct MenuBarLabel: View {
             // screenshots and checks without clicking the menu.
             .task {
                 guard CommandLine.arguments.contains("--show-settings") else { return }
-                NSApp.activate()
+                AppActivation.activate()
                 openSettings()
                 SettingsWindow.bringToFront()
             }
@@ -60,9 +60,9 @@ private struct MenuContent: View {
         Divider()
 
         // An app without a Dock icon opens its windows behind the active app
-        // unless it activates itself first.
+        // unless it activates itself first (`AppActivation`).
         Button("Settings…") {
-            NSApp.activate()
+            AppActivation.activate()
             openSettings()
             SettingsWindow.bringToFront()
         }
@@ -91,9 +91,25 @@ private struct UpdateItem: View {
     }
 }
 
-/// Since macOS 14 `NSApp.activate()` is a request that macOS can decline while
-/// another app is active; the Settings window then opened behind it (seen
-/// with Ghostty). Ordering the window itself to the front works regardless.
+/// Makes SpaceJumper the active app before it shows a window. Since macOS 14
+/// `NSApp.activate()` is a request that macOS can decline while another app is
+/// active; the window then opened behind that app (seen with Ghostty), or in
+/// front but dimmed, as an inactive app's window, until it was clicked.
+/// `activate(from:options:)` with the frontmost app was accepted in a test
+/// where `NSApp.activate()` was declined (macOS 27.0.1, 2026-10-28).
+@MainActor
+enum AppActivation {
+    static func activate() {
+        if let front = NSWorkspace.shared.frontmostApplication, front != NSRunningApplication.current {
+            NSRunningApplication.current.activate(from: front, options: [])
+        } else {
+            NSApp.activate()
+        }
+    }
+}
+
+/// Orders the Settings window to the front in case the activation is declined
+/// all the same (`AppActivation`).
 @MainActor
 enum SettingsWindow {
     static func bringToFront() {
@@ -117,7 +133,7 @@ enum AboutPanel {
     private static let repository = URL(string: "https://github.com/alberti42/SpaceJumper")!
 
     static func show() {
-        NSApp.activate()
+        AppActivation.activate()
         NSApp.orderFrontStandardAboutPanel(options: [.credits: credits()])
         // The panel is a plain NSPanel (macOS 27.0.1); the app's other windows
         // are status-bar windows and the SwiftUI Settings window.

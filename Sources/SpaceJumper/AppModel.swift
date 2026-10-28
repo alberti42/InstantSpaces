@@ -308,7 +308,7 @@ final class AppModel: ObservableObject {
         panel.allowedContentTypes = [.application]
         panel.directoryURL = URL(fileURLWithPath: "/Applications")
         panel.prompt = "Add"
-        NSApp.activate()
+        AppActivation.activate()
         guard panel.runModal() == .OK, let url = panel.url, let bundle = Bundle(url: url),
               let identifier = bundle.bundleIdentifier,
               !appShortcuts.contains(where: { $0.bundleIdentifier == identifier })

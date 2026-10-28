@@ -10,7 +10,7 @@ enum DiagnosticsCopier {
     private static let issues = URL(string: "https://github.com/alberti42/SpaceJumper/issues")!
 
     static func run(model: AppModel) {
-        NSApp.activate()
+        AppActivation.activate()
         let ask = NSAlert()
         ask.messageText = "Copy Diagnostics"
         ask.informativeText = "SpaceJumper will copy a diagnostics report to your clipboard, replacing its current contents.\n\nNothing is sent over the Internet: it is plain text you can read and edit before sharing, for example in a GitHub issue."

@@ -56,7 +56,7 @@ final class Updater: NSObject, SPUStandardUserDriverDelegate {
     }
 
     func checkForUpdates() {
-        NSApp.activate()
+        AppActivation.activate()
         controller.checkForUpdates(nil)
     }
 
