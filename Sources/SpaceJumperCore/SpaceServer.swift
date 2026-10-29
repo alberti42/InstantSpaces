@@ -130,4 +130,34 @@ public final class SkyLightServer: SpaceServer {
     public static func setSwitchesOnAppActivation(_ on: Bool) -> Bool {
         SLBSetSwitchesOnAppActivation(on)
     }
+
+    // The menu bar (see `MenuBarReveal`). Like the call above, these need a
+    // `SkyLightServer` to have loaded SkyLight.
+
+    @discardableResult
+    public static func setMenuBarOverride(display: UInt32, _ on: Bool) -> Bool {
+        SLBSetMenuBarOverride(display, on)
+    }
+
+    public static func menuBarOverride(display: UInt32) -> Bool {
+        SLBMenuBarOverride(display)
+    }
+
+    /// 0 hidden to 1 shown, for the current Space.
+    public static func menuBarReveal() -> Double {
+        SLBMenuBarReveal()
+    }
+
+    public static func currentSpace() -> UInt64 {
+        SLBActiveSpace()
+    }
+
+    public static func observeMenuBarReveals(_ handler: @escaping (UInt64) -> Void) {
+        SLBObserveMenuBarReveals(handler)
+    }
+
+    @discardableResult
+    public static func setMenuBarAutohide(_ on: Bool) -> Bool {
+        SLBSetMenuBarAutohide(on)
+    }
 }

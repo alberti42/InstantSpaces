@@ -311,3 +311,65 @@ BOOL SLBSetSwitchesOnAppActivation(BOOL on)
     NSDictionary *preferences = @{(__bridge NSString *)*key: @(on)};
     return setPreferences(sMainConnectionID(), (__bridge CFDictionaryRef)preferences) == 0;
 }
+
+// The menu-bar calls are resolved when first used, as above: without them only
+// the menu-bar settings are lost.
+static void *MenuBarSymbol(const char *name)
+{
+    void *skyLight = dlopen(kSkyLightPath.fileSystemRepresentation, RTLD_NOW);
+    return skyLight ? dlsym(skyLight, name) : NULL;
+}
+
+BOOL SLBSetMenuBarOverride(uint32_t display, BOOL on)
+{
+    static int (*setOverride)(CGSConnectionID, uint32_t, uint8_t);
+    if (!setOverride) setOverride = MenuBarSymbol("SLSSetMenuBarVisibilityOverrideOnDisplay");
+    if (!setOverride || !sMainConnectionID) return NO;
+    return setOverride(sMainConnectionID(), display, on ? 1 : 0) == 0;
+}
+
+BOOL SLBMenuBarOverride(uint32_t display)
+{
+    static int (*getOverride)(CGSConnectionID, uint32_t);
+    if (!getOverride) getOverride = MenuBarSymbol("SLSGetMenuBarVisibilityOverrideOnDisplay");
+    if (!getOverride || !sMainConnectionID) return NO;
+    return getOverride(sMainConnectionID(), display) != 0;
+}
+
+double SLBMenuBarReveal(void)
+{
+    static double (*getReveal)(uint64_t);
+    if (!getReveal) getReveal = MenuBarSymbol("SLSGetSpaceMenuBarReveal");
+    if (!getReveal || !sGetActiveSpace || !sMainConnectionID) return 0;
+    return getReveal(sGetActiveSpace(sMainConnectionID()));
+}
+
+static void (^sMenuBarRevealHandler)(uint64_t);
+
+// The record of 0x524 starts with the Space ID (then start time and duration).
+static void MenuBarRevealed(uint32_t type, void *data, size_t length, void *context)
+{
+    if (!data || length < sizeof(uint64_t)) return;
+    uint64_t space;
+    memcpy(&space, data, sizeof space);
+    void (^handler)(uint64_t) = sMenuBarRevealHandler;
+    if (handler) dispatch_async(dispatch_get_main_queue(), ^{ handler(space); });
+}
+
+void SLBObserveMenuBarReveals(void (^handler)(uint64_t space))
+{
+    static int (*registerProc)(void (*)(uint32_t, void *, size_t, void *), uint32_t, void *);
+    BOOL registered = sMenuBarRevealHandler != nil;
+    sMenuBarRevealHandler = [handler copy];
+    if (registered) return;
+    if (!registerProc) registerProc = MenuBarSymbol("SLSRegisterNotifyProc");
+    if (registerProc) registerProc(MenuBarRevealed, 0x524, NULL);
+}
+
+BOOL SLBSetMenuBarAutohide(BOOL on)
+{
+    static int (*setAutohide)(CGSConnectionID, bool);
+    if (!setAutohide) setAutohide = MenuBarSymbol("SLSSetMenuBarAutohideEnabled");
+    if (!setAutohide || !sMainConnectionID) return NO;
+    return setAutohide(sMainConnectionID(), on) == 0;
+}

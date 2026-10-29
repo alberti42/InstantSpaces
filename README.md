@@ -100,6 +100,11 @@ you set it.
   on" in Settings → Spaces.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
+- **Hidden menu bar** (Settings → macOS → Menu Bar): choose macOS's
+  "Automatically hide and show the menu bar", and, with "Show the menu bar
+  sooner" (off by default), the hidden menu bar slides in when the pointer
+  reaches the top edge instead of after macOS's wait (350 ms or longer). See
+  [The hidden menu bar](#the-hidden-menu-bar).
 - **Hidden Dock** (Settings → macOS → Dock): switch macOS's "Automatically
   hide and show the Dock" on or off, and set how long the hidden Dock waits
   on desktops, how long the pointer pushes in full-screen apps (0 for both
@@ -325,6 +330,30 @@ does without SpaceJumper.
 SpaceJumper does not handle ⌘Tab to a hidden app (⌘H) on another Space, by
 design: macOS switches there with its own slide.
 [Troubleshooting](#troubleshooting) explains why.
+
+### The hidden menu bar
+
+macOS shows a hidden menu bar after the pointer has rested at the top edge;
+the wait measured 347–1181 ms on macOS 27.0.1. No setting changes it. With
+"Show the menu bar sooner" on, SpaceJumper samples the pointer 60 times a
+second and, when it reaches the top edge (after "Wait before showing", 0 by
+default), asks WindowServer to show the menu bar on that display
+(`SLSSetMenuBarVisibilityOverrideOnDisplay`). The menu bar then slides in as
+it does for macOS, for 0.15 s; only macOS can change that.
+
+SpaceJumper gives the menu bar back to macOS in one of two ways:
+
+- When macOS shows the menu bar itself, which it announces to every app,
+  SpaceJumper lets go at once. Nothing changes on screen, and macOS hides
+  the menu bar later, as usual.
+- Otherwise, when the pointer has been below the menu bar for 0.3 s, the menu
+  bar hides. An open menu keeps it shown, as macOS does.
+
+"Automatically hide and show the menu bar" is the setting in System Settings
+→ Menu Bar. SpaceJumper changes it as System Settings does:
+`com.apple.controlcenter AutoHideMenuBarOption` for the choice, the global
+`_HIHideMenuBar` and `CGSSetMenuBarAutohideEnabled` for desktops, and the
+global `AppleMenuBarVisibleInFullscreen` for full-screen apps.
 
 ### The hidden Dock
 

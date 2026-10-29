@@ -79,4 +79,25 @@ BOOL SLBEventMatchesSymbolicHotKey(uint16_t keyCode, uint64_t flags, int hotKey)
 /// Desktop & Dock pane makes this call after changing it (macOS 27.0.1).
 BOOL SLBSetSwitchesOnAppActivation(BOOL on);
 
+/// Shows the hidden menu bar on a display (`SLSSetMenuBarVisibilityOverrideOnDisplay`,
+/// 1) or gives it back to macOS (0). Both slide for 0.150 s, as macOS's own
+/// reveal (macOS 27.0.1).
+BOOL SLBSetMenuBarOverride(uint32_t display, BOOL on);
+
+/// Whether the override is on (`SLSGetMenuBarVisibilityOverrideOnDisplay`).
+/// WindowServer turns it off by itself at times, around Space changes.
+BOOL SLBMenuBarOverride(uint32_t display);
+
+/// How far the menu bar of the current Space is shown, 0 hidden to 1 shown
+/// (`SLSGetSpaceMenuBarReveal`).
+double SLBMenuBarReveal(void);
+
+/// Calls `handler` on the main queue with the Space of every menu-bar reveal
+/// WindowServer announces (notification 0x524). Needs a running NSApplication.
+void SLBObserveMenuBarReveals(void (^handler)(uint64_t space));
+
+/// Whether the menu bar hides on desktops (`CGSSetMenuBarAutohideEnabled`), as
+/// System Settings → Menu Bar sets it.
+BOOL SLBSetMenuBarAutohide(BOOL on);
+
 NS_ASSUME_NONNULL_END

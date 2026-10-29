@@ -238,19 +238,17 @@ private enum AppIcon {
 /// A macOS setting that SpaceJumper changes: a switch, and a button to the
 /// System Settings pane where macOS shows it. The icon is a warning while the
 /// setting works against one of SpaceJumper's.
-private struct MacOSSettingRow: View {
+private struct MacOSSettingRow<Control: View>: View {
     let title: String
     let explanation: String
     var warns = false
-    @Binding var isOn: Bool
     let open: () -> Void
+    @ViewBuilder let control: Control
 
     var body: some View {
         LabeledContent {
             HStack {
-                Toggle(title, isOn: $isOn)
-                    .toggleStyle(.switch)
-                    .labelsHidden()
+                control
                 Button("System Settings…", action: open)
             }
         } label: {
@@ -264,10 +262,59 @@ private struct MacOSSettingRow: View {
     }
 }
 
+extension MacOSSettingRow where Control == AnyView {
+    /// A row with a switch.
+    init(title: String, explanation: String, warns: Bool = false, isOn: Binding<Bool>, open: @escaping () -> Void) {
+        self.init(title: title, explanation: explanation, warns: warns, open: open) {
+            AnyView(Toggle(title, isOn: isOn).toggleStyle(.switch).labelsHidden())
+        }
+    }
+}
+
+// MARK: Menu bar
+
+/// macOS's "Automatically hide and show the menu bar", and SpaceJumper's
+/// sooner reveal (`MenuBarRevealer`).
+private struct MenuBarSection: View {
+    @ObservedObject var model: AppModel
+
+    var body: some View {
+        Section {
+            MacOSSettingRow(title: "Automatically hide and show the menu bar",
+                            explanation: "The macOS setting in Menu Bar.",
+                            open: model.openMenuBarSettings) {
+                Picker("Automatically hide and show the menu bar", selection: Binding(
+                    get: { model.macOSSettings.menuBarHiding },
+                    set: { model.setMenuBarHiding($0) })) {
+                    ForEach(MenuBarHiding.allCases, id: \.self) { Text($0.title).tag($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            if model.macOSSettings.menuBarHiding != .never {
+                Toggle(isOn: $model.menuBarRevealsSooner) {
+                    Text("Show the menu bar sooner")
+                    Text("The menu bar slides in when the pointer reaches the top edge, and hides 0.3 s after the pointer leaves it. An open menu keeps it shown.")
+                }
+                if model.menuBarRevealsSooner {
+                    TimingSlider(title: "Wait before showing",
+                               explanation: "How long the pointer stays at the top edge before the menu bar slides in. macOS waits 350 ms or longer.",
+                               value: Binding(get: { Double(model.menuBarRevealWaitMilliseconds) },
+                                              set: { model.menuBarRevealWaitMilliseconds = Int(($0 / 10).rounded()) * 10 }),
+                               range: 0...300, label: { $0 == 0 ? "Off" : "\(Int($0)) ms" },
+                               onEditingChanged: { _ in })
+                }
+            }
+        } header: {
+            Text("Menu Bar")
+        }
+    }
+}
+
 // MARK: Dock
 
-/// A slider of the Dock section, laid out like Duration in the Spaces tab.
-private struct DockSlider: View {
+/// A slider of the macOS tab, laid out like Duration in the Spaces tab.
+private struct TimingSlider: View {
     let title: String
     let explanation: String
     @Binding var value: Double
@@ -309,17 +356,17 @@ private struct DockSection: View {
             if settings.dockAutohidesEffectively {
                 // No `step` on the sliders: it draws a tick per step. The values
                 // are rounded to 10 ms and 5 % instead.
-                DockSlider(title: "Wait on desktops", explanation: "How long the pointer rests at the edge of a desktop before the Dock appears. macOS default duration: 150 ms.",
+                TimingSlider(title: "Wait on desktops", explanation: "How long the pointer rests at the edge of a desktop before the Dock appears. macOS default duration: 150 ms.",
                            value: Binding(get: { Double(settings.dockDesktopWaitMilliseconds) },
                                           set: { model.setDockDesktopWait(milliseconds: $0) }),
                            range: 0...300, label: Self.milliseconds,
                            onEditingChanged: model.dockSliderEditing)
-                DockSlider(title: "Push in full-screen apps", explanation: "How long the pointer has to keep pushing against the edge of a full-screen app before the Dock appears. A pause starts the count again, and resting at the edge never shows it. macOS default duration: 250 ms.",
+                TimingSlider(title: "Push in full-screen apps", explanation: "How long the pointer has to keep pushing against the edge of a full-screen app before the Dock appears. A pause starts the count again, and resting at the edge never shows it. macOS default duration: 250 ms.",
                            value: Binding(get: { Double(settings.dockPushMilliseconds) },
                                           set: { model.setDockPush(milliseconds: $0) }),
                            range: 0...500, label: Self.milliseconds,
                            onEditingChanged: model.dockSliderEditing)
-                DockSlider(title: "Slide duration", explanation: "How long the Dock takes to slide in and out, compared with macOS. Off: no slide.",
+                TimingSlider(title: "Slide duration", explanation: "How long the Dock takes to slide in and out, compared with macOS. Off: no slide.",
                            value: Binding(get: { settings.dockAnimationShare },
                                           set: { model.setDockAnimationShare($0) }),
                            range: 0...1, label: Self.share,
@@ -380,6 +427,7 @@ private struct MacOSPane: View {
             } header: {
                 Text("Mission Control")
             }
+            MenuBarSection(model: model)
             DockSection(model: model)
         }
         .formStyle(.grouped)

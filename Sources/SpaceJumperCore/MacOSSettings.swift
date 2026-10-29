@@ -30,11 +30,13 @@ public struct MacOSSettings: Equatable, Sendable {
     /// out, as a multiple of macOS's own; 0 shows it without the slide. Not in
     /// System Settings.
     public var dockAnimationModifier: Double?
+    /// "Automatically hide and show the menu bar" (`MenuBarHiding`).
+    public var menuBarHiding: MenuBarHiding
 
     public init(threeFingerHorizontalSwipe: Int? = nil, fourFingerHorizontalSwipe: Int? = nil,
                 rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil, reducesMotion: Bool = false,
                 dockAutohides: Bool? = nil, dockAutohideDelay: Double? = nil, dockDigDuration: Double? = nil,
-                dockAnimationModifier: Double? = nil) {
+                dockAnimationModifier: Double? = nil, menuBarHiding: MenuBarHiding = .never) {
         self.threeFingerHorizontalSwipe = threeFingerHorizontalSwipe
         self.fourFingerHorizontalSwipe = fourFingerHorizontalSwipe
         self.rearrangesSpaces = rearrangesSpaces
@@ -44,6 +46,7 @@ public struct MacOSSettings: Equatable, Sendable {
         self.dockAutohideDelay = dockAutohideDelay
         self.dockDigDuration = dockDigDuration
         self.dockAnimationModifier = dockAnimationModifier
+        self.menuBarHiding = menuBarHiding
     }
 
     /// How an animated switch looks: a cross-fade while Reduce motion is on and

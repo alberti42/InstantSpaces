@@ -22,6 +22,8 @@ final class AppModel: ObservableObject {
         static let menuBarFrame = "menuBarFrame"
         static let menuBarFrameShape = "menuBarFrameShape"
         static let menuBarShowsSpaceName = "menuBarShowsSpaceName"
+        static let menuBarRevealsSooner = "menuBarRevealsSooner"
+        static let menuBarRevealWait = "menuBarRevealWaitMilliseconds"
         /// Set once SpaceJumper has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -117,7 +119,18 @@ final class AppModel: ObservableObject {
         didSet { UserDefaults.standard.set(menuBarShowsSpaceName, forKey: Key.menuBarShowsSpaceName) }
     }
 
+    /// Show the hidden menu bar as soon as the pointer touches the top edge
+    /// (`MenuBarRevealer`); off by default.
+    @Published var menuBarRevealsSooner: Bool {
+        didSet { UserDefaults.standard.set(menuBarRevealsSooner, forKey: Key.menuBarRevealsSooner); updateMenuBarRevealer() }
+    }
+    /// How long the pointer stays at the top edge before the menu bar shows, 0 … 300 ms.
+    @Published var menuBarRevealWaitMilliseconds: Int {
+        didSet { UserDefaults.standard.set(menuBarRevealWaitMilliseconds, forKey: Key.menuBarRevealWait); updateMenuBarRevealer() }
+    }
+
     private let switcher: SpaceSwitcher?
+    private var menuBarRevealer: MenuBarRevealer?
     private let hotKeys = HotKeyCenter()
     private let gestureTap = GestureTap()
     private var accessTimer: Timer?
@@ -142,7 +155,8 @@ final class AppModel: ObservableObject {
                                      Key.arrowKeys: true, Key.desktopKeys: true, Key.swipes: true,
                                      Key.wrapsAround: false, Key.switchesOnActivation: false,
                                      Key.animationDuration: 0, Key.followsReduceMotion: true,
-                                     Key.menuBarShowsSpaceName: false])
+                                     Key.menuBarShowsSpaceName: false, Key.menuBarRevealsSooner: false,
+                                     Key.menuBarRevealWait: 0])
         modifierPrefix = ModifierPrefix(rawValue: defaults.string(forKey: Key.modifierPrefix) ?? "") ?? .default
         arrowKeysEnabled = defaults.bool(forKey: Key.arrowKeys)
         desktopKeysEnabled = defaults.bool(forKey: Key.desktopKeys)
@@ -158,6 +172,8 @@ final class AppModel: ObservableObject {
         menuBarFrame = MenuBarFrame(rawValue: defaults.string(forKey: Key.menuBarFrame) ?? "") ?? .none
         menuBarFrameShape = MenuBarFrameShape(rawValue: defaults.string(forKey: Key.menuBarFrameShape) ?? "") ?? .roundedRectangle
         menuBarShowsSpaceName = defaults.bool(forKey: Key.menuBarShowsSpaceName)
+        menuBarRevealsSooner = defaults.bool(forKey: Key.menuBarRevealsSooner)
+        menuBarRevealWaitMilliseconds = defaults.integer(forKey: Key.menuBarRevealWait)
 
         do {
             switcher = try SpaceSwitcher()
@@ -179,6 +195,8 @@ final class AppModel: ObservableObject {
         }
         updateGestureTap()
         refreshMacOSSettings()
+        if switcher != nil { menuBarRevealer = MenuBarRevealer() }
+        updateMenuBarRevealer()
 
         // Also posted when another tool, or the Dock, changes the Space.
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(
@@ -394,9 +412,30 @@ final class AppModel: ObservableObject {
             dockAutohides: DockPreferences.value("autohide") as? Bool,
             dockAutohideDelay: DockPreferences.value(DockPreferences.autohideDelay) as? Double,
             dockDigDuration: DockPreferences.value(DockPreferences.digDuration) as? Double,
-            dockAnimationModifier: DockPreferences.value(DockPreferences.animationModifier) as? Double)
+            dockAnimationModifier: DockPreferences.value(DockPreferences.animationModifier) as? Double,
+            menuBarHiding: MenuBarPreferences.hiding())
         switcher?.transition = settings.transition(followingReduceMotion: followsReduceMotion)
-        if settings != macOSSettings { macOSSettings = settings }
+        if settings != macOSSettings {
+            let hidingChanged = settings.menuBarHiding != macOSSettings.menuBarHiding
+            macOSSettings = settings
+            if hidingChanged { updateMenuBarRevealer() }
+        }
+    }
+
+    /// macOS's "Automatically hide and show the menu bar".
+    func setMenuBarHiding(_ hiding: MenuBarHiding) {
+        MenuBarPreferences.setHiding(hiding)
+        refreshMacOSSettings()
+    }
+
+    /// The revealer runs while its setting is on and the menu bar hides somewhere.
+    private func updateMenuBarRevealer() {
+        menuBarRevealer?.update(enabled: menuBarRevealsSooner && macOSSettings.menuBarHiding != .never,
+                                wait: Double(menuBarRevealWaitMilliseconds) / 1000)
+    }
+
+    func openMenuBarSettings() {
+        openSystemSettings("com.apple.ControlCenter-Settings.extension")
     }
 
     /// Sets macOS's "When switching to an application, switch to a Space with
@@ -546,6 +585,7 @@ final class AppModel: ObservableObject {
             .init("Switch instantly with ⌘Tab", switchesOnActivation ? "on" : "off"),
             .init("Menu-bar frame", "\(menuBarFrame.title), \(menuBarFrameShape.title)"),
             .init("Menu-bar Space name", menuBarShowsSpaceName ? "on" : "off"),
+            .init("Show the menu bar sooner", menuBarRevealsSooner ? "on, wait \(menuBarRevealWaitMilliseconds) ms" : "off"),
             .init("Open at login", opensAtLogin ? "on" : "off"),
         ]
         d.macOSSettings = [
@@ -557,6 +597,7 @@ final class AppModel: ObservableObject {
             .init("Dock autohide-delay", macOSSettings.dockAutohideDelay.map { "\($0) s" } ?? "not set"),
             .init("Dock digduration-duration", macOSSettings.dockDigDuration.map { "\($0) s" } ?? "not set"),
             .init("Dock autohide-time-modifier", macOSSettings.dockAnimationModifier.map { "\($0)" } ?? "not set"),
+            .init("Automatically hide the menu bar", macOSSettings.menuBarHiding.title),
         ]
         d.shortcuts = enabledBindings.map(\.name)
         d.clashes = clashes.map(\.description)
