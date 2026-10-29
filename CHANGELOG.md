@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Settings: a new macOS tab holds the Mission Control group ("Switch instantly with ⌘Tab" and the two macOS options) and the Dock group; General keeps Menu Bar, Startup and Updates.
+- Settings: a new macOS tab holds the Mission Control group ("Switch instantly with ⌘Tab" and the two macOS options), the Menu Bar group and the Dock group; General keeps the menu-bar number's settings (Menu Bar), Startup and Updates.
 - Settings: the macOS options "When switching to an application, switch to a Space with open windows for the application" and "Automatically rearrange Spaces based on most recent use" have a switch instead of Turn On / Turn Off; changing the rearranging restarts the Dock. The buttons that open System Settings are called System Settings… instead of Change….
 
 ### Fixed
