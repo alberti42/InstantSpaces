@@ -22,9 +22,16 @@ import Testing
         #expect(reveal.pointer(display: 2, fromTop: 10, barHeight: bar, menuBarShown: true, at: 5) == [])
         // Below it: it hides after the grace period.
         #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 6) == [])
-        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 6.2) == [])
-        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 6.31) == [.hide(display: 2)])
+        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 6.1) == [])
+        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 6.21) == [.hide(display: 2)])
         #expect(reveal.shownDisplay == nil)
+    }
+
+    @Test func aHideDelayOfZeroHidesAtOnce() {
+        var reveal = MenuBarReveal()
+        reveal.hideDelay = 0
+        _ = reveal.pointer(display: 2, fromTop: 0, barHeight: bar, menuBarShown: false, at: 0)
+        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1) == [.hide(display: 2)])
     }
 
     @Test func returningToTheBarCancelsTheHide() {
@@ -33,8 +40,8 @@ import Testing
         _ = reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1)
         _ = reveal.pointer(display: 2, fromTop: 10, barHeight: bar, menuBarShown: true, at: 1.2)
         #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1.4) == [])
-        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1.65) == [])
-        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1.71) == [.hide(display: 2)])
+        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1.5) == [])
+        #expect(reveal.pointer(display: 2, fromTop: 100, barHeight: bar, menuBarShown: true, at: 1.61) == [.hide(display: 2)])
     }
 
     @Test func waitsWithThePointerAtTheEdge() {

@@ -42,7 +42,7 @@ public enum MenuBarHiding: Int, CaseIterable, Sendable {
 ///  - when macOS reveals the menu bar itself (WindowServer notification 0x524
 ///    for the current Space, later than the override's own, which come within
 ///    10 ms). The menu bar then stays, and macOS hides it when it decides to;
-///  - or when the pointer has been below the menu bar for `hideGrace`: the
+///  - or when the pointer has been below the menu bar for `hideDelay`: the
 ///    menu bar hides, as macOS hides it after the pointer leaves. An open menu
 ///    keeps it shown (macOS does that by itself).
 /// macOS's own wait was 347–1181 ms on macOS 27.0.1; turning the override off
@@ -53,13 +53,18 @@ public struct MenuBarReveal: Sendable {
         case hide(display: UInt32)
     }
 
-    /// How long the pointer stays below the menu bar before it hides.
-    public static let hideGrace: TimeInterval = 0.3
+    /// How long the pointer stays below the menu bar before it hides. 0.15 s
+    /// showed no flicker (user, 2026-10-29); the default keeps a margin.
+    /// Turning the override off while macOS's own wait was still counting
+    /// made the menu bar hide and show again.
+    public static let defaultHideDelay: TimeInterval = 0.2
     /// 0x524 within this time after the override went on are the override's own.
     public static let ownNotificationTime: TimeInterval = 0.06
 
     /// How long the pointer stays at the top edge before the menu bar shows.
     public var wait: TimeInterval
+    /// How long the pointer stays below the menu bar before it hides.
+    public var hideDelay = MenuBarReveal.defaultHideDelay
     /// The display whose override is on.
     public private(set) var shownDisplay: UInt32?
     private var shownAt: TimeInterval = 0
@@ -104,7 +109,7 @@ public struct MenuBarReveal: Sendable {
         }
         let left = leftAt ?? now
         leftAt = left
-        if now - left >= Self.hideGrace {
+        if now - left >= hideDelay {
             actions.append(.hide(display: shown))
             shownDisplay = nil
             leftAt = nil

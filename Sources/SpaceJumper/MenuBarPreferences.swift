@@ -63,8 +63,9 @@ final class MenuBarRevealer {
     }
 
     /// Starts or stops, with the wait at the top edge before the menu bar shows.
-    func update(enabled: Bool, wait: TimeInterval) {
+    func update(enabled: Bool, wait: TimeInterval, hideDelay: TimeInterval) {
         reveal.wait = wait
+        reveal.hideDelay = hideDelay
         if enabled, timer == nil {
             let timer = Timer(timeInterval: 1.0 / 60, repeats: true) { [weak self] _ in
                 MainActor.assumeIsolated { self?.tick() }

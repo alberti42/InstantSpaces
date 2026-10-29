@@ -24,6 +24,9 @@ final class AppModel: ObservableObject {
         static let menuBarShowsSpaceName = "menuBarShowsSpaceName"
         static let menuBarRevealsSooner = "menuBarRevealsSooner"
         static let menuBarRevealWait = "menuBarRevealWaitMilliseconds"
+        /// Not in Settings: `defaults write io.alberti42.SpaceJumper
+        /// menuBarHideDelayMilliseconds -int N`. Read every 5 s.
+        static let menuBarHideDelay = "menuBarHideDelayMilliseconds"
         /// Set once SpaceJumper has shown macOS's Accessibility dialog by itself.
         static let accessibilityRequested = "accessibilityRequested"
     }
@@ -244,6 +247,7 @@ final class AppModel: ObservableObject {
                 if let self { self.spaceChanges.resynchronize(self.windowServerCurrentSpaces()) }
                 self?.refreshClashes()
                 self?.refreshMacOSSettings()
+                self?.updateMenuBarRevealer()
             }
         }
     }
@@ -431,7 +435,14 @@ final class AppModel: ObservableObject {
     /// The revealer runs while its setting is on and the menu bar hides somewhere.
     private func updateMenuBarRevealer() {
         menuBarRevealer?.update(enabled: menuBarRevealsSooner && macOSSettings.menuBarHiding != .never,
-                                wait: Double(menuBarRevealWaitMilliseconds) / 1000)
+                                wait: Double(menuBarRevealWaitMilliseconds) / 1000,
+                                hideDelay: Self.menuBarHideDelay)
+    }
+
+    /// The hidden setting `menuBarHideDelayMilliseconds`, or `MenuBarReveal`'s default.
+    private static var menuBarHideDelay: TimeInterval {
+        (UserDefaults.standard.object(forKey: Key.menuBarHideDelay) as? Int)
+            .map { Double(max($0, 0)) / 1000 } ?? MenuBarReveal.defaultHideDelay
     }
 
     func openMenuBarSettings() {

@@ -346,8 +346,19 @@ SpaceJumper gives the menu bar back to macOS in one of two ways:
 - When macOS shows the menu bar itself, which it announces to every app,
   SpaceJumper lets go at once. Nothing changes on screen, and macOS hides
   the menu bar later, as usual.
-- Otherwise, when the pointer has been below the menu bar for 0.3 s, the menu
+- Otherwise, when the pointer has been below the menu bar for 0.2 s, the menu
   bar hides. An open menu keeps it shown, as macOS does.
+
+The 0.2 s has no control in Settings. To try another value (in
+milliseconds; SpaceJumper reads it within 5 s):
+
+```sh
+defaults write io.alberti42.SpaceJumper menuBarHideDelayMilliseconds -int 300
+defaults delete io.alberti42.SpaceJumper menuBarHideDelayMilliseconds   # back to 200
+```
+
+A value close to 0 can make the menu bar hide and show again, when macOS's
+own wait was still counting.
 
 "Automatically hide and show the menu bar" is the setting in System Settings
 → Menu Bar. SpaceJumper changes it as System Settings does:

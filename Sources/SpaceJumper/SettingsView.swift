@@ -294,7 +294,7 @@ private struct MenuBarSection: View {
             if model.macOSSettings.menuBarHiding != .never {
                 Toggle(isOn: $model.menuBarRevealsSooner) {
                     Text("Show the menu bar sooner")
-                    Text("The menu bar slides in when the pointer reaches the top edge, and hides 0.3 s after the pointer leaves it. An open menu keeps it shown.")
+                    Text("The menu bar slides in when the pointer reaches the top edge, and hides 0.2 s after the pointer leaves it. An open menu keeps it shown.")
                 }
                 if model.menuBarRevealsSooner {
                     TimingSlider(title: "Wait before showing",

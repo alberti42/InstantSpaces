@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Settings → macOS → Menu Bar: macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never), and "Show the menu bar sooner" (off by default): the hidden menu bar slides in when the pointer reaches the top edge, after "Wait before showing" (0–300 ms; macOS waits 350 ms or longer), and hides 0.3 s after the pointer leaves it. An open menu keeps it shown.
+- Settings → macOS → Menu Bar: macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never), and "Show the menu bar sooner" (off by default): the hidden menu bar slides in when the pointer reaches the top edge, after "Wait before showing" (0–300 ms; macOS waits 350 ms or longer), and hides 0.2 s after the pointer leaves it. An open menu keeps it shown.
 - Settings → macOS → Dock: switch macOS's "Automatically hide and show the Dock" on or off, sliders for how long the hidden Dock waits with the pointer at the edge of a desktop (macOS: 150 ms), how long the pointer has to push against the edge in a full-screen app (macOS: 250 ms; resting at the edge never shows the Dock there), and how long the Dock slides in and out (Off to macOS's default), and Restore Defaults. With both waits at Off, the Dock appears as soon as the pointer reaches the edge. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
 
 ### Changed
