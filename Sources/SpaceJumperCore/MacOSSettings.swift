@@ -135,41 +135,7 @@ public struct MacOSSettings: Equatable, Sendable {
         Self.milliseconds(dockDigDuration ?? Self.defaultDockDigDuration)
     }
 
-    /// What the desktop wait does now, for the Dock section.
-    public var dockDesktopWaitExplanation: String {
-        dockDesktopWaitMilliseconds == 0
-            ? "The Dock appears as soon as the pointer reaches the edge of a desktop."
-            : "The Dock appears when the pointer has rested at the edge of a desktop for \(dockDesktopWaitMilliseconds) ms"
-                + Self.defaultNote(dockDesktopWaitMilliseconds, Self.defaultDockAutohideDelay)
-    }
-
-    /// What the push does now, for the Dock section.
-    public var dockPushExplanation: String {
-        dockPushMilliseconds == 0
-            ? "In a full-screen app, the Dock appears as soon as the pointer reaches the edge."
-            : "In a full-screen app, the pointer has to keep pushing against the edge for \(dockPushMilliseconds) ms"
-                + Self.defaultNote(dockPushMilliseconds, Self.defaultDockDigDuration)
-                + " A pause starts the count again, and resting at the edge never shows the Dock."
-    }
-
     private static func milliseconds(_ seconds: Double) -> Int { Int((seconds * 1000).rounded()) }
-
-    /// Ends a sentence about a wait: names macOS's default unless the wait is it.
-    private static func defaultNote(_ milliseconds: Int, _ defaultSeconds: Double) -> String {
-        let defaultMilliseconds = Self.milliseconds(defaultSeconds)
-        return milliseconds == defaultMilliseconds
-            ? ", macOS's default."
-            : ". macOS's default is \(defaultMilliseconds) ms."
-    }
-
-    /// What the slide setting does now, for the Dock section.
-    public var dockSlideExplanation: String {
-        switch dockAnimationShare {
-        case 0: return "The Dock is there at once, without sliding in or out."
-        case 1: return "The Dock slides in and out as fast as macOS's default."
-        default: return "The Dock slides in and out in \(Int((dockAnimationShare * 100).rounded())) % of macOS's default time."
-        }
-    }
 
     /// The Dock's slide as a share of macOS's, 0 … 1; 1 when the key is not set.
     public var dockAnimationShare: Double {

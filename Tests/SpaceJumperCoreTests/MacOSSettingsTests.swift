@@ -60,19 +60,6 @@ import Testing
         #expect(MacOSSettings(dockAnimationModifier: 3).dockAnimationShare == 1)
     }
 
-    @Test func dockExplanationsDescribeTheCurrentSetting() {
-        #expect(MacOSSettings().dockDesktopWaitExplanation.contains("for 150 ms"))
-        #expect(MacOSSettings(dockAutohideDelay: 0).dockDesktopWaitExplanation.contains("as soon as"))
-        #expect(MacOSSettings().dockPushExplanation.contains("for 250 ms"))
-        #expect(MacOSSettings(dockDigDuration: 0.1).dockPushExplanation.contains("for 100 ms"))
-        #expect(MacOSSettings().dockDesktopWaitExplanation.hasSuffix("for 150 ms, macOS's default."))
-        #expect(MacOSSettings(dockDigDuration: 0.1).dockPushExplanation.contains("macOS's default is 250 ms."))
-        #expect(MacOSSettings(dockDigDuration: 0).dockPushExplanation.contains("as soon as"))
-        #expect(MacOSSettings(dockAnimationModifier: 0).dockSlideExplanation.contains("at once"))
-        #expect(MacOSSettings().dockSlideExplanation.contains("default"))
-        #expect(MacOSSettings(dockAnimationModifier: 0.4).dockSlideExplanation.contains("40 %"))
-    }
-
     @Test func dockTimingChangedByAnyKey() {
         #expect(!MacOSSettings(dockAutohides: true).changesDockTiming)
         #expect(MacOSSettings(dockAutohideDelay: 0).changesDockTiming)

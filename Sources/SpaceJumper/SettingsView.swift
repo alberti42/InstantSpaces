@@ -308,17 +308,17 @@ private struct DockSection: View {
             if settings.dockAutohidesEffectively {
                 // No `step` on the sliders: it draws a tick per step. The values
                 // are rounded to 10 ms and 5 % instead.
-                DockSlider(title: "Wait on desktops", explanation: settings.dockDesktopWaitExplanation,
+                DockSlider(title: "Wait on desktops", explanation: "How long the pointer rests at the edge of a desktop before the Dock appears. macOS default duration: 150 ms.",
                            value: Binding(get: { Double(settings.dockDesktopWaitMilliseconds) },
                                           set: { model.setDockDesktopWait(milliseconds: $0) }),
-                           range: 0...500, label: Self.milliseconds,
+                           range: 0...300, label: Self.milliseconds,
                            onEditingChanged: model.dockSliderEditing)
-                DockSlider(title: "Push in full-screen apps", explanation: settings.dockPushExplanation,
+                DockSlider(title: "Push in full-screen apps", explanation: "How long the pointer has to keep pushing against the edge of a full-screen app before the Dock appears. A pause starts the count again, and resting at the edge never shows it. macOS default duration: 250 ms.",
                            value: Binding(get: { Double(settings.dockPushMilliseconds) },
                                           set: { model.setDockPush(milliseconds: $0) }),
                            range: 0...500, label: Self.milliseconds,
                            onEditingChanged: model.dockSliderEditing)
-                DockSlider(title: "Slide duration", explanation: settings.dockSlideExplanation,
+                DockSlider(title: "Slide duration", explanation: "How long the Dock takes to slide in and out, compared with macOS. Off: no slide.",
                            value: Binding(get: { settings.dockAnimationShare },
                                           set: { model.setDockAnimationShare($0) }),
                            range: 0...1, label: Self.share,
