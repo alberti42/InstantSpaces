@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Settings → General → Dock: switch macOS's "Automatically hide and show the Dock" on or off, "Show the Dock instantly" (the hidden Dock appears as soon as the pointer reaches the edge, on desktops and in full-screen apps, where macOS otherwise waits until the pointer has pushed against the edge for 0.25 s), a Slide slider for the Dock's slide in and out, and Restore Defaults. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
+- Settings → General → Dock: switch macOS's "Automatically hide and show the Dock" on or off, sliders for how long the hidden Dock waits with the pointer at the edge of a desktop (macOS: 150 ms), how long the pointer has to push against the edge in a full-screen app (macOS: 250 ms; resting at the edge never shows the Dock there), and how long the Dock slides in and out (Off to macOS's default), and Restore Defaults. With both waits at Off, the Dock appears as soon as the pointer reaches the edge. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
 
 ### Changed
 

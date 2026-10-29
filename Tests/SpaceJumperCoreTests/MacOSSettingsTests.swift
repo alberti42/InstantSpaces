@@ -46,12 +46,11 @@ import Testing
                     .contains("cross-fade instead"))
     }
 
-    @Test func dockAppearsInstantlyOnlyWithBothWaitsAtZero() {
-        #expect(!MacOSSettings().showsDockInstantly)
-        #expect(!MacOSSettings(dockAutohideDelay: 0).showsDockInstantly)
-        #expect(!MacOSSettings(dockDigDuration: 0).showsDockInstantly)
-        #expect(!MacOSSettings(dockAutohideDelay: 0, dockDigDuration: 0.25).showsDockInstantly)
-        #expect(MacOSSettings(dockAutohideDelay: 0, dockDigDuration: 0).showsDockInstantly)
+    @Test func dockWaitsUseMacOSDefaultsWhenUnset() {
+        #expect(MacOSSettings().dockDesktopWaitMilliseconds == 150)
+        #expect(MacOSSettings().dockPushMilliseconds == 250)
+        #expect(MacOSSettings(dockAutohideDelay: 0).dockDesktopWaitMilliseconds == 0)
+        #expect(MacOSSettings(dockDigDuration: 0.08).dockPushMilliseconds == 80)
     }
 
     @Test func dockAnimationShare() {
@@ -59,6 +58,19 @@ import Testing
         #expect(MacOSSettings(dockAnimationModifier: 0).dockAnimationShare == 0)
         #expect(MacOSSettings(dockAnimationModifier: 0.4).dockAnimationShare == 0.4)
         #expect(MacOSSettings(dockAnimationModifier: 3).dockAnimationShare == 1)
+    }
+
+    @Test func dockExplanationsDescribeTheCurrentSetting() {
+        #expect(MacOSSettings().dockDesktopWaitExplanation.contains("for 150 ms"))
+        #expect(MacOSSettings(dockAutohideDelay: 0).dockDesktopWaitExplanation.contains("as soon as"))
+        #expect(MacOSSettings().dockPushExplanation.contains("for 250 ms"))
+        #expect(MacOSSettings(dockDigDuration: 0.1).dockPushExplanation.contains("for 100 ms"))
+        #expect(MacOSSettings().dockDesktopWaitExplanation.hasSuffix("for 150 ms, macOS's default."))
+        #expect(MacOSSettings(dockDigDuration: 0.1).dockPushExplanation.contains("macOS's default is 250 ms."))
+        #expect(MacOSSettings(dockDigDuration: 0).dockPushExplanation.contains("as soon as"))
+        #expect(MacOSSettings(dockAnimationModifier: 0).dockSlideExplanation.contains("at once"))
+        #expect(MacOSSettings().dockSlideExplanation.contains("default"))
+        #expect(MacOSSettings(dockAnimationModifier: 0.4).dockSlideExplanation.contains("40 %"))
     }
 
     @Test func dockTimingChangedByAnyKey() {

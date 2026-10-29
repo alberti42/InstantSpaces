@@ -265,6 +265,31 @@ private struct MacOSSettingRow: View {
 
 // MARK: Dock
 
+/// A slider of the Dock section, laid out like Duration in the Spaces tab.
+private struct DockSlider: View {
+    let title: String
+    let explanation: String
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let label: (Double) -> String
+    let onEditingChanged: (Bool) -> Void
+
+    var body: some View {
+        LabeledContent {
+            HStack {
+                Slider(value: $value, in: range, onEditingChanged: onEditingChanged)
+                    .frame(width: 160)
+                Text(label(value))
+                    .monospacedDigit()
+                    .frame(width: 56, alignment: .trailing)
+            }
+        } label: {
+            Text(title)
+            Text(explanation)
+        }
+    }
+}
+
 /// The hidden Dock: macOS's auto-hide, and the keys of `com.apple.dock` that
 /// System Settings does not show (see `DockPreferences`).
 private struct DockSection: View {
@@ -281,29 +306,23 @@ private struct DockSection: View {
                               set: { model.setDockAutohides($0) }),
                 open: model.openMissionControlSettings)
             if settings.dockAutohidesEffectively {
-                Toggle(isOn: Binding(
-                    get: { settings.showsDockInstantly },
-                    set: { model.setShowsDockInstantly($0) })) {
-                    Text("Show the Dock instantly")
-                    Text("The Dock appears as soon as the pointer reaches the edge. macOS waits \(Self.seconds(MacOSSettings.defaultDockAutohideDelay)) on a desktop, and in a full-screen app until the pointer has pushed against the edge for \(Self.seconds(MacOSSettings.defaultDockDigDuration)).")
-                }
-                LabeledContent {
-                    HStack {
-                        // No `step`: it draws a tick per step. The value is rounded
-                        // to 5 % instead.
-                        Slider(value: Binding(
-                            get: { settings.dockAnimationShare },
-                            set: { model.setDockAnimationShare($0) }),
-                               in: 0...1)
-                            .frame(width: 160)
-                        Text(Self.share(settings.dockAnimationShare))
-                            .monospacedDigit()
-                            .frame(width: 56, alignment: .trailing)
-                    }
-                } label: {
-                    Text("Slide")
-                    Text("How long the Dock takes to slide in and out, as a share of macOS's time. Off shows it at once.")
-                }
+                // No `step` on the sliders: it draws a tick per step. The values
+                // are rounded to 10 ms and 5 % instead.
+                DockSlider(title: "Wait on desktops", explanation: settings.dockDesktopWaitExplanation,
+                           value: Binding(get: { Double(settings.dockDesktopWaitMilliseconds) },
+                                          set: { model.setDockDesktopWait(milliseconds: $0) }),
+                           range: 0...500, label: Self.milliseconds,
+                           onEditingChanged: model.dockSliderEditing)
+                DockSlider(title: "Push in full-screen apps", explanation: settings.dockPushExplanation,
+                           value: Binding(get: { Double(settings.dockPushMilliseconds) },
+                                          set: { model.setDockPush(milliseconds: $0) }),
+                           range: 0...500, label: Self.milliseconds,
+                           onEditingChanged: model.dockSliderEditing)
+                DockSlider(title: "Slide duration", explanation: settings.dockSlideExplanation,
+                           value: Binding(get: { settings.dockAnimationShare },
+                                          set: { model.setDockAnimationShare($0) }),
+                           range: 0...1, label: Self.share,
+                           onEditingChanged: model.dockSliderEditing)
                 if settings.changesDockTiming {
                     LabeledContent {
                         Button("Restore Defaults") { model.restoreDockDefaults() }
@@ -316,13 +335,13 @@ private struct DockSection: View {
         } header: {
             Text("Dock")
         } footer: {
-            Text("The Dock restarts after a change to Show the Dock instantly or Slide, as it reads these settings only when it starts. System Settings does not show them; the README lists them.")
+            Text("The Dock restarts after a change to a slider, as it reads these settings only when it starts. System Settings does not show them; the README lists them.")
                 .foregroundStyle(.secondary)
         }
     }
 
-    private static func seconds(_ value: Double) -> String {
-        "\(value.formatted(.number.precision(.fractionLength(2)))) s"
+    private static func milliseconds(_ value: Double) -> String {
+        value == 0 ? "Off" : "\(Int(value)) ms"
     }
 
     private static func share(_ value: Double) -> String {

@@ -132,6 +132,9 @@ final class AppModel: ObservableObject {
     private var frontApp = NSWorkspace.shared.frontmostApplication
     /// The pending restart of the Dock after its preferences changed.
     private var dockRestart: DispatchWorkItem?
+    /// A Dock slider is held; its changes wait for the release.
+    private var isAdjustingDock = false
+    private var dockChangedWhileAdjusting = false
 
     init() {
         let defaults = UserDefaults.standard
@@ -426,11 +429,28 @@ final class AppModel: ObservableObject {
         refreshMacOSSettings()
     }
 
-    /// Sets both waits of the hidden Dock to 0 (on desktops and in full-screen
-    /// apps), or deletes both keys so that the Dock uses its own values.
-    func setShowsDockInstantly(_ on: Bool) {
-        DockPreferences.set([DockPreferences.autohideDelay: on ? 0 : nil,
-                             DockPreferences.digDuration: on ? 0 : nil])
+    /// How long the pointer rests at the edge of a desktop before the hidden
+    /// Dock appears, rounded to 10 ms; macOS's default deletes the key.
+    func setDockDesktopWait(milliseconds: Double) {
+        setDockWait(DockPreferences.autohideDelay, milliseconds,
+                    current: macOSSettings.dockDesktopWaitMilliseconds,
+                    default: MacOSSettings.defaultDockAutohideDelay)
+    }
+
+    /// How long the pointer pushes against the edge in a full-screen app
+    /// before the hidden Dock appears, rounded to 10 ms; macOS's default
+    /// deletes the key.
+    func setDockPush(milliseconds: Double) {
+        setDockWait(DockPreferences.digDuration, milliseconds,
+                    current: macOSSettings.dockPushMilliseconds,
+                    default: MacOSSettings.defaultDockDigDuration)
+    }
+
+    private func setDockWait(_ key: String, _ milliseconds: Double, current: Int, default seconds: Double) {
+        let rounded = Int((milliseconds / 10).rounded()) * 10
+        guard rounded != current else { return }
+        let value = Double(rounded) / 1000
+        DockPreferences.set([key: value == seconds ? nil : value])
         dockDidChange()
     }
 
@@ -450,10 +470,30 @@ final class AppModel: ObservableObject {
         dockDidChange()
     }
 
-    /// The Dock reads the keys only when it starts. It is restarted 0.5 s
-    /// after the last change, so that moving the slider restarts it once.
+    /// Called when a Dock slider is grabbed and released. While one is held,
+    /// the Dock is not restarted; on release it is, if a value changed.
+    func dockSliderEditing(_ editing: Bool) {
+        isAdjustingDock = editing
+        if !editing && dockChangedWhileAdjusting {
+            dockChangedWhileAdjusting = false
+            scheduleDockRestart()
+        }
+    }
+
+    /// The Dock reads the keys only when it starts. It is restarted after the
+    /// slider is released, or 0.5 s after the last change from the keyboard,
+    /// so that moving a slider restarts it once.
     private func dockDidChange() {
         refreshMacOSSettings()
+        dockRestart?.cancel()
+        if isAdjustingDock {
+            dockChangedWhileAdjusting = true
+        } else {
+            scheduleDockRestart()
+        }
+    }
+
+    private func scheduleDockRestart() {
         dockRestart?.cancel()
         let restart = DispatchWorkItem { DockPreferences.restartDock() }
         dockRestart = restart

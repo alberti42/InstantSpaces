@@ -101,9 +101,10 @@ you set it.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
 - **Hidden Dock** (Settings → General → Dock): switch macOS's "Automatically
-  hide and show the Dock" on or off, make the hidden Dock appear as soon as
-  the pointer reaches the edge, on desktops and in full-screen apps, and
-  shorten or remove its slide. Restore Defaults removes these settings. See
+  hide and show the Dock" on or off, and set how long the hidden Dock waits
+  on desktops, how long the pointer pushes in full-screen apps (0 for both
+  makes it appear as soon as the pointer reaches the edge), and how long it
+  slides. Restore Defaults removes these settings. See
   [The hidden Dock](#the-hidden-dock).
 - **Several displays**: the shortcuts act on the display with the active menu bar.
 - **Open at login**, through a login helper registered with macOS.
@@ -346,8 +347,9 @@ SpaceJumper changes them in Settings → General → Dock:
 
 | Setting in SpaceJumper | Keys it writes |
 |---|---|
-| Show the Dock instantly | `autohide-delay` 0 and `digduration-duration` 0; off deletes both |
-| Slide | `autohide-time-modifier`, the share shown (0 for Off); 100 % deletes it |
+| Wait on desktops | `autohide-delay`, in seconds; macOS's 150 ms deletes it |
+| Push in full-screen apps | `digduration-duration`, in seconds; macOS's 250 ms deletes it |
+| Slide duration | `autohide-time-modifier`, the share shown (0 for Off); 100 % deletes it |
 | Restore Defaults | deletes all three |
 
 The Dock reads these keys only when it starts, so SpaceJumper restarts it
@@ -359,7 +361,7 @@ restart.
 To do the same in Terminal, or to undo it without SpaceJumper:
 
 ```sh
-# Show the Dock instantly, on desktops and in full-screen apps
+# No wait on desktops and no push in full-screen apps
 defaults write com.apple.dock autohide-delay -float 0
 defaults write com.apple.dock digduration-duration -float 0
 # No slide
