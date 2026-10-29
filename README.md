@@ -25,14 +25,14 @@ you set it.
 
 <table>
   <tr>
-    <td valign="top" width="50%"><img src="Images/Settings-General.png" width="100%" alt="SpaceJumper's Settings, General tab: Switch instantly with ⌘Tab with the two macOS options next to it, the menu-bar frame and the name of full-screen Spaces, startup and updates"></td>
+    <td valign="top" width="50%"><img src="Images/Settings-General.png" width="100%" alt="SpaceJumper's Settings, General tab: the menu-bar frame and the name of full-screen Spaces, startup and updates"></td>
     <td valign="top" width="50%"><img src="Images/Settings-Spaces.png" width="100%" alt="SpaceJumper's Settings, Spaces tab: the transition with Duration, wrap-around and Reduce motion, the shortcuts with modifier keys and numbering, and trackpad swipes"></td>
   </tr>
 </table>
 <table>
   <tr>
     <td valign="top" width="50%"><img src="Images/Settings-Apps.png" width="100%" alt="SpaceJumper's Settings, Apps tab: the modifier keys and a list of apps with their letters: LibreWolf ⌃⌘L, Emacs ⌃⌘E, Messages ⌃⌘X, MailMate ⌃⌘M, BusyCal ⌃⌘C"></td>
-    <td valign="top" width="50%"></td>
+    <td valign="top" width="50%"><img src="Images/Settings-macOS.png" width="100%" alt="SpaceJumper's Settings, macOS tab: Switch instantly with ⌘Tab with the two Mission Control options, the menu bar's hiding with Show the menu bar sooner and Wait before showing, and the Dock's hiding with its wait, push and slide sliders"></td>
   </tr>
 </table>
 
