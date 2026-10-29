@@ -8,10 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Settings → General → Dock: switch macOS's "Automatically hide and show the Dock" on or off, sliders for how long the hidden Dock waits with the pointer at the edge of a desktop (macOS: 150 ms), how long the pointer has to push against the edge in a full-screen app (macOS: 250 ms; resting at the edge never shows the Dock there), and how long the Dock slides in and out (Off to macOS's default), and Restore Defaults. With both waits at Off, the Dock appears as soon as the pointer reaches the edge. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
+- Settings → macOS → Dock: switch macOS's "Automatically hide and show the Dock" on or off, sliders for how long the hidden Dock waits with the pointer at the edge of a desktop (macOS: 150 ms), how long the pointer has to push against the edge in a full-screen app (macOS: 250 ms; resting at the edge never shows the Dock there), and how long the Dock slides in and out (Off to macOS's default), and Restore Defaults. With both waits at Off, the Dock appears as soon as the pointer reaches the edge. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
 
 ### Changed
 
+- Settings: a new macOS tab holds the Mission Control group ("Switch instantly with ⌘Tab" and the two macOS options) and the Dock group; General keeps Menu Bar, Startup and Updates.
 - Settings: the macOS options "When switching to an application, switch to a Space with open windows for the application" and "Automatically rearrange Spaces based on most recent use" have a switch instead of Turn On / Turn Off; changing the rearranging restarts the Dock. The buttons that open System Settings are called System Settings… instead of Change….
 
 ### Fixed

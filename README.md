@@ -70,7 +70,7 @@ you set it.
 - **⌘Tab** (off by default): when ⌘Tab or the Dock activates an app with no
   window on the current Space, SpaceJumper switches to the Space of its
   frontmost window, instantly or with your slide. Turn it on in Settings →
-  General, and turn off macOS's own option below it, which would slide.
+  macOS, and turn off macOS's own option below it, which would slide.
 - **Menu-bar item** showing the number of the current Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
   rounded rectangle or a capsule. On a full-screen Space it can also show the
@@ -100,7 +100,7 @@ you set it.
   on" in Settings → Spaces.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
-- **Hidden Dock** (Settings → General → Dock): switch macOS's "Automatically
+- **Hidden Dock** (Settings → macOS → Dock): switch macOS's "Automatically
   hide and show the Dock" on or off, and set how long the hidden Dock waits
   on desktops, how long the pointer pushes in full-screen apps (0 for both
   makes it appear as soon as the pointer reaches the edge), and how long it
@@ -168,7 +168,7 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
 - The switch on ⌘Tab needs no permission. SpaceJumper reads the window list
   for window numbers and owners only (not titles or contents, which would
   need Screen Recording access) and asks WindowServer which Space each window
-  is on. The switches for macOS settings in Settings → General change the
+  is on. The switches for macOS settings in Settings → macOS change the
   macOS preferences `AppleSpacesSwitchOnActivate` and `mru-spaces` and the
   Dock's keys (see [The hidden Dock](#the-hidden-dock)); SpaceJumper changes
   them only when you use one of them.
@@ -218,7 +218,7 @@ Common cases:
 - **⌘Tab to an app on another Space still slides.** The macOS option "When
   switching to an application, switch to a Space with open windows for the
   application" is on, or "Switch instantly with ⌘Tab" is off. Settings →
-  General shows both.
+  macOS shows both.
 - **⌘Tab to a hidden app on another Space slides.** This is macOS's own
   switch. When ⌘Tab shows a hidden app (⌘H) again on another Space, macOS
   switches there with its own slide, even with its option "When switching to
@@ -232,7 +232,7 @@ Common cases:
 - **⌘Tab no longer changes the Space.** SpaceJumper's "Switch instantly with
   ⌘Tab" and macOS's own option "When switching to an application, switch to a
   Space with open windows for the application" are both off, so neither
-  switches. Turn one of them on in Settings → General: SpaceJumper's for an
+  switches. Turn one of them on in Settings → macOS: SpaceJumper's for an
   instant switch, or macOS's (the switch below it) for macOS's slide.
 - **Desktops show no name in the menu bar.** macOS gives desktops no names:
   Mission Control calls them "Desktop 1", "Desktop 2", …, and with Numbering
@@ -246,8 +246,8 @@ Common cases:
   [spaces-renamer](https://github.com/dado3212/spaces-renamer) names your
   Spaces.
 - **Space numbers change by themselves.** macOS's "Automatically rearrange
-  Spaces based on most recent use" is on (Settings → General shows it). Turn
-  it off in Desktop & Dock → Mission Control to keep the order you set.
+  Spaces based on most recent use" is on. Turn it off in Settings → macOS, or in
+  Desktop & Dock → Mission Control, to keep the order you set.
 
 For a detailed log to attach to an issue, run
 
@@ -343,7 +343,7 @@ The Dock then slides in, for a time multiplied by `autohide-time-modifier`
 (1 when the key is not set; 0 shows the Dock without the slide).
 
 These are keys of `com.apple.dock` that System Settings does not show.
-SpaceJumper changes them in Settings → General → Dock:
+SpaceJumper changes them in Settings → macOS → Dock:
 
 | Setting in SpaceJumper | Keys it writes |
 |---|---|

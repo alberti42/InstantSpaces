@@ -10,6 +10,7 @@ struct SettingsView: View {
             Tab("General", systemImage: "gearshape") { GeneralPane(model: model) }
             Tab("Spaces", systemImage: "rectangle.split.3x1") { SpacesPane(model: model) }
             Tab("Apps", systemImage: "square.grid.2x2") { AppsPane(model: model) }
+            Tab("macOS", systemImage: "macwindow") { MacOSPane(model: model) }
         }
         .frame(width: 480)
         .fixedSize(horizontal: false, vertical: true)
@@ -349,11 +350,12 @@ private struct DockSection: View {
     }
 }
 
-// MARK: General
+// MARK: macOS
 
-private struct GeneralPane: View {
+/// The macOS settings that SpaceJumper works with or changes: Mission Control
+/// and the hidden Dock.
+private struct MacOSPane: View {
     @ObservedObject var model: AppModel
-    @Bindable private var updater = Updater.shared
 
     var body: some View {
         Form {
@@ -379,6 +381,22 @@ private struct GeneralPane: View {
                 Text("Mission Control")
             }
             DockSection(model: model)
+        }
+        .formStyle(.grouped)
+        // The window grows to fit the pane instead of scrolling it.
+        .scrollDisabled(true)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+// MARK: General
+
+private struct GeneralPane: View {
+    @ObservedObject var model: AppModel
+    @Bindable private var updater = Updater.shared
+
+    var body: some View {
+        Form {
             Section {
                 Picker("Frame", selection: $model.menuBarFrame) {
                     ForEach(MenuBarFrame.allCases, id: \.self) { Text($0.title).tag($0) }
