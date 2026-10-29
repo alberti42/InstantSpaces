@@ -6,6 +6,49 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.7.0</title>
+            <pubDate>Thu, 29 Oct 2026 16:11:50 +0000</pubDate>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>0.7.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.7.0</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.7.0/SpaceJumper.zip" length="4150661" type="application/octet-stream" sparkle:edSignature="1+d03h/sfBzBMpISvSvPtQnXMU+JmsG3WGk024OT94H3QAp6eMfB6nyt95OmJ55tXzQxJOAP0vDIcGqV8pLYDw=="/>
+        
+            <description><![CDATA[
+<h3>Added</h3>
+<ul>
+<li>Settings → macOS → Menu Bar: macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never), and "Show the menu bar sooner" (off by default): the hidden menu bar slides in when the pointer reaches the top edge, after "Wait before showing" (0–300 ms; macOS waits 350 ms or longer), and hides 0.2 s after the pointer leaves it. An open menu keeps it shown.</li>
+<li>Settings → macOS → Dock: switch macOS's "Automatically hide and show the Dock" on or off, sliders for how long the hidden Dock waits with the pointer at the edge of a desktop (macOS: 150 ms), how long the pointer has to push against the edge in a full-screen app (macOS: 250 ms; resting at the edge never shows the Dock there), and how long the Dock slides in and out (Off to macOS's default), and Restore Defaults. With both waits at Off, the Dock appears as soon as the pointer reaches the edge. The Dock restarts after a change to these settings. The README lists the keys of <code>com.apple.dock</code> they write.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Settings: a new macOS tab holds the Mission Control group ("Switch instantly with ⌘Tab" and the two macOS options), the Menu Bar group and the Dock group; General keeps the menu-bar number's settings (Menu Bar), Startup and Updates.</li>
+<li>Settings: the macOS options "When switching to an application, switch to a Space with open windows for the application" and "Automatically rearrange Spaces based on most recent use" have a switch instead of Turn On / Turn Off; changing the rearranging restarts the Dock. The buttons that open System Settings are called System Settings… instead of Change….</li>
+</ul>
+<h3>Fixed</h3>
+<ul>
+<li>Changing macOS's "When switching to an application, switch to a Space with open windows for the application" from SpaceJumper (the Turn On / Turn Off button up to 0.6.0) stored the new value, but macOS kept switching as before until the Dock restarted. SpaceJumper now also passes the value to WindowServer, as System Settings does.</li>
+</ul>
+<h2>Changes since v0.6.0</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/b693ef3">b693ef3</a> Version bump to v0.7.0 (build 11)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/afd3864">afd3864</a> CHANGELOG: the macOS tab also holds the Menu Bar group</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/6e629e8">6e629e8</a> Update the README screenshots, add the macOS tab</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/2dabb41">2dabb41</a> Menu bar: hide 0.2 s after the pointer leaves, hidden setting for the delay</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/cc72222">cc72222</a> Settings → macOS → Menu Bar: macOS's hiding choice and a sooner reveal</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/faa7a83">faa7a83</a> Settings: move Mission Control and Dock to a new macOS tab</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/5a8fd54">5a8fd54</a> Dock sliders: fixed descriptions, desktop wait up to 300 ms</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/105ba72">105ba72</a> Dock: sliders for both waits, and restart the Dock on slider release</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/945b3fa">945b3fa</a> Add Dock settings, switches for macOS options, and apply the ⌘Tab option</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/296cd7e">296cd7e</a> Release v0.6.0 (automatic appcast update)</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.6.0...v0.7.0</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.6.0</title>
             <pubDate>Wed, 28 Oct 2026 21:09:43 +0000</pubDate>
             <sparkle:version>10</sparkle:version>
