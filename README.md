@@ -70,7 +70,7 @@ you set it.
 - **⌘Tab** (off by default): when ⌘Tab or the Dock activates an app with no
   window on the current Space, SpaceJumper switches to the Space of its
   frontmost window, instantly or with your slide. Turn it on in Settings →
-  General; a button there turns off macOS's own switch, which would slide.
+  General, and turn off macOS's own option below it, which would slide.
 - **Menu-bar item** showing the number of the current Space. It can have a frame, to tell it apart from other numbers
   in the menu bar: an outline or a filled shape with the number cut out, as a
   rounded rectangle or a capsule. On a full-screen Space it can also show the
@@ -81,7 +81,9 @@ you set it.
   macOS shortcuts that use the same keys, and
   shows the macOS settings that affect SpaceJumper: how swiping between Spaces
   is set in Trackpad settings, whether macOS switches Spaces when an app is
-  activated, and whether macOS rearranges Spaces by recent use.
+  activated, whether macOS rearranges Spaces by recent use, and whether the
+  Dock hides. The last three have a switch; System Settings… opens the pane
+  where macOS shows a setting.
 - **Numbering**, for the menu bar and ⌃1 … ⌃9, chosen in Settings →
   Shortcuts. Every Space (the default): each Space by its position in Mission
   Control, full-screen apps included. Desktops only: only desktops, as Mission
@@ -98,6 +100,11 @@ you set it.
   on" in Settings → Spaces.
 - **Wrap around** (off by default): ⌃← ⌃→ and trackpad swipes go from the last
   Space to the first and back.
+- **Hidden Dock** (Settings → General → Dock): switch macOS's "Automatically
+  hide and show the Dock" on or off, make the hidden Dock appear as soon as
+  the pointer reaches the edge, on desktops and in full-screen apps, and
+  shorten or remove its slide. Restore Defaults removes these settings. See
+  [The hidden Dock](#the-hidden-dock).
 - **Several displays**: the shortcuts act on the display with the active menu bar.
 - **Open at login**, through a login helper registered with macOS.
 - **Updates** through [Sparkle](https://sparkle-project.org): SpaceJumper
@@ -160,9 +167,10 @@ To report a security problem privately, see [SECURITY.md](SECURITY.md).
 - The switch on ⌘Tab needs no permission. SpaceJumper reads the window list
   for window numbers and owners only (not titles or contents, which would
   need Screen Recording access) and asks WindowServer which Space each window
-  is on. Turn Off and Turn On in Settings → General change the macOS
-  preference `AppleSpacesSwitchOnActivate`; SpaceJumper changes it only when
-  you press one of them.
+  is on. The switches for macOS settings in Settings → General change the
+  macOS preferences `AppleSpacesSwitchOnActivate` and `mru-spaces` and the
+  Dock's keys (see [The hidden Dock](#the-hidden-dock)); SpaceJumper changes
+  them only when you use one of them.
 - SpaceJumper connects to the network only for updates: it downloads the
   update feed (`Releases/appcast.xml` in this repository) from GitHub, and, when
   you install an update, `SpaceJumper.zip` from GitHub Releases. Sparkle sends
@@ -224,8 +232,7 @@ Common cases:
   ⌘Tab" and macOS's own option "When switching to an application, switch to a
   Space with open windows for the application" are both off, so neither
   switches. Turn one of them on in Settings → General: SpaceJumper's for an
-  instant switch, or macOS's (the Turn On button next to it) for macOS's
-  slide.
+  instant switch, or macOS's (the switch below it) for macOS's slide.
 - **Desktops show no name in the menu bar.** macOS gives desktops no names:
   Mission Control calls them "Desktop 1", "Desktop 2", …, and with Numbering
   set to Every Space that name can differ from the number in the menu bar
@@ -317,6 +324,54 @@ does without SpaceJumper.
 SpaceJumper does not handle ⌘Tab to a hidden app (⌘H) on another Space, by
 design: macOS switches there with its own slide.
 [Troubleshooting](#troubleshooting) explains why.
+
+### The hidden Dock
+
+With "Automatically hide and show the Dock" on, the Dock waits before it
+appears, and it waits differently on a desktop and in a full-screen app:
+
+- On a desktop, it appears after the pointer has rested at the edge for
+  `autohide-delay` seconds (0.15 s when the key is not set).
+- In a full-screen app, `autohide-delay` has no effect. The pointer must keep
+  pushing against the edge for `digduration-duration` seconds (0.25 s when
+  the key is not set). A pause of more than 0.1 s, or a push that drifts
+  sideways, starts the count again, and a pointer resting at the edge never
+  shows the Dock.
+
+The Dock then slides in, for a time multiplied by `autohide-time-modifier`
+(1 when the key is not set; 0 shows the Dock without the slide).
+
+These are keys of `com.apple.dock` that System Settings does not show.
+SpaceJumper changes them in Settings → General → Dock:
+
+| Setting in SpaceJumper | Keys it writes |
+|---|---|
+| Show the Dock instantly | `autohide-delay` 0 and `digduration-duration` 0; off deletes both |
+| Slide | `autohide-time-modifier`, the share shown (0 for Off); 100 % deletes it |
+| Restore Defaults | deletes all three |
+
+The Dock reads these keys only when it starts, so SpaceJumper restarts it
+after a change, as `killall Dock` does. "Automatically hide and show the Dock"
+itself is the setting in System Settings → Desktop & Dock; SpaceJumper changes
+it through the same call as System Settings, and the Dock follows without a
+restart.
+
+To do the same in Terminal, or to undo it without SpaceJumper:
+
+```sh
+# Show the Dock instantly, on desktops and in full-screen apps
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock digduration-duration -float 0
+# No slide
+defaults write com.apple.dock autohide-time-modifier -float 0
+killall Dock
+
+# Undo
+defaults delete com.apple.dock autohide-delay
+defaults delete com.apple.dock digduration-duration
+defaults delete com.apple.dock autohide-time-modifier
+killall Dock
+```
 
 ## Building from source
 

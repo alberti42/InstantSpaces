@@ -55,7 +55,7 @@ private struct SpacesPane: View {
                 LabeledContent {
                     HStack {
                         Text(model.macOSSettings.reducesMotion ? "On" : "Off")
-                        Button("Change…") { model.openReduceMotionSettings() }
+                        Button("System Settings…") { model.openReduceMotionSettings() }
                     }
                 } label: {
                     Label {
@@ -107,7 +107,7 @@ private struct SpacesPane: View {
                         if let setting = model.macOSSettings.swipeSetting {
                             Text(setting)
                         }
-                        Button("Change…") { model.openTrackpadSettings() }
+                        Button("System Settings…") { model.openTrackpadSettings() }
                     }
                 } label: {
                     Text("Swipe set in macOS")
@@ -232,6 +232,104 @@ private enum AppIcon {
     }
 }
 
+// MARK: macOS settings
+
+/// A macOS setting that SpaceJumper changes: a switch, and a button to the
+/// System Settings pane where macOS shows it. The icon is a warning while the
+/// setting works against one of SpaceJumper's.
+private struct MacOSSettingRow: View {
+    let title: String
+    let explanation: String
+    var warns = false
+    @Binding var isOn: Bool
+    let open: () -> Void
+
+    var body: some View {
+        LabeledContent {
+            HStack {
+                Toggle(title, isOn: $isOn)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                Button("System Settings…", action: open)
+            }
+        } label: {
+            Label {
+                Text(title)
+                Text(explanation)
+            } icon: {
+                Image(systemName: warns ? "exclamationmark.triangle" : "info.circle")
+            }
+        }
+    }
+}
+
+// MARK: Dock
+
+/// The hidden Dock: macOS's auto-hide, and the keys of `com.apple.dock` that
+/// System Settings does not show (see `DockPreferences`).
+private struct DockSection: View {
+    @ObservedObject var model: AppModel
+
+    private var settings: MacOSSettings { model.macOSSettings }
+
+    var body: some View {
+        Section {
+            MacOSSettingRow(
+                title: "Automatically hide and show the Dock",
+                explanation: "The macOS setting in Desktop & Dock.",
+                isOn: Binding(get: { settings.dockAutohidesEffectively },
+                              set: { model.setDockAutohides($0) }),
+                open: model.openMissionControlSettings)
+            if settings.dockAutohidesEffectively {
+                Toggle(isOn: Binding(
+                    get: { settings.showsDockInstantly },
+                    set: { model.setShowsDockInstantly($0) })) {
+                    Text("Show the Dock instantly")
+                    Text("The Dock appears as soon as the pointer reaches the edge. macOS waits \(Self.seconds(MacOSSettings.defaultDockAutohideDelay)) on a desktop, and in a full-screen app until the pointer has pushed against the edge for \(Self.seconds(MacOSSettings.defaultDockDigDuration)).")
+                }
+                LabeledContent {
+                    HStack {
+                        // No `step`: it draws a tick per step. The value is rounded
+                        // to 5 % instead.
+                        Slider(value: Binding(
+                            get: { settings.dockAnimationShare },
+                            set: { model.setDockAnimationShare($0) }),
+                               in: 0...1)
+                            .frame(width: 160)
+                        Text(Self.share(settings.dockAnimationShare))
+                            .monospacedDigit()
+                            .frame(width: 56, alignment: .trailing)
+                    }
+                } label: {
+                    Text("Slide")
+                    Text("How long the Dock takes to slide in and out, as a share of macOS's time. Off shows it at once.")
+                }
+                if settings.changesDockTiming {
+                    LabeledContent {
+                        Button("Restore Defaults") { model.restoreDockDefaults() }
+                    } label: {
+                        Text("macOS's own timing")
+                        Text("Removes the settings SpaceJumper made for the Dock.")
+                    }
+                }
+            }
+        } header: {
+            Text("Dock")
+        } footer: {
+            Text("The Dock restarts after a change to Show the Dock instantly or Slide, as it reads these settings only when it starts. System Settings does not show them; the README lists them.")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private static func seconds(_ value: Double) -> String {
+        "\(value.formatted(.number.precision(.fractionLength(2)))) s"
+    }
+
+    private static func share(_ value: Double) -> String {
+        value == 0 ? "Off" : "\(Int((value * 100).rounded())) %"
+    }
+}
+
 // MARK: General
 
 private struct GeneralPane: View {
@@ -245,39 +343,23 @@ private struct GeneralPane: View {
                     Text("Switch instantly with ⌘Tab")
                     Text("When ⌘Tab or the Dock activates an app with no window on this Space, SpaceJumper switches to a Space where it has one. macOS's option below has to be off.")
                 }
-                LabeledContent {
-                    HStack {
-                        Text(model.macOSSettings.switchesOnActivateEffectively ? "On" : "Off")
-                        if let needed = model.macOSSettings.switchOnActivateNeeded(spaceJumperSwitches: model.switchesOnActivation) {
-                            Button(needed ? "Turn On" : "Turn Off") { model.setMacOSSwitchesOnActivate(needed) }
-                        }
-                        Button("Change…") { model.openMissionControlSettings() }
-                    }
-                } label: {
-                    Label {
-                        Text("When switching to an application, switch to a Space with open windows for the application")
-                        Text(model.macOSSettings.switchOnActivateExplanation(spaceJumperSwitches: model.switchesOnActivation))
-                    } icon: {
-                        Image(systemName: model.macOSSettings.switchOnActivateNeeded(spaceJumperSwitches: model.switchesOnActivation) == false
-                              ? "exclamationmark.triangle" : "info.circle")
-                    }
-                }
-                LabeledContent {
-                    HStack {
-                        Text(model.macOSSettings.rearrangesSpacesEffectively ? "On" : "Off")
-                        Button("Change…") { model.openMissionControlSettings() }
-                    }
-                } label: {
-                    Label {
-                        Text("Automatically rearrange Spaces based on most recent use")
-                        Text(model.macOSSettings.rearrangeExplanation)
-                    } icon: {
-                        Image(systemName: "info.circle")
-                    }
-                }
+                MacOSSettingRow(
+                    title: "When switching to an application, switch to a Space with open windows for the application",
+                    explanation: model.macOSSettings.switchOnActivateExplanation(spaceJumperSwitches: model.switchesOnActivation),
+                    warns: model.macOSSettings.switchOnActivateNeeded(spaceJumperSwitches: model.switchesOnActivation) == false,
+                    isOn: Binding(get: { model.macOSSettings.switchesOnActivateEffectively },
+                                  set: { model.setMacOSSwitchesOnActivate($0) }),
+                    open: model.openMissionControlSettings)
+                MacOSSettingRow(
+                    title: "Automatically rearrange Spaces based on most recent use",
+                    explanation: model.macOSSettings.rearrangeExplanation,
+                    isOn: Binding(get: { model.macOSSettings.rearrangesSpacesEffectively },
+                                  set: { model.setMacOSRearrangesSpaces($0) }),
+                    open: model.openMissionControlSettings)
             } header: {
                 Text("Mission Control")
             }
+            DockSection(model: model)
             Section {
                 Picker("Frame", selection: $model.menuBarFrame) {
                     ForEach(MenuBarFrame.allCases, id: \.self) { Text($0.title).tag($0) }

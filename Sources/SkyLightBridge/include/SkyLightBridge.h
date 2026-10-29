@@ -72,4 +72,11 @@ NSString *_Nullable SLBSymbolicHotKeyName(int hotKey);
 /// (`SLSIsEventMatchingSymbolicHotKey`). A switched-off shortcut never matches.
 BOOL SLBEventMatchesSymbolicHotKey(uint16_t keyCode, uint64_t flags, int hotKey);
 
+/// Tells WindowServer whether to switch to a Space with a window of an app
+/// that is activated (`SLSSessionSetCurrentSessionWorkspacePreferences` with
+/// `kCGSWorkspaceSwitchOnAppActivationKey`). The Dock passes the preference
+/// `AppleSpacesSwitchOnActivate` on only when it starts; System Settings'
+/// Desktop & Dock pane makes this call after changing it (macOS 27.0.1).
+BOOL SLBSetSwitchesOnAppActivation(BOOL on);
+
 NS_ASSUME_NONNULL_END

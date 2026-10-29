@@ -298,3 +298,16 @@ BOOL SLBEventMatchesSymbolicHotKey(uint16_t keyCode, uint64_t flags, int hotKey)
     CFRelease(event);
     return matches;
 }
+
+BOOL SLBSetSwitchesOnAppActivation(BOOL on)
+{
+    // Resolved here, not in SLBLoad: without it only this setting is lost.
+    void *skyLight = dlopen(kSkyLightPath.fileSystemRepresentation, RTLD_NOW);
+    if (!skyLight || !sMainConnectionID) return NO;
+    int (*setPreferences)(CGSConnectionID, CFDictionaryRef) =
+        dlsym(skyLight, "SLSSessionSetCurrentSessionWorkspacePreferences");
+    CFStringRef *key = dlsym(skyLight, "kCGSWorkspaceSwitchOnAppActivationKey");
+    if (!setPreferences || !key) return NO;
+    NSDictionary *preferences = @{(__bridge NSString *)*key: @(on)};
+    return setPreferences(sMainConnectionID(), (__bridge CFDictionaryRef)preferences) == 0;
+}

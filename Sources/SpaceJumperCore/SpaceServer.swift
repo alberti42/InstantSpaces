@@ -122,4 +122,12 @@ public final class SkyLightServer: SpaceServer {
     public func eventTriggers(_ id: Int32, keyCode: Int, flags: UInt64) -> Bool {
         SLBEventMatchesSymbolicHotKey(UInt16(keyCode), flags, id)
     }
+
+    /// Tells WindowServer whether to switch Spaces when an app is activated,
+    /// as System Settings does after changing `AppleSpacesSwitchOnActivate`;
+    /// the preference alone takes effect only when the Dock restarts. Needs a
+    /// `SkyLightServer` to have loaded SkyLight.
+    public static func setSwitchesOnAppActivation(_ on: Bool) -> Bool {
+        SLBSetSwitchesOnAppActivation(on)
+    }
 }

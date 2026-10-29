@@ -16,14 +16,34 @@ public struct MacOSSettings: Equatable, Sendable {
     /// Reduce motion (System Settings → Accessibility → Motion), as
     /// `NSWorkspace.accessibilityDisplayShouldReduceMotion` reports it.
     public var reducesMotion: Bool
+    /// `com.apple.dock autohide`, "Automatically hide and show the Dock"; off
+    /// by default.
+    public var dockAutohides: Bool?
+    /// `com.apple.dock autohide-delay`: seconds the pointer rests at the edge
+    /// of a desktop before the hidden Dock appears. Not in System Settings.
+    public var dockAutohideDelay: Double?
+    /// `com.apple.dock digduration-duration`: seconds the pointer must keep
+    /// pushing against the edge in a full-screen app before the hidden Dock
+    /// appears. Not in System Settings.
+    public var dockDigDuration: Double?
+    /// `com.apple.dock autohide-time-modifier`: the hidden Dock's slide in and
+    /// out, as a multiple of macOS's own; 0 shows it without the slide. Not in
+    /// System Settings.
+    public var dockAnimationModifier: Double?
 
     public init(threeFingerHorizontalSwipe: Int? = nil, fourFingerHorizontalSwipe: Int? = nil,
-                rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil, reducesMotion: Bool = false) {
+                rearrangesSpaces: Bool? = nil, switchesOnActivate: Bool? = nil, reducesMotion: Bool = false,
+                dockAutohides: Bool? = nil, dockAutohideDelay: Double? = nil, dockDigDuration: Double? = nil,
+                dockAnimationModifier: Double? = nil) {
         self.threeFingerHorizontalSwipe = threeFingerHorizontalSwipe
         self.fourFingerHorizontalSwipe = fourFingerHorizontalSwipe
         self.rearrangesSpaces = rearrangesSpaces
         self.switchesOnActivate = switchesOnActivate
         self.reducesMotion = reducesMotion
+        self.dockAutohides = dockAutohides
+        self.dockAutohideDelay = dockAutohideDelay
+        self.dockDigDuration = dockDigDuration
+        self.dockAnimationModifier = dockAnimationModifier
     }
 
     /// How an animated switch looks: a cross-fade while Reduce motion is on and
@@ -94,5 +114,28 @@ public struct MacOSSettings: Equatable, Sendable {
         case (false, false):
             return "Activating an app does not change the Space. Turn this on so that macOS switches again."
         }
+    }
+
+    /// The Dock's own values when the keys are not set, from its
+    /// `DockBarMouseEventHandler initWithConnection:` (macOS 27.0.1).
+    public static let defaultDockAutohideDelay = 0.15
+    public static let defaultDockDigDuration = 0.25
+
+    public var dockAutohidesEffectively: Bool { dockAutohides ?? false }
+
+    /// Whether the hidden Dock appears as soon as the pointer reaches the
+    /// edge, on desktops and in full-screen apps: both waits are 0.
+    public var showsDockInstantly: Bool {
+        dockAutohideDelay == 0 && dockDigDuration == 0
+    }
+
+    /// The Dock's slide as a share of macOS's, 0 … 1; 1 when the key is not set.
+    public var dockAnimationShare: Double {
+        min(max(dockAnimationModifier ?? 1, 0), 1)
+    }
+
+    /// Whether any of the keys SpaceJumper writes for the hidden Dock is set.
+    public var changesDockTiming: Bool {
+        dockAutohideDelay != nil || dockDigDuration != nil || dockAnimationModifier != nil
     }
 }

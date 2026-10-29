@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Settings → General → Dock: switch macOS's "Automatically hide and show the Dock" on or off, "Show the Dock instantly" (the hidden Dock appears as soon as the pointer reaches the edge, on desktops and in full-screen apps, where macOS otherwise waits until the pointer has pushed against the edge for 0.25 s), a Slide slider for the Dock's slide in and out, and Restore Defaults. The Dock restarts after a change to these settings. The README lists the keys of `com.apple.dock` they write.
+
+### Changed
+
+- Settings: the macOS options "When switching to an application, switch to a Space with open windows for the application" and "Automatically rearrange Spaces based on most recent use" have a switch instead of Turn On / Turn Off; changing the rearranging restarts the Dock. The buttons that open System Settings are called System Settings… instead of Change….
+
+### Fixed
+
+- Changing macOS's "When switching to an application, switch to a Space with open windows for the application" from SpaceJumper (the Turn On / Turn Off button up to 0.6.0) stored the new value, but macOS kept switching as before until the Dock restarted. SpaceJumper now also passes the value to WindowServer, as System Settings does.
+
 ## [0.6.0] - 2026-10-28
 
 ### Added

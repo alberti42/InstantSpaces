@@ -46,6 +46,29 @@ import Testing
                     .contains("cross-fade instead"))
     }
 
+    @Test func dockAppearsInstantlyOnlyWithBothWaitsAtZero() {
+        #expect(!MacOSSettings().showsDockInstantly)
+        #expect(!MacOSSettings(dockAutohideDelay: 0).showsDockInstantly)
+        #expect(!MacOSSettings(dockDigDuration: 0).showsDockInstantly)
+        #expect(!MacOSSettings(dockAutohideDelay: 0, dockDigDuration: 0.25).showsDockInstantly)
+        #expect(MacOSSettings(dockAutohideDelay: 0, dockDigDuration: 0).showsDockInstantly)
+    }
+
+    @Test func dockAnimationShare() {
+        #expect(MacOSSettings().dockAnimationShare == 1)
+        #expect(MacOSSettings(dockAnimationModifier: 0).dockAnimationShare == 0)
+        #expect(MacOSSettings(dockAnimationModifier: 0.4).dockAnimationShare == 0.4)
+        #expect(MacOSSettings(dockAnimationModifier: 3).dockAnimationShare == 1)
+    }
+
+    @Test func dockTimingChangedByAnyKey() {
+        #expect(!MacOSSettings(dockAutohides: true).changesDockTiming)
+        #expect(MacOSSettings(dockAutohideDelay: 0).changesDockTiming)
+        #expect(MacOSSettings(dockDigDuration: 0).changesDockTiming)
+        #expect(MacOSSettings(dockAnimationModifier: 1).changesDockTiming)
+        #expect(!MacOSSettings().dockAutohidesEffectively)
+    }
+
     @Test func notFollowingReduceMotionKeepsTheSlide() {
         #expect(MacOSSettings(reducesMotion: true).transition(followingReduceMotion: false) == .slide)
         #expect(MacOSSettings(reducesMotion: true).reduceMotionExplanation(followingReduceMotion: false)

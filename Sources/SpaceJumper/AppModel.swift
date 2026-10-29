@@ -130,6 +130,8 @@ final class AppModel: ObservableObject {
     private var spaceChanges = SpaceChangeTracker(current: [])
     /// The app that was active before the latest activation.
     private var frontApp = NSWorkspace.shared.frontmostApplication
+    /// The pending restart of the Dock after its preferences changed.
+    private var dockRestart: DispatchWorkItem?
 
     init() {
         let defaults = UserDefaults.standard
@@ -385,20 +387,77 @@ final class AppModel: ObservableObject {
             fourFingerHorizontalSwipe: value("TrackpadFourFingerHorizSwipeGesture", trackpad) as? Int,
             rearrangesSpaces: value("mru-spaces", "com.apple.dock") as? Bool,
             switchesOnActivate: value("AppleSpacesSwitchOnActivate", kCFPreferencesAnyApplication as String) as? Bool,
-            reducesMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion)
+            reducesMotion: NSWorkspace.shared.accessibilityDisplayShouldReduceMotion,
+            dockAutohides: DockPreferences.value("autohide") as? Bool,
+            dockAutohideDelay: DockPreferences.value(DockPreferences.autohideDelay) as? Double,
+            dockDigDuration: DockPreferences.value(DockPreferences.digDuration) as? Double,
+            dockAnimationModifier: DockPreferences.value(DockPreferences.animationModifier) as? Double)
         switcher?.transition = settings.transition(followingReduceMotion: followsReduceMotion)
         if settings != macOSSettings { macOSSettings = settings }
     }
 
     /// Sets macOS's "When switching to an application, switch to a Space with
-    /// open windows for the application". The Dock reads the new value at
-    /// the next activation, without a restart (macOS 27.0.1).
+    /// open windows for the application" and tells WindowServer, as System
+    /// Settings does: the Dock passes the preference on only when it starts
+    /// (macOS 27.0.1).
     func setMacOSSwitchesOnActivate(_ on: Bool) {
         CFPreferencesSetValue("AppleSpacesSwitchOnActivate" as CFString, on as CFBoolean,
                               kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
         CFPreferencesSynchronize(kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost)
-        log.info("AppleSpacesSwitchOnActivate set to \(on, privacy: .public)")
+        let applied = switcher != nil && SkyLightServer.setSwitchesOnAppActivation(on)
+        log.info("AppleSpacesSwitchOnActivate set to \(on, privacy: .public), WindowServer told: \(applied, privacy: .public)")
         refreshMacOSSettings()
+    }
+
+    /// Sets macOS's "Automatically rearrange Spaces based on most recent use"
+    /// and restarts the Dock, as `defaults write com.apple.dock mru-spaces`
+    /// followed by `killall Dock` does. Whether the Dock would follow without
+    /// the restart was not tested.
+    func setMacOSRearrangesSpaces(_ on: Bool) {
+        CFPreferencesSetAppValue("mru-spaces" as CFString, on as CFBoolean, "com.apple.dock" as CFString)
+        CFPreferencesAppSynchronize("com.apple.dock" as CFString)
+        log.info("mru-spaces set to \(on, privacy: .public)")
+        dockDidChange()
+    }
+
+    /// "Automatically hide and show the Dock"; the Dock follows without a restart.
+    func setDockAutohides(_ on: Bool) {
+        DockPreferences.setAutohides(on)
+        refreshMacOSSettings()
+    }
+
+    /// Sets both waits of the hidden Dock to 0 (on desktops and in full-screen
+    /// apps), or deletes both keys so that the Dock uses its own values.
+    func setShowsDockInstantly(_ on: Bool) {
+        DockPreferences.set([DockPreferences.autohideDelay: on ? 0 : nil,
+                             DockPreferences.digDuration: on ? 0 : nil])
+        dockDidChange()
+    }
+
+    /// The hidden Dock's slide as a share of macOS's, rounded to 5 %; 1 deletes
+    /// the key.
+    func setDockAnimationShare(_ share: Double) {
+        let rounded = (share * 20).rounded() / 20
+        guard rounded != macOSSettings.dockAnimationShare else { return }
+        DockPreferences.set([DockPreferences.animationModifier: rounded >= 1 ? nil : rounded])
+        dockDidChange()
+    }
+
+    /// Deletes every key SpaceJumper writes for the hidden Dock.
+    func restoreDockDefaults() {
+        DockPreferences.set([DockPreferences.autohideDelay: nil, DockPreferences.digDuration: nil,
+                             DockPreferences.animationModifier: nil])
+        dockDidChange()
+    }
+
+    /// The Dock reads the keys only when it starts. It is restarted 0.5 s
+    /// after the last change, so that moving the slider restarts it once.
+    private func dockDidChange() {
+        refreshMacOSSettings()
+        dockRestart?.cancel()
+        let restart = DispatchWorkItem { DockPreferences.restartDock() }
+        dockRestart = restart
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: restart)
     }
 
     func openTrackpadSettings() {
@@ -454,6 +513,10 @@ final class AppModel: ObservableObject {
             .init("Reduce motion", macOSSettings.reducesMotion ? "on" : "off"),
             .init("Switch to a Space with open windows (⌘Tab)", macOSSettings.switchesOnActivateEffectively ? "on" : "off"),
             .init("Automatically rearrange Spaces", macOSSettings.rearrangesSpacesEffectively ? "on" : "off"),
+            .init("Automatically hide the Dock", macOSSettings.dockAutohidesEffectively ? "on" : "off"),
+            .init("Dock autohide-delay", macOSSettings.dockAutohideDelay.map { "\($0) s" } ?? "not set"),
+            .init("Dock digduration-duration", macOSSettings.dockDigDuration.map { "\($0) s" } ?? "not set"),
+            .init("Dock autohide-time-modifier", macOSSettings.dockAnimationModifier.map { "\($0)" } ?? "not set"),
         ]
         d.shortcuts = enabledBindings.map(\.name)
         d.clashes = clashes.map(\.description)
