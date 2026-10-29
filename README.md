@@ -253,6 +253,16 @@ Common cases:
 - **Space numbers change by themselves.** macOS's "Automatically rearrange
   Spaces based on most recent use" is on. Turn it off in Settings → macOS, or in
   Desktop & Dock → Mission Control, to keep the order you set.
+- **Mission Control flickers and shows dark frames when a top hot corner opens
+  it.** This is macOS's own behaviour. In Mission Control, the bar of Spaces at
+  the top expands into thumbnails of every Space when the pointer is near the
+  top, and macOS draws all of them at once. A top corner leaves the pointer
+  there, so the bar expands right after Mission Control opens. F3, a swipe or a
+  bottom corner leave the pointer lower, and the bar keeps showing names only.
+  Use a bottom corner (Desktop & Dock → Hot Corners). The Dock reads
+  `spacesbar-delay` (0.1 s when not set), `spacesbar-distance` (64) and
+  `spacesbar-angle`, which seem to set when the bar expands; changing them is
+  untested.
 
 For a detailed log to attach to an issue, run
 
