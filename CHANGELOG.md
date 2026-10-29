@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-29
+
 ### Added
 
 - Settings → macOS → Menu Bar: macOS's "Automatically hide and show the menu bar" (Always, On Desktop Only, In Full Screen Only, Never), and "Show the menu bar sooner" (off by default): the hidden menu bar slides in when the pointer reaches the top edge, after "Wait before showing" (0–300 ms; macOS waits 350 ms or longer), and hides 0.2 s after the pointer leaves it. An open menu keeps it shown.
@@ -122,7 +124,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Open at Login, through a login helper registered with macOS.
 - Software updates through [Sparkle](https://sparkle-project.org). SpaceJumper checks for a new version once a week; Check for Updates in the menu checks at once, and "Check for updates automatically" in Settings → General turns the weekly check on or off.
 
-[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/alberti42/SpaceJumper/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/alberti42/SpaceJumper/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/alberti42/SpaceJumper/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/alberti42/SpaceJumper/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/alberti42/SpaceJumper/compare/v0.3.1...v0.4.0
