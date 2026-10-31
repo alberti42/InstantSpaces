@@ -1,8 +1,17 @@
 import Foundation
 
-/// One normal window (layer 0) of an app, as `SpaceServer.windows(ofProcess:)`
-/// reports it.
+/// One window of an app in a layer that `countsLayer` accepts, as
+/// `SpaceServer.windows(ofProcess:)` reports it.
 public struct AppWindow: Equatable, Sendable {
+    /// Whether a window in this layer counts as one of the app's windows:
+    /// normal (0), floating (3) and modal panel (8). A dialog such as
+    /// Zotero's Import window is in layer 8; with only layer 0 counted,
+    /// clicking it on the current Space switched to the main window's Space.
+    /// Menus (101), the status bar (25) and higher layers do not count.
+    public static func countsLayer(_ layer: Int) -> Bool {
+        (0...8).contains(layer)
+    }
+
     public let id: UInt32
     /// `SLSCopySpacesForWindows`; empty for some ordered-out windows.
     public let spaces: [UInt64]

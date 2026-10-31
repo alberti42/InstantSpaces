@@ -20,7 +20,8 @@ public protocol SpaceServer: AnyObject {
     func dissolveScreen(_ freeze: Int32, duration: TimeInterval)
     /// The width in points of the display with this identifier.
     func displayWidth(_ display: String) -> Double
-    /// The normal windows (layer 0) of a process, front to back, with their
+    /// The windows of a process in the layers `AppWindow.countsLayer` accepts,
+    /// front to back, with their
     /// Spaces and whether they are shown.
     func windows(ofProcess pid: Int32) -> [AppWindow]
     /// The macOS keyboard shortcuts that are switched on, without names.
@@ -97,7 +98,8 @@ public final class SkyLightServer: SpaceServer {
         let info = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID) as? [[String: Any]] ?? []
         let ids = info.compactMap { window -> UInt32? in
             guard (window[kCGWindowOwnerPID as String] as? Int32) == pid,
-                  (window[kCGWindowLayer as String] as? Int) == 0 else { return nil }
+                  let layer = window[kCGWindowLayer as String] as? Int,
+                  AppWindow.countsLayer(layer) else { return nil }
             return (window[kCGWindowNumber as String] as? NSNumber)?.uint32Value
         }
         let attributes = SLBCopyWindowAttributes(ids.map { NSNumber(value: $0) })

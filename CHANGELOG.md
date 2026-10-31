@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- "Switch instantly with ⌘Tab": clicking an app's dialog on the current Space (Zotero's Import window) switched to the Space of the app's main window. SpaceJumper counted only normal windows (layer 0); it now also counts floating windows and dialogs (layers up to 8).
+
 ## [0.7.0] - 2026-10-29
 
 ### Added

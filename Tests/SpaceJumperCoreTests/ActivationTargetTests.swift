@@ -96,3 +96,15 @@ private func target(_ windows: [AppWindow], current: Set<UInt64> = [1, 10]) -> U
         #expect(!tracker.isChanging(current: [10, 4], at: start))
     }
 }
+
+/// Zotero's Import dialog is in layer 8 (modal panel). Clicking it on the
+/// current Space must not switch to the main window's Space.
+@Test func countsDialogsAndFloatingWindows() {
+    #expect(AppWindow.countsLayer(0))
+    #expect(AppWindow.countsLayer(3))
+    #expect(AppWindow.countsLayer(8))
+    #expect(!AppWindow.countsLayer(25))
+    #expect(!AppWindow.countsLayer(101))
+    #expect(!AppWindow.countsLayer(1000))
+    #expect(!AppWindow.countsLayer(-1))
+}
