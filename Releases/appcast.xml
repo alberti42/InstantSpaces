@@ -6,6 +6,34 @@
         <description>Updates of SpaceJumper. .github/workflows/publish-release.yml adds an item for each published release.</description>
         <language>en</language>
         <item>
+            <title>0.7.1</title>
+            <pubDate>Sat, 31 Oct 2026 16:50:01 +0000</pubDate>
+            <sparkle:version>12</sparkle:version>
+            <sparkle:shortVersionString>0.7.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <link>https://github.com/alberti42/SpaceJumper/releases/tag/v0.7.1</link>
+            <sparkle:informationalUpdate>
+                <sparkle:belowVersion>4</sparkle:belowVersion>
+            </sparkle:informationalUpdate>
+            <enclosure url="https://github.com/alberti42/SpaceJumper/releases/download/v0.7.1/SpaceJumper.zip" length="4150857" type="application/octet-stream" sparkle:edSignature="I5KoISrhhhB1XKbopMbZN27SmMoY6f2SDofOztZiv8ncLqLsADj/uDlPsDtsrKyfnBiJiNzwwRhZJsDy2HdKDg=="/>
+        
+            <description><![CDATA[
+<h3>Fixed</h3>
+<ul>
+<li>"Switch instantly with ⌘Tab": clicking an app's dialog on the current Space (Zotero's Import window) switched to the Space of the app's main window. SpaceJumper counted only normal windows (layer 0); it now also counts floating windows and dialogs (layers up to 8).</li>
+</ul>
+<h2>Changes since v0.7.0</h2>
+<ul>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/229293e">229293e</a> Version bump to v0.7.1 (build 12)</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/96f406c">96f406c</a> Count dialogs and floating windows when following an activation</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/9b526a0">9b526a0</a> Added license badge to the README.md</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/d2bad72">d2bad72</a> README: Mission Control flickers when a top hot corner opens it</li>
+<li><a href="https://github.com/alberti42/SpaceJumper/commit/f836cab">f836cab</a> Release v0.7.0 (automatic appcast update)</li>
+</ul>
+<p><strong>Full diff:</strong> https://github.com/alberti42/SpaceJumper/compare/v0.7.0...v0.7.1</p>
+            ]]></description>
+        </item>
+        <item>
             <title>0.7.0</title>
             <pubDate>Thu, 29 Oct 2026 16:11:50 +0000</pubDate>
             <sparkle:version>11</sparkle:version>
