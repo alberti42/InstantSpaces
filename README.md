@@ -4,6 +4,7 @@
 
 [![notarized download](https://img.shields.io/github/actions/workflow/status/alberti42/SpaceJumper/verify-release.yml?label=notarized%20download&logo=apple)](https://github.com/alberti42/SpaceJumper/actions/workflows/verify-release.yml)
 [![build](https://img.shields.io/github/actions/workflow/status/alberti42/SpaceJumper/build.yml?branch=main&label=build)](https://github.com/alberti42/SpaceJumper/actions/workflows/build.yml)
+[![license](https://img.shields.io/github/license/alberti42/SpaceJumper)](LICENSE)
 
 **A menu-bar app for macOS that switches between Spaces without the slide animation, or with a slide as long as you choose.**
 
